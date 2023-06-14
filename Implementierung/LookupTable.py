@@ -21,7 +21,7 @@ def approx(x):
     return m * (x-x_arr[app]) + y_arr[app]
 
 
-x = np.linspace(0, 10, 100)
+x = np.linspace(0, 100000000000, 100)
 y = np.array([math.asinh(x) for x in x])
 y_approx = np.array([approx(x) for x in x])
 y_err = np.abs(y - y_approx)/y
