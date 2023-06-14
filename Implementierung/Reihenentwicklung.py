@@ -34,21 +34,22 @@ print(math.asinh(0.5))
 # a = np.linalg.solve(f_matrix, y_arr)
 # print(a)
 
-x_arr = np.linspace(0, 10000, 100)
+x_arr = np.linspace(-1, 1, 100)
 y_arr = np.array([math.asinh(x) for x in x_arr])
 
 a = range(0, 100)
 b = range(0, 100)
 c = 1
 coeffs1 = [1.0]
-for i in range(0,7):
+for i in range(0,9):
     c = c * (a[2*i+1]/a[2*i+2]) * (-1.0)
     coeffs1.append(c/a[2*i+3])
 
 
-y_approx = np.array([sum([coeffs1[i] * math.pow(x, i) for i in range(0, len(coeffs1))]) for x in x_arr])
-plt.plot(x_arr, y_arr, label="asinh(x)", )
-plt.plot(x_arr, y_approx, label="Approximation")
+y_approx = np.array([sum([coeffs1[i] * math.pow(x, i*2 +1) for i in range(0, len(coeffs1))]) for x in x_arr])
+
+y_err = np.abs(y_arr - y_approx)
+plt.plot(x_arr, y_err, label="Fehler")
 plt.legend()
 plt.grid()
 plt.show()
