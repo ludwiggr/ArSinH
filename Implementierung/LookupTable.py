@@ -3,10 +3,18 @@ import math
 import matplotlib.pyplot as plt
 
 
-n = 1000
+n = 1023
 x_arr = np.geomspace(1, math.pow(2,n), n)
 y_arr = np.array([math.asinh(x) for x in x_arr])
-#print(y_arr)
+f = open("ylookupTable.txt", "a")
+for i in range(0, len(x_arr)):
+    f.write(str(y_arr[i]) + ",")
+f.close()
+f = open("xlookupTable.txt", "a")
+for i in range(0, len(x_arr)):
+    f.write(str(x_arr[i]) + ",")
+f.close()
+print(y_arr)
 #exit()
 
 def approx(x):
