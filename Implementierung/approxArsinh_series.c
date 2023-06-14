@@ -8,7 +8,7 @@ void printOutOfRange(){
 
 
 double approxArsinh_series(double x){
-    if(x < -1.0){
+    if(x < -1.0 || x > 1.0){
         printOutOfRange();
         return NAN;
     }
