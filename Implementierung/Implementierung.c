@@ -115,6 +115,6 @@ int main (int argc, char *argv[]) {
         fprintf(stderr, "Runtime-measurement not yet implemented\n");
         return EXIT_FAILURE;
     }
-    return 0;
+    return 1;
 }
 
