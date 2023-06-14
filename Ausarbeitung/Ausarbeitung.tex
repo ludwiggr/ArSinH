@@ -4,10 +4,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% TODO: Ersetzen Sie in den folgenden Zeilen die entsprechenden -Texte-
 %% mit den richtigen Werten.
-\newcommand{\theGroup}{IhreGruppennummer} % Beispiel: 42
-\newcommand{\theNumber}{IhreProjektnummer} % Beispiel: A123
-\author{Vorname1 Nachname1 \and Vorname2 Nachname2 \and Vorname3 Nachname3}
-\date{AktuellesSemester} % Beispiel: Wintersemester 2019/20
+\newcommand{\theGroup}{233} % Beispiel: 42
+\newcommand{\theNumber}{A316} % Beispiel: A123
+\author{Ludwig Gröber \and Julian Pins \and Daniel Safyan}
+\date{Sommersemester 2023} % Beispiel: Wintersemester 2019/20
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Diese Zeile bitte -nicht- aendern.
@@ -17,24 +17,79 @@
 \maketitle
 
 \section{Einleitung}
+\("\)In diesem einleitenden Abschnitt soll die Problemstellung eingeführt und beschrie- ben werden. Zudem muss die Aufgabenstellung analysiert und ggf. näher spezi- fiziert werden.\("\)
+\subsection{Einführung 1/2Seite}
+
+\subsection{Aufgabenstellung analysiert und spezifiziert 1/2Seite}
+Intervalle werden größer an den Rändern, weil double precision nicht so genau ist.
+Relativer Fehler bleibt gleich an jeder Stelle.
+Punktsymmetrie zum Ursprung
+ar sin h = sinh^-1
 
 
 \section{Lösungsansatz}
+\("\)Der gewählte Lösungsansatz soll klar und nachvollziehbar beschrieben und analy- siert werden. Getroffene Entscheidungen werden diskutiert und begründet, umge- setzte Optimierungen werden erläutert. Wo möglich beinhaltet dies eine Gegenüber- stellung möglicher Lösungsalternativen und Überlegungen zu möglichen weiteren Optimierungen.\("\)
+Ideen: Reihenentwicklung nicht zur Runtime, sondern zur Compiletime berechnen.
+Runge Effekt: zwischen Integralgrenzen gut angenähert, wenn mit Polynom genähert wird. -> Deshalb funktioniert die Reihenentwicklung nicht.
+Lösung: Splines über großen Bereich mit x^3 Polynom annähern. Intervall gleich verteilt. alpha x^3 + beta x^2 + gamma x + delta
+Annäherung für große Werte: x^2 + 1 = x^2
+Ableitung per Tailor-Reihe
+Idee: 1. Chilliger Lookup Table mit Interpolation 2. Splines Lookup Table
+Entwicklung als echte Reihendarstellung muss begrenzt werden im Wertebereich
 
+Reihe: Basisfunktionen + Lineares Gleichungssystem
+Lagrange Polynome
+Tailor-Reihe / Tailor Entweicklung
+
+\subsection{Naive Implementierung Reihenentwicklung ]-1/1[}
+
+\subsection{Naive Implementierung Tabellen-Lookup ]-Inf/+Inf[}
+
+\subsection{Vergleich der beiden Ansätze}
+
+\subsection{Optimierte Implementierung Reihenentwicklung ]-1/1[}
+
+\subsection{Optimierte Implementierung Tabellen-Lookup ]-Inf/+Inf[}
+Idee: Hash-Map
+
+\subsection{Implementierung mit komplexen Instruktionen}
 
 % TODO: Je nach Aufgabenstellung einen der Begriffe wählen
-\section{Korrektheit/Genauigkeit}
+\section{Genauigkeit}
+\("\)Die Korrektheit bzw. Genauigkeit (jeweils wo angemessen) der Implementierung und des Ansatzes soll gezeigt und bewertet werden. Nach Möglichkeit sind hierfür auch automatisierte Tests zu implementieren und abzugeben. Außerdem sollen sinnvolle und repräsentative Beispiele für Eingaben und die dazu berechneten Ergebnisse gezeigt werden.\("\)
+Im gegebenen Kontext ist die Genauigkeit der Lösung als die Abweichung vom funktionswert der mathematischen Funktion zu verstehen.
 
+Schönes Zitat~\cite{buch}.
 
 \section{Performanzanalyse}
+\("\)In diesem Abschnitt soll die Performanz der Implementierung analysiert und bewertet werden. Hierzu sind geeignete Methoden zu wählen, beispielsweise Zeitmessungen. Bei Zeitmessungen ist mindestens eine weitere zur Evaluierung der Implementierung geeignete Vergleichsimplementierung heranzuziehen und diese auf verschiedenen repräsentativen Eingaben auszuführen. Die Wahl der Eingaben ist zu begründen und die Messumgebung und -methodik sind genau zu spezifizieren. Die gewonnenen Ergebnisse sind zu bewerten und Ursachen für beobachtete Performanzunterschiede zu benennen.\("\)
+
+\subsection{Methodik und Annahmen 0,5Seite}
+
+\subsubsection{Zeitmesung der naiven Reihenentwicklung}
+\subsubsection{Zeitmesung des naiven Tabellen-Lookup}
+\subsubsection{Zeitmesung der optimierten Reihenentwicklung}
+\subsubsection{Zeitmesung des optimierten Tabellen-Lookup}
+
+\subsection{Zeitmessung Implementierung mit komplexen Instruktionen}
+\("\)ziehen Sie als weiteren Vergleich eine C-Implementierung unter Nutzung von komplexeren Instruktionen, die beispielsweise eine Wurzelberechnung durchführen, heran.\("\)
+
+\subsection{Bewertung und Erklärung der Ergebnisse}
+
 
 
 \section{Zusammenfassung und Ausblick}
+\("\)Neben einer kurzen Zusammenfassung des umgesetzten Projektes sollte dieser Ab- schnitt einen kurzen Ausblick enthalten. In diesem wird beurteilt, wo zusätzliches Potential für Verbesserungen existiert, ob rückblickend eine andere Lösungsalter- native besser wäre.\("\)
+Provide a summary of your work and discuss future prospects~\cite{intel2017man}.
+
+
 
 % TODO: Fuegen Sie Ihre Quellen der Datei Ausarbeitung.bib hinzu
 % Referenzieren Sie diese dann mit \cite{}.
 % Beispiel: CR2 ist ein Register der x86-Architektur~\cite{intel2017man}.
 \bibliographystyle{plain}
 \bibliography{Ausarbeitung}{}
+% Sämtliche in der Ausarbeitung verwendeten Quellen sind hier aufzuführen.
+% Es sollen nur zitierfähige Quellen verwendet werden. Wir empfehlen die Verwendung von BibTEX.
 
 \end{document}
