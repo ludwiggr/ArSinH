@@ -5,6 +5,8 @@
 #include <errno.h>
 #include <math.h>
 #include <string.h>
+#include "approxArsinh_lookup.h"
+#include "approxArsinh_series.h"
 
 static const long int numberOfImplementations= 4;     //number of possible Implementations to choose from
 static const long int maxNumberOfRepetitions= 1000;   //max number of repetitions of the function call to avoid timeout

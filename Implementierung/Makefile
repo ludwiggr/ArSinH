@@ -5,10 +5,10 @@ CC = gcc
 objects = main.c approxArsinh_lookup.c approxArsinh_series.c Implementierung.c
 
 main: $(objects)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ -lm
 
 clean:
-	rm -f main
+	rm -f main 
 
 
 
