@@ -7,6 +7,7 @@
 #include <string.h>
 #include "approxArsinh_lookup.h"
 #include "approxArsinh_series.h"
+#include <time.h>
 
 static const long int numberOfImplementations= 4;     //number of possible Implementations to choose from
 static const long int maxNumberOfRepetitions= 1000;   //max number of repetitions of the function call to avoid timeout
@@ -31,6 +32,28 @@ double approxArsinh_series2(double x){
         e+=prev;
     }
     return e;
+}
+
+double performance(unsigned int n, double x){
+    /*
+    n = number of repititions (should be at least 20)
+    x = input value
+    */
+    double sum = 0.0;
+    struct timespec start, end;
+    int c = clock_gettime(CLOCK_MONOTONIC, &start);
+    if(c == -1){
+        printf("Error: clock_gettime failed!\n");
+        return EXIT_FAILURE;
+    }
+    for (int i = 0; i < n; i++){
+        approxArsinh_series2(x);
+    }
+    c = clock_gettime(CLOCK_MONOTONIC, &end);
+    double time = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1000000000.0;
+
+    return time;
+
 }
 
 
@@ -151,7 +174,8 @@ int main (int argc, char *argv[]) {
     }
 
     else {
-        fprintf(stderr, "Runtime-measurement not yet implemented\n");
+        performance(runtime, 0.5);
+        //fprintf(stderr, "Runtime-measurement not yet implemented\n");
         return EXIT_FAILURE;
     }
 

@@ -7,7 +7,7 @@ void printOutOfRange(){
 
 
 int exponent(double d){
-    int e = (int)(d&&0x7FF0000000000000);
+    size_t e = (int)(d&&0x7FF0000000000000);
     e = e >> 52;
     e = e - 1023;
     return e;
