@@ -2,16 +2,17 @@
 CFLAGS = -O0 -g2 -Wall -Werror -Wextra -pedantic -std=c17
 CC = gcc
 
-objects = main.o approxArsinh_lookup.o approxArsinh_series.o Implementierung.o
+output = approxArsinh_lookup.o approxArsinh_series.o Implementierung.o
+tocompile = approxArsinh_lookup.c approxArsinh_lookup.h approxArsinh_series.c approxArsinh_series.h Implementierung.c
 
-main: $(objects)
+main: $(output)
 	$(CC) $(CFLAGS) -o $@ $^ -lm
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f main $(objects)
+	rm -f main $(output)
 
 
 
