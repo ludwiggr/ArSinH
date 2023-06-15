@@ -51,15 +51,19 @@ ar sin h = sinh^-1
 
 
 \section{Lösungsansatz}
-\("\)Der gewählte Lösungsansatz soll klar und nachvollziehbar beschrieben und analy- siert werden. Getroffene Entscheidungen werden diskutiert und begründet, umge- setzte Optimierungen werden erläutert. Wo möglich beinhaltet dies eine Gegenüber- stellung möglicher Lösungsalternativen und Überlegungen zu möglichen weiteren Optimierungen.\("\)
+\("\)Der gewählte Lösungsansatz soll klar und nachvollziehbar beschrieben und analy- siert werden.
+Getroffene Entscheidungen werden diskutiert und begründet, umge- setzte Optimierungen werden erläutert.
+Wo möglich beinhaltet dies eine Gegenüber- stellung möglicher Lösungsalternativen und Überlegungen zu möglichen weiteren Optimierungen.\("\)
+
 Ideen: Reihenentwicklung nicht zur Runtime, sondern zur Compiletime berechnen.
 Runge Effekt: zwischen Integralgrenzen gut angenähert, wenn mit Polynom genähert wird. -> Deshalb funktioniert die Reihenentwicklung nicht.
 Lösung: Splines über großen Bereich mit x^3 Polynom annähern. Intervall gleich verteilt. alpha x^3 + beta x^2 + gamma x + delta
 Annäherung für große Werte: x^2 + 1 = x^2
 Ableitung per Tailor-Reihe
 Idee: 1. Chilliger Lookup Table mit Interpolation 2. Splines Lookup Table
-Entwicklung als echte Reihendarstellung muss begrenzt werden im Wertebereich
+Entwicklung als echte Reihendarstellung muss begrenzt werden im Wertebereich.
 
+Grunstätzlich möglichst wenig zur Runtime berechnen.
 Reihe: Basisfunktionen + Lineares Gleichungssystem
 Lagrange Polynome
 Tailor-Reihe / Tailor Entweicklung
@@ -71,38 +75,52 @@ Tailor-Reihe / Tailor Entweicklung
 \subsection{Vergleich der beiden Ansätze}
 
 \subsection{Optimierte Implementierung Reihenentwicklung ]-1/1[}
+Complexe Instruktionen, Wurzel, Log, Exponent, SIMD?
 
 \subsection{Optimierte Implementierung Tabellen-Lookup ]-Inf/+Inf[}
 Idee: Hash-Map
 
 \subsection{Implementierung mit komplexen Instruktionen}
 
-% TODO: Je nach Aufgabenstellung einen der Begriffe wählen
-\section{Genauigkeit}
-\("\)Die Korrektheit bzw. Genauigkeit (jeweils wo angemessen) der Implementierung und des Ansatzes soll gezeigt und bewertet werden. Nach Möglichkeit sind hierfür auch automatisierte Tests zu implementieren und abzugeben. Außerdem sollen sinnvolle und repräsentative Beispiele für Eingaben und die dazu berechneten Ergebnisse gezeigt werden.\("\)
-Im gegebenen Kontext ist die Genauigkeit der Lösung als die Abweichung vom funktionswert der mathematischen Funktion zu verstehen.
 
-Schönes Zitat~\cite{buch}.
+\section{Genauigkeit}
+\("\)Die Korrektheit bzw. Genauigkeit (jeweils wo angemessen) der Implementierung und des Ansatzes
+soll gezeigt und bewertet werden.
+Nach Möglichkeit sind hierfür auch automatisierte Tests zu implementieren und abzugeben.
+Außerdem sollen sinnvolle und repräsentative Beispiele für Eingaben und die dazu berechneten Ergebnisse gezeigt werden.\("\)
+
+Im gegebenen Kontext ist die Genauigkeit der Lösung als die Abweichung vom funktionswert der mathematisch definierten Funktion zu verstehen.
 
 \section{Performanzanalyse}
-\("\)In diesem Abschnitt soll die Performanz der Implementierung analysiert und bewertet werden. Hierzu sind geeignete Methoden zu wählen, beispielsweise Zeitmessungen. Bei Zeitmessungen ist mindestens eine weitere zur Evaluierung der Implementierung geeignete Vergleichsimplementierung heranzuziehen und diese auf verschiedenen repräsentativen Eingaben auszuführen. Die Wahl der Eingaben ist zu begründen und die Messumgebung und -methodik sind genau zu spezifizieren. Die gewonnenen Ergebnisse sind zu bewerten und Ursachen für beobachtete Performanzunterschiede zu benennen.\("\)
+\("\)In diesem Abschnitt soll die Performanz der Implementierung analysiert und bewertet werden.
+Hierzu sind geeignete Methoden zu wählen, beispielsweise Zeitmessungen.
+Bei Zeitmessungen ist mindestens eine weitere zur Evaluierung der Implementierung geeignete Vergleichsimplementierung
+heranzuziehen und diese auf verschiedenen repräsentativen Eingaben auszuführen.
+Die Wahl der Eingaben ist zu begründen und die Messumgebung und -methodik sind genau zu spezifizieren.
+Die gewonnenen Ergebnisse sind zu bewerten und Ursachen für beobachtete Performanzunterschiede zu benennen.\("\)
 
 \subsection{Methodik und Annahmen 0,5Seite}
 
 \subsubsection{Zeitmesung der naiven Reihenentwicklung}
-\subsubsection{Zeitmesung des naiven Tabellen-Lookup}
-\subsubsection{Zeitmesung der optimierten Reihenentwicklung}
-\subsubsection{Zeitmesung des optimierten Tabellen-Lookup}
 
-\subsection{Zeitmessung Implementierung mit komplexen Instruktionen}
+\subsubsection{Zeitmesung des naiven Tabellen-Lookup}
+
+\subsubsection{Zeitmesung der optimierten Reihenentwicklung}
 \("\)ziehen Sie als weiteren Vergleich eine C-Implementierung unter Nutzung von komplexeren Instruktionen, die beispielsweise eine Wurzelberechnung durchführen, heran.\("\)
 
-\subsection{Bewertung und Erklärung der Ergebnisse}
+\subsubsection{Zeitmesung des optimierten Tabellen-Lookup}
+\("\)ziehen Sie als weiteren Vergleich eine C-Implementierung unter Nutzung von komplexeren Instruktionen, die beispielsweise eine Wurzelberechnung durchführen, heran.\("\)
+
+
+\subsection{Bewertung, Einordnung und Erklärung der Ergebnisse}
 
 
 
 \section{Zusammenfassung und Ausblick}
-\("\)Neben einer kurzen Zusammenfassung des umgesetzten Projektes sollte dieser Ab- schnitt einen kurzen Ausblick enthalten. In diesem wird beurteilt, wo zusätzliches Potential für Verbesserungen existiert, ob rückblickend eine andere Lösungsalter- native besser wäre.\("\)
+\("\)Neben einer kurzen Zusammenfassung des umgesetzten Projektes sollte dieser Abschnitt einen kurzen Ausblick enthalten.
+In diesem wird beurteilt, wo zusätzliches Potential für Verbesserungen existiert, ob rückblickend eine andere
+Lösungsalternative besser wäre.\("\)
+
 Provide a summary of your work and discuss future prospects~\cite{intel2017man}.
 
 
