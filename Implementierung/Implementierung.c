@@ -205,7 +205,7 @@ int main (int argc, char *argv[]) {
 
     else {
         double time = performance(runtime, 0.5, implementation);
-        printf("The runtime %ld iterations of the function was %f seconds.\n",runtime, time);
+        printf("The accumilated runtime of %ld iterations of implementation number %ld was %f seconds.\n",runtime, implementation, time);
         //fprintf(stderr, "Runtime-measurement not yet implemented\n");
     }
 
