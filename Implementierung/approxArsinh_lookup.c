@@ -19,7 +19,7 @@ double approxArsinh_lookup(double x){
     if(x < 0){
         return -approxArsinh_lookup(-x);
     }
-    unsigned int exp = exponent(x);
+    int exp = exponent(x);
     //check if is nan or inf
     if(exp == 1024){
         return NAN;
