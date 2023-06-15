@@ -1,11 +1,6 @@
 
 #include "approxArsinh_lookup.h"
 
-void printOutOfRange(){
-    printf("Error: Input out of range!\nTry using the lookup table implementation instead.\n");
-}
-
-
 int exponent(double d){
     size_t e = (int)(d&&0x7FF0000000000000);
     e = e >> 52;

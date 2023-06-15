@@ -16,8 +16,7 @@ static const size_t iterations= 30;                   //iterations of series cal
 void help(void){                            //prints options and use cases of the program
     printf("When parsing a negative number, make sure to use a double dash beforhand. \nElse it will be interpreted as a flags.\n");
 }
-double approxArsinh_series(double x);
-double approxArsinh_lookup(double x);
+
 double approxArsinh_predefined(double x){
     return log(x+sqrt(x*x+1));
 }
@@ -38,14 +37,14 @@ double performance(unsigned int n, double x, int implentation){
     /*
     n = number of repititions (should be at least 20)
     x = input value
-    implementation = 0: series ; 1: lookup table
+    implementation = 1: series ; 0: lookup table
     */
     double sum = 0.0;
     struct timespec start, end;
     int c;
     switch (implentation)
     {
-    case 0:
+    case 1:
         c = clock_gettime(CLOCK_MONOTONIC, &start);
         if(c == -1){
             printf("Error: clock_gettime failed!\n");
@@ -60,7 +59,7 @@ double performance(unsigned int n, double x, int implentation){
             return EXIT_FAILURE;
         }
         break;
-    case 1:
+    case 0:
         c = clock_gettime(CLOCK_MONOTONIC, &start);
         if(c == -1){
             printf("Error: clock_gettime failed!\n");
