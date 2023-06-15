@@ -8,7 +8,7 @@
 
 static const long int numberOfImplementations= 4;     //number of possible Implementations to choose from
 static const long int maxNumberOfRepetitions= 1000;   //max number of repetitions of the function call to avoid timeout
-static const size_t iterations= 30;
+static const size_t iterations= 30;                   //iterations of series calculations
 
 void help(void){                            //prints options and use cases of the program
     printf("When parsing a negative number, make sure to use a double dash beforhand. \nElse it will be interpreted as a flags.\n");
