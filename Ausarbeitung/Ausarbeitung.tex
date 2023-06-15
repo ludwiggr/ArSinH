@@ -14,122 +14,120 @@
 \title{Gruppe \theGroup{} -- Abgabe zu Aufgabe \theNumber}
 
 \begin{document}
-\maketitle
-
-\section{Einleitung}
-\("\)In diesem einleitenden Abschnitt soll die Problemstellung eingeführt und beschrie- ben werden.
-Zudem muss die Aufgabenstellung analysiert und ggf. näher spezi- fiziert werden.\("\)\n
-\subsection{Einführung 1/2Seite}
-Die gestellte Aufgabe verlangt die Implementierung der Funktion f(x)=arsinh(x) im C17 Standard von C.
+    \maketitle
 
 
-Ebenso sollen gefundene Lösungen wissenschaftlich bewertet werden.
-Die Funktion area sinus hyperbolicus ist die Umkehrfunktion des sinus hyperbolicus.
-Die Gruppe der hyperbolischen Funktionen wird für die Hankel-Transformation~\cite{hankel},
-bei der Lösung bestimmter Differenzialgleichungen~\cite{differenzial}, bei der Beschreibung von Katenoiden~\cite{katenoid}
-sowie für die zeitliche Entwicklung der Ausdehnung des Universums~\cite{katenoid} benötigt.
+    \section{Einleitung}
+    \("\)In diesem einleitenden Abschnitt soll die Problemstellung eingeführt und beschrie- ben werden.
+    Zudem muss die Aufgabenstellung analysiert und ggf. näher spezi- fiziert werden.\("\)\n
+
+    \subsection{Einführung 1/2Seite}
+    Die gestellte Aufgabe verlangt die Implementierung der Funktion f(x)=arsinh(x) im C17 Standard von C.
 
 
-\subsection{Aufgabenstellung analysiert und spezifiziert 1/2Seite}
-Der area sinus hyperbolicus kann über den Logarithmus oder über ein Integral definiert werden.
+    Ebenso sollen gefundene Lösungen wissenschaftlich bewertet werden.
+    Die Funktion area sinus hyperbolicus ist die Umkehrfunktion des sinus hyperbolicus.
+    Die Gruppe der hyperbolischen Funktionen wird für die Hankel-Transformation~\cite{hankel},
+    bei der Lösung bestimmter Differenzialgleichungen~\cite{differenzial}, bei der Beschreibung von Katenoiden~\cite{katenoid}
+    sowie für die zeitliche Entwicklung der Ausdehnung des Universums~\cite{katenoid} benötigt.
 
-\operatorname{arsinh}(x) = \ln \left(x + \sqrt{x^2 + 1} \right) mit \, x \in R
+    \subsection{Aufgabenstellung analysiert und spezifiziert 1/2Seite}
+    Der area sinus hyperbolicus kann über den Logarithmus oder über ein Integral definiert werden.
 
-
-\operatorname{arsinh}(x) = \int\_{0}^{1} \frac{x}{\sqrt{x^2 y^2 + 1}} \,\mathrm{d}y mit \, x \in R
-
-
-
-Der arsinh ist im Bereich \infty < x < + \infty \, definiert.
-Im Limit kann er durch die Funktion f(x)\to \pm \ln(2|x|) angenähert werden.
-Ebenso ist als besondere mathematische Eigenschaft die Punktsymmetrie zum Ursprung (0,0) zu erwähnen.
-
-Intervalle werden größer an den Rändern, weil double precision nicht so genau ist.
-Relativer Fehler bleibt gleich an jeder Stelle.
-Punktsymmetrie zum Ursprung
-ar sin h = sinh^-1
+    \operatorname{arsinh}(x) = \ln \left(x + \sqrt{x^2 + 1} \right) mit \, x \in R
 
 
-\section{Lösungsansatz}
-\("\)Der gewählte Lösungsansatz soll klar und nachvollziehbar beschrieben und analy- siert werden.
-Getroffene Entscheidungen werden diskutiert und begründet, umge- setzte Optimierungen werden erläutert.
-Wo möglich beinhaltet dies eine Gegenüber- stellung möglicher Lösungsalternativen und Überlegungen zu möglichen weiteren Optimierungen.\("\)
-
-Ideen: Reihenentwicklung nicht zur Runtime, sondern zur Compiletime berechnen.
-Runge Effekt: zwischen Integralgrenzen gut angenähert, wenn mit Polynom genähert wird. -> Deshalb funktioniert die Reihenentwicklung nicht.
-Lösung: Splines über großen Bereich mit x^3 Polynom annähern. Intervall gleich verteilt. alpha x^3 + beta x^2 + gamma x + delta
-Annäherung für große Werte: x^2 + 1 = x^2
-Ableitung per Tailor-Reihe
-Idee: 1. Chilliger Lookup Table mit Interpolation 2. Splines Lookup Table
-Entwicklung als echte Reihendarstellung muss begrenzt werden im Wertebereich.
-
-Grunstätzlich möglichst wenig zur Runtime berechnen.
-Reihe: Basisfunktionen + Lineares Gleichungssystem
-Lagrange Polynome
-Tailor-Reihe / Tailor Entweicklung
-
-\subsection{Naive Implementierung Reihenentwicklung ]-1/1[}
-
-\subsection{Naive Implementierung Tabellen-Lookup ]-Inf/+Inf[}
-
-\subsection{Vergleich der beiden Ansätze}
-
-\subsection{Optimierte Implementierung Reihenentwicklung ]-1/1[}
-Complexe Instruktionen, Wurzel, Log, Exponent, SIMD?
-
-\subsection{Optimierte Implementierung Tabellen-Lookup ]-Inf/+Inf[}
-Idee: Hash-Map
-
-\subsection{Implementierung mit komplexen Instruktionen}
+    \operatorname{arsinh}(x) = \int\_{0}^{1} \frac{x}{\sqrt{x^2 y^2 + 1}} \,\mathrm{d}y mit \, x \in R
 
 
-\section{Genauigkeit}
-\("\)Die Korrektheit bzw. Genauigkeit (jeweils wo angemessen) der Implementierung und des Ansatzes
-soll gezeigt und bewertet werden.
-Nach Möglichkeit sind hierfür auch automatisierte Tests zu implementieren und abzugeben.
-Außerdem sollen sinnvolle und repräsentative Beispiele für Eingaben und die dazu berechneten Ergebnisse gezeigt werden.\("\)
+    Der arsinh ist im Bereich \infty < x < + \infty \, definiert.
+    Im Limit kann er durch die Funktion f(x)\to \pm \ln(2|x|) angenähert werden.
+    Ebenso ist als besondere mathematische Eigenschaft die Punktsymmetrie zum Ursprung (0,0) zu erwähnen.
 
-Im gegebenen Kontext ist die Genauigkeit der Lösung als die Abweichung vom funktionswert der mathematisch definierten Funktion zu verstehen.
-
-\section{Performanzanalyse}
-\("\)In diesem Abschnitt soll die Performanz der Implementierung analysiert und bewertet werden.
-Hierzu sind geeignete Methoden zu wählen, beispielsweise Zeitmessungen.
-Bei Zeitmessungen ist mindestens eine weitere zur Evaluierung der Implementierung geeignete Vergleichsimplementierung
-heranzuziehen und diese auf verschiedenen repräsentativen Eingaben auszuführen.
-Die Wahl der Eingaben ist zu begründen und die Messumgebung und -methodik sind genau zu spezifizieren.
-Die gewonnenen Ergebnisse sind zu bewerten und Ursachen für beobachtete Performanzunterschiede zu benennen.\("\)
-
-\subsection{Methodik und Annahmen 0,5Seite}
-
-\subsubsection{Zeitmesung der naiven Reihenentwicklung}
-
-\subsubsection{Zeitmesung des naiven Tabellen-Lookup}
-
-\subsubsection{Zeitmesung der optimierten Reihenentwicklung}
-\("\)ziehen Sie als weiteren Vergleich eine C-Implementierung unter Nutzung von komplexeren Instruktionen, die beispielsweise eine Wurzelberechnung durchführen, heran.\("\)
-
-\subsubsection{Zeitmesung des optimierten Tabellen-Lookup}
-\("\)ziehen Sie als weiteren Vergleich eine C-Implementierung unter Nutzung von komplexeren Instruktionen, die beispielsweise eine Wurzelberechnung durchführen, heran.\("\)
+    Intervalle werden größer an den Rändern, weil double precision nicht so genau ist.
+    Relativer Fehler bleibt gleich an jeder Stelle.
+    Punktsymmetrie zum Ursprung
+    ar sin h = sinh^-1
 
 
-\subsection{Bewertung, Einordnung und Erklärung der Ergebnisse}
+    \section{Lösungsansatz}
+    \("\)Der gewählte Lösungsansatz soll klar und nachvollziehbar beschrieben und analy- siert werden.
+    Getroffene Entscheidungen werden diskutiert und begründet, umge- setzte Optimierungen werden erläutert.
+    Wo möglich beinhaltet dies eine Gegenüber- stellung möglicher Lösungsalternativen und Überlegungen zu möglichen weiteren Optimierungen.\("\)
+
+    Ideen: Reihenentwicklung nicht zur Runtime, sondern zur Compiletime berechnen.
+    Runge Effekt: zwischen Integralgrenzen gut angenähert, wenn mit Polynom genähert wird. -> Deshalb funktioniert die Reihenentwicklung nicht.
+    Lösung: Splines über großen Bereich mit x^3 Polynom annähern. Intervall gleich verteilt. alpha x^3 + beta x^2 + gamma x + delta
+    Annäherung für große Werte: x^2 + 1 = x^2
+    Ableitung per Tailor-Reihe
+    Idee: 1. Chilliger Lookup Table mit Interpolation 2. Splines Lookup Table
+    Entwicklung als echte Reihendarstellung muss begrenzt werden im Wertebereich.
+
+    Grunstätzlich möglichst wenig zur Runtime berechnen.
+    Reihe: Basisfunktionen + Lineares Gleichungssystem
+    Lagrange Polynome
+    Tailor-Reihe / Tailor Entweicklung
+
+    \subsection{Naive Implementierung Reihenentwicklung ]-1/1[}
+
+    \subsection{Naive Implementierung Tabellen-Lookup ]-Inf/+Inf[}
+
+    \subsection{Vergleich der beiden Ansätze}
+
+    \subsection{Optimierte Implementierung Reihenentwicklung ]-1/1[}
+    Complexe Instruktionen, Wurzel, Log, Exponent, SIMD?
+
+    \subsection{Optimierte Implementierung Tabellen-Lookup ]-Inf/+Inf[}
+    Idee: Hash-Map
+
+    \subsection{Implementierung mit komplexen Instruktionen}
 
 
+    \section{Genauigkeit}
+    \("\)Die Korrektheit bzw. Genauigkeit (jeweils wo angemessen) der Implementierung und des Ansatzes
+    soll gezeigt und bewertet werden.
+    Nach Möglichkeit sind hierfür auch automatisierte Tests zu implementieren und abzugeben.
+    Außerdem sollen sinnvolle und repräsentative Beispiele für Eingaben und die dazu berechneten Ergebnisse gezeigt werden.\("\)
 
-\section{Zusammenfassung und Ausblick}
-\("\)Neben einer kurzen Zusammenfassung des umgesetzten Projektes sollte dieser Abschnitt einen kurzen Ausblick enthalten.
-In diesem wird beurteilt, wo zusätzliches Potential für Verbesserungen existiert, ob rückblickend eine andere
-Lösungsalternative besser wäre.\("\)
+    Im gegebenen Kontext ist die Genauigkeit der Lösung als die Abweichung vom funktionswert der mathematisch definierten Funktion zu verstehen.
 
-Provide a summary of your work and discuss future prospects~\cite{intel2017man}.
 
+    \section{Performanzanalyse}
+    \("\)In diesem Abschnitt soll die Performanz der Implementierung analysiert und bewertet werden.
+    Hierzu sind geeignete Methoden zu wählen, beispielsweise Zeitmessungen.
+    Bei Zeitmessungen ist mindestens eine weitere zur Evaluierung der Implementierung geeignete Vergleichsimplementierung
+    heranzuziehen und diese auf verschiedenen repräsentativen Eingaben auszuführen.
+    Die Wahl der Eingaben ist zu begründen und die Messumgebung und -methodik sind genau zu spezifizieren.
+    Die gewonnenen Ergebnisse sind zu bewerten und Ursachen für beobachtete Performanzunterschiede zu benennen.\("\)
+
+    \subsection{Methodik und Annahmen 0,5Seite}
+
+    \subsubsection{Zeitmesung der naiven Reihenentwicklung}
+
+    \subsubsection{Zeitmesung des naiven Tabellen-Lookup}
+
+    \subsubsection{Zeitmesung der optimierten Reihenentwicklung}
+    \("\)ziehen Sie als weiteren Vergleich eine C-Implementierung unter Nutzung von komplexeren Instruktionen, die beispielsweise eine Wurzelberechnung durchführen, heran.\("\)
+
+    \subsubsection{Zeitmesung des optimierten Tabellen-Lookup}
+    \("\)ziehen Sie als weiteren Vergleich eine C-Implementierung unter Nutzung von komplexeren Instruktionen, die beispielsweise eine Wurzelberechnung durchführen, heran.\("\)
+
+    \subsection{Bewertung, Einordnung und Erklärung der Ergebnisse}
+
+
+    \section{Zusammenfassung und Ausblick}
+    \("\)Neben einer kurzen Zusammenfassung des umgesetzten Projektes sollte dieser Abschnitt einen kurzen Ausblick enthalten.
+    In diesem wird beurteilt, wo zusätzliches Potential für Verbesserungen existiert, ob rückblickend eine andere
+    Lösungsalternative besser wäre.\("\)
+
+    Provide a summary of your work and discuss future prospects~\cite{intel2017man}.
 
 
 % TODO: Fuegen Sie Ihre Quellen der Datei Ausarbeitung.bib hinzu
 % Referenzieren Sie diese dann mit \cite{}.
 % Beispiel: CR2 ist ein Register der x86-Architektur~\cite{intel2017man}.
-\bibliographystyle{plain}
-\bibliography{Ausarbeitung}{}
+    \bibliographystyle{plain}
+    \bibliography{Ausarbeitung}{}
 % Sämtliche in der Ausarbeitung verwendeten Quellen sind hier aufzuführen.
 % Es sollen nur zitierfähige Quellen verwendet werden. Wir empfehlen die Verwendung von BibTEX.
 

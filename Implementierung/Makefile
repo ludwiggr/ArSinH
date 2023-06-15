@@ -2,13 +2,16 @@
 CFLAGS = -O0 -g2 -Wall -Werror -Wextra -pedantic -std=c17
 CC = gcc
 
-objects = main.c approxArsinh_lookup.c approxArsinh_lookup.h approxArsinh_series.c approxArsinh_series.h Implementierung.c
+objects = main.o approxArsinh_lookup.o approxArsinh_series.o Implementierung.o
 
 main: $(objects)
 	$(CC) $(CFLAGS) -o $@ $^ -lm -lrt
 
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
 clean:
-	rm -f main 
+	rm -f main $(objects)
 
 
 
