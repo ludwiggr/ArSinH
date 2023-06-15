@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include "approxArsinh_lookup.h"
 
 void printOutOfRange(){
     printf("Error: Input out of range!\nTry using the lookup table implementation instead.\n");
