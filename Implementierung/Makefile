@@ -5,7 +5,7 @@ CC = gcc
 objects = main.o approxArsinh_lookup.o approxArsinh_series.o Implementierung.o
 
 main: $(objects)
-	$(CC) $(CFLAGS) -o $@ $^ -lm -lrt
+	$(CC) $(CFLAGS) -o $@ $^ -lm
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<

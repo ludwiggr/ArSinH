@@ -23,9 +23,6 @@ double approxArsinh_lookup(double x);
 
 double approxArsinh_predefined(double x) {
     return log(x + sqrt(x * x + 1));
-
-double approxArsinh_predefined(double x){
-    return log(x+sqrt(x*x+1));
 }
 
 double approxArsinh_series2(double x) {
@@ -40,9 +37,9 @@ double approxArsinh_series2(double x) {
     }
     return e;
 }
-void relative_error(double x, int implementation){
+double relative_error(double x, int implementation){
     double exact = approxArsinh_predefined(x);
-    double approx;
+    double approx = 0.0;
     switch(implementation){
         case 0:
             approx = approxArsinh_series(x);
@@ -52,6 +49,7 @@ void relative_error(double x, int implementation){
             break;
         default:
             printf("Error: Implementation not found!\n");
+            return -1;
             break;
     }
     return fabs((approx-exact)/exact);
@@ -63,7 +61,6 @@ double performance(unsigned int n, double x, int implentation) {
     x = input value
     implementation = 1: series ; 0: lookup table
     */
-    double sum = 0.0;
     struct timespec start, end;
     int c;
     switch (implentation)
@@ -112,7 +109,6 @@ double performance(unsigned int n, double x, int implentation) {
 
 
 int main(int argc, char *argv[]) {
-    const char *progname = argv[0];
 
     long int implementation = 0;          //choose Implementation
     long int runtime = 0;                 //if B-flag this sets numbers of executions for runtime measurement
