@@ -16,8 +16,8 @@ static const size_t iterations= 30;                   //iterations of series cal
 void help(void){                            //prints options and use cases of the program
     printf("When parsing a negative number, make sure to use a double dash beforhand. \nElse it will be interpreted as a flags.\n");
 }
-double approxArsinh_series(double x){return x;}
-double approxArsinh_lookup(double x){return x;}
+double approxArsinh_series(double x);
+double approxArsinh_lookup(double x);
 double approxArsinh_predefined(double x){
     return log(x+sqrt(x*x+1));
 }
@@ -34,24 +34,55 @@ double approxArsinh_series2(double x){
     return e;
 }
 
-double performance(unsigned int n, double x){
+double performance(unsigned int n, double x, int implentation){
     /*
     n = number of repititions (should be at least 20)
     x = input value
+    implementation = 0: series ; 1: lookup table
     */
     double sum = 0.0;
     struct timespec start, end;
-    int c = clock_gettime(CLOCK_MONOTONIC, &start);
-    if(c == -1){
-        printf("Error: clock_gettime failed!\n");
-        return EXIT_FAILURE;
-    }
-    for (int i = 0; i < n; i++){
-        approxArsinh_series2(x);
-    }
-    c = clock_gettime(CLOCK_MONOTONIC, &end);
-    double time = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1000000000.0;
+    int c;
+    switch (implentation)
+    {
+    case 0:
+        c = clock_gettime(CLOCK_MONOTONIC, &start);
+        if(c == -1){
+            printf("Error: clock_gettime failed!\n");
+            return EXIT_FAILURE;
+        }
+        for(unsigned int i = 0; i<n; i++){
+            approxArsinh_series(x);
+        }
+        c = clock_gettime(CLOCK_MONOTONIC, &end);
+        if(c == -1){
+            printf("Error: clock_gettime failed!\n");
+            return EXIT_FAILURE;
+        }
+        break;
+    case 1:
+        c = clock_gettime(CLOCK_MONOTONIC, &start);
+        if(c == -1){
+            printf("Error: clock_gettime failed!\n");
+            return EXIT_FAILURE;
+        }
+        for(unsigned int i = 0; i<n; i++){
+            approxArsinh_lookup(x);
+        }
+        c = clock_gettime(CLOCK_MONOTONIC, &end);
+        if(c == -1){
+            printf("Error: clock_gettime failed!\n");
+            return EXIT_FAILURE;
+        }
+        break;
 
+    default:
+        printf("Error: Implementation not found!\n");
+        break;
+    }
+    
+
+    double time = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1000000000.0;
     return time;
 
 }
@@ -174,9 +205,9 @@ int main (int argc, char *argv[]) {
     }
 
     else {
-        performance(runtime, 0.5);
+        double time = performance(runtime, 0.5, implementation);
+        printf("The runtime %ld iterations of the function was %f seconds.\n",runtime, time);
         //fprintf(stderr, "Runtime-measurement not yet implemented\n");
-        return EXIT_FAILURE;
     }
 
 
