@@ -8,15 +8,13 @@ print(math.asinh(0.5))
 # a = 0.0
 # for i in range(1, n):
 #     b.append(math.pow(2,i))
-    
+
 # for i in b:
 #     try:
 #         a = math.asinh(i)
 #     except Exception as e:
 #         print("Overflow bei i = ", i)
 #         break
-
-
 
 
 # genauigkeit n (anzahl an stützstellen)
@@ -41,12 +39,11 @@ a = range(0, 100)
 b = range(0, 100)
 c = 1
 coeffs1 = [1.0]
-for i in range(0,9):
-    c = c * (a[2*i+1]/a[2*i+2]) * (-1.0)
-    coeffs1.append(c/a[2*i+3])
+for i in range(0, 9):
+    c = c * (a[2 * i + 1] / a[2 * i + 2]) * (-1.0)
+    coeffs1.append(c / a[2 * i + 3])
 
-
-y_approx = np.array([sum([coeffs1[i] * math.pow(x, i*2 +1) for i in range(0, len(coeffs1))]) for x in x_arr])
+y_approx = np.array([sum([coeffs1[i] * math.pow(x, i * 2 + 1) for i in range(0, len(coeffs1))]) for x in x_arr])
 
 y_err = np.abs(y_arr - y_approx)
 plt.plot(x_arr, y_err, label="Fehler")

@@ -37,10 +37,11 @@ double approxArsinh_series2(double x) {
     }
     return e;
 }
-double relative_error(double x, int implementation){
+
+double relative_error(double x, int implementation) {
     double exact = approxArsinh_predefined(x);
     double approx = 0.0;
-    switch(implementation){
+    switch (implementation) {
         case 0:
             approx = approxArsinh_series(x);
             break;
@@ -52,7 +53,7 @@ double relative_error(double x, int implementation){
             return -1;
             break;
     }
-    return fabs((approx-exact)/exact);
+    return fabs((approx - exact) / exact);
 }
 
 double performance(unsigned int n, double x, int implentation) {
@@ -63,53 +64,52 @@ double performance(unsigned int n, double x, int implentation) {
     */
     struct timespec start, end;
     int c;
-    switch (implentation)
-    {
-    case 1:
-        c = clock_gettime(CLOCK_MONOTONIC, &start);
-        if(c == -1){
-            printf("Error: clock_gettime failed!\n");
-            return EXIT_FAILURE;
-        }
-        for(unsigned int i = 0; i<n; i++){
-            approxArsinh_series(x);
-        }
-        c = clock_gettime(CLOCK_MONOTONIC, &end);
-        if(c == -1){
-            printf("Error: clock_gettime failed!\n");
-            return EXIT_FAILURE;
-        }
-        break;
-    case 0:
-        c = clock_gettime(CLOCK_MONOTONIC, &start);
-        if(c == -1){
-            printf("Error: clock_gettime failed!\n");
-            return EXIT_FAILURE;
-        }
-        for(unsigned int i = 0; i<n; i++){
-            approxArsinh_lookup(x);
-        }
-        c = clock_gettime(CLOCK_MONOTONIC, &end);
-        if(c == -1){
-            printf("Error: clock_gettime failed!\n");
-            return EXIT_FAILURE;
-        }
-        break;
-    case 2:
-        c = clock_gettime(CLOCK_MONOTONIC, &start);
-        if(c == -1){
-            printf("Error: clock_gettime failed!\n");
-            return EXIT_FAILURE;
-        }
-        for(unsigned int i = 0; i<n; i++){
-            approxArsinh_predefined(x);
-        }
-        c = clock_gettime(CLOCK_MONOTONIC, &end);
-        if(c == -1){
-            printf("Error: clock_gettime failed!\n");
-            return EXIT_FAILURE;
-        }
-        break;
+    switch (implentation) {
+        case 1:
+            c = clock_gettime(CLOCK_MONOTONIC, &start);
+            if (c == -1) {
+                printf("Error: clock_gettime failed!\n");
+                return EXIT_FAILURE;
+            }
+            for (unsigned int i = 0; i < n; i++) {
+                approxArsinh_series(x);
+            }
+            c = clock_gettime(CLOCK_MONOTONIC, &end);
+            if (c == -1) {
+                printf("Error: clock_gettime failed!\n");
+                return EXIT_FAILURE;
+            }
+            break;
+        case 0:
+            c = clock_gettime(CLOCK_MONOTONIC, &start);
+            if (c == -1) {
+                printf("Error: clock_gettime failed!\n");
+                return EXIT_FAILURE;
+            }
+            for (unsigned int i = 0; i < n; i++) {
+                approxArsinh_lookup(x);
+            }
+            c = clock_gettime(CLOCK_MONOTONIC, &end);
+            if (c == -1) {
+                printf("Error: clock_gettime failed!\n");
+                return EXIT_FAILURE;
+            }
+            break;
+        case 2:
+            c = clock_gettime(CLOCK_MONOTONIC, &start);
+            if (c == -1) {
+                printf("Error: clock_gettime failed!\n");
+                return EXIT_FAILURE;
+            }
+            for (unsigned int i = 0; i < n; i++) {
+                approxArsinh_predefined(x);
+            }
+            c = clock_gettime(CLOCK_MONOTONIC, &end);
+            if (c == -1) {
+                printf("Error: clock_gettime failed!\n");
+                return EXIT_FAILURE;
+            }
+            break;
 
         default:
             printf("Error: Implementation not found!\n");
@@ -243,7 +243,8 @@ int main(int argc, char *argv[]) {
         }
     } else {
         double time = performance(iterations, 0.5, implementation);
-        printf("The accumilated runtime of %ld iterations of implementation number %ld was %f seconds.\n",iterations, implementation, time);
+        printf("The accumilated runtime of %ld iterations of implementation number %ld was %f seconds.\n", iterations,
+               implementation, time);
         //fprintf(stderr, "Runtime-measurement not yet implemented\n");
     }
 
