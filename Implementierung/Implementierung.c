@@ -32,6 +32,22 @@ double approxArsinh_series2(double x){
     }
     return e;
 }
+void relative_error(double x, int implementation){
+    double exact = approxArsinh_predefined(x);
+    double approx;
+    switch(implementation){
+        case 0:
+            approx = approxArsinh_series(x);
+            break;
+        case 1:
+            approx = approxArsinh_lookup(x);
+            break;
+        default:
+            printf("Error: Implementation not found!\n");
+            break;
+    }
+    return fabs((approx-exact)/exact);
+}
 
 double performance(unsigned int n, double x, int implentation){
     /*
