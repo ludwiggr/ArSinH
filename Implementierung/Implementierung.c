@@ -91,6 +91,7 @@ int main (int argc, char *argv[]) {
                 return EXIT_FAILURE;
         }
     }
+    
     if(optind != argc) {
         number = strtod(argv[optind], &endptr);
         if(endptr == argv[optind] || *endptr != '\0') {
@@ -116,9 +117,6 @@ int main (int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    //printf("Implementation has value: %li\n", implementation);
-    //printf("Runtime has value: %li\n", runtime);
-    //printf("number has value: %f\n", number);
     double result;
     if(runtime==0){
         switch(implementation){
@@ -149,10 +147,13 @@ int main (int argc, char *argv[]) {
                 return EXIT_FAILURE;
         }
     }
+
     else {
         fprintf(stderr, "Runtime-measurement not yet implemented\n");
         return EXIT_FAILURE;
     }
+
+
     return 0;
 }
 
