@@ -59,7 +59,7 @@ double performance(unsigned int n, double x, int implentation) {
     /*
     n = number of repititions (should be at least 20)
     x = input value
-    implementation = 1: series ; 0: lookup table
+    implementation = 1: series ; 0: lookup table ; 2: impl with complex functions
     */
     struct timespec start, end;
     int c;
@@ -95,6 +95,21 @@ double performance(unsigned int n, double x, int implentation) {
             return EXIT_FAILURE;
         }
         break;
+    case 2:
+        c = clock_gettime(CLOCK_MONOTONIC, &start);
+        if(c == -1){
+            printf("Error: clock_gettime failed!\n");
+            return EXIT_FAILURE;
+        }
+        for(unsigned int i = 0; i<n; i++){
+            approxArsinh_predefined(x);
+        }
+        c = clock_gettime(CLOCK_MONOTONIC, &end);
+        if(c == -1){
+            printf("Error: clock_gettime failed!\n");
+            return EXIT_FAILURE;
+        }
+        break;
 
         default:
             printf("Error: Implementation not found!\n");
@@ -110,9 +125,9 @@ double performance(unsigned int n, double x, int implentation) {
 
 int main(int argc, char *argv[]) {
 
-    long int implementation = 0;          //choose Implementation
-    long int runtime = 0;                 //if B-flag this sets numbers of executions for runtime measurement
-    double number = 0.;                 //x
+    long int implementation = 0;          // := choose Implementation
+    long int iterations = 0;              // := if B-flag this sets numbers of iterations for runtime measurement
+    double number = 0.;                   // := input value
 
     errno = 0;
     char *endptr;
@@ -134,7 +149,7 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case 'B':
-                runtime = strtol(optarg, &endptr, 10);
+                iterations = strtol(optarg, &endptr, 10);
                 if (endptr == optarg || *endptr != '\0') {
                     fprintf(stderr, "%s could not be converted to long.\nArgument may only contain digits 0-9\n",
                             optarg);
@@ -190,15 +205,15 @@ int main(int argc, char *argv[]) {
                 implementation, numberOfImplementations - 1);
         return EXIT_FAILURE;
     }
-    if (runtime < 0 || runtime > maxNumberOfRepetitions) {
+    if (iterations < 0 || iterations > maxNumberOfRepetitions) {
         fprintf(stderr,
                 "%li is not a valid number of repetitions of the function call.\nChoose a value between 1 and %li.\n",
-                runtime, maxNumberOfRepetitions);
+                iterations, maxNumberOfRepetitions);
         return EXIT_FAILURE;
     }
 
     double result;
-    if (runtime == 0) {
+    if (iterations == 0) {
         switch (implementation) {
             case 0:
                 result = approxArsinh_lookup(number);
@@ -227,8 +242,8 @@ int main(int argc, char *argv[]) {
                 return EXIT_FAILURE;
         }
     } else {
-        double time = performance(runtime, 0.5, implementation);
-        printf("The accumilated runtime of %ld iterations of implementation number %ld was %f seconds.\n",runtime, implementation, time);
+        double time = performance(iterations, 0.5, implementation);
+        printf("The accumilated runtime of %ld iterations of implementation number %ld was %f seconds.\n",iterations, implementation, time);
         //fprintf(stderr, "Runtime-measurement not yet implemented\n");
     }
 

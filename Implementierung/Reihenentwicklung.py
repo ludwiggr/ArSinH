@@ -19,7 +19,7 @@ print(math.asinh(0.5))
 
 
 
-#genauigkeit n (anzahl an stützstellen)
+# genauigkeit n (anzahl an stützstellen)
 
 # y_arr = np.array([math.asinh(x) for x in x_arr])
 
