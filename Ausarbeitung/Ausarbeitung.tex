@@ -17,10 +17,33 @@
 \maketitle
 
 \section{Einleitung}
-\("\)In diesem einleitenden Abschnitt soll die Problemstellung eingeführt und beschrie- ben werden. Zudem muss die Aufgabenstellung analysiert und ggf. näher spezi- fiziert werden.\("\)
+\("\)In diesem einleitenden Abschnitt soll die Problemstellung eingeführt und beschrie- ben werden.
+Zudem muss die Aufgabenstellung analysiert und ggf. näher spezi- fiziert werden.\("\)\n
 \subsection{Einführung 1/2Seite}
+Die gestellte Aufgabe verlangt die Implementierung der Funktion f(x)=arsinh(x) im C17 Standard von C.
+
+
+Ebenso sollen gefundene Lösungen wissenschaftlich bewertet werden.
+Die Funktion area sinus hyperbolicus ist die Umkehrfunktion des sinus hyperbolicus.
+Die Gruppe der hyperbolischen Funktionen wird für die Hankel-Transformation~\cite{hankel},
+bei der Lösung bestimmter Differenzialgleichungen~\cite{differenzial}, bei der Beschreibung von Katenoiden~\cite{katenoid}
+sowie für die zeitliche Entwicklung der Ausdehnung des Universums~\cite{katenoid} benötigt.
+
 
 \subsection{Aufgabenstellung analysiert und spezifiziert 1/2Seite}
+Der area sinus hyperbolicus kann über den Logarithmus oder über ein Integral definiert werden.
+
+\operatorname{arsinh}(x) = \ln \left(x + \sqrt{x^2 + 1} \right) mit \, x \in R
+
+
+\operatorname{arsinh}(x) = \int\_{0}^{1} \frac{x}{\sqrt{x^2 y^2 + 1}} \,\mathrm{d}y mit \, x \in R
+
+
+
+Der arsinh ist im Bereich \infty < x < + \infty \, definiert.
+Im Limit kann er durch die Funktion f(x)\to \pm \ln(2|x|) angenähert werden.
+Ebenso ist als besondere mathematische Eigenschaft die Punktsymmetrie zum Ursprung (0,0) zu erwähnen.
+
 Intervalle werden größer an den Rändern, weil double precision nicht so genau ist.
 Relativer Fehler bleibt gleich an jeder Stelle.
 Punktsymmetrie zum Ursprung
