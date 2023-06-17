@@ -9,6 +9,8 @@
 #include "approxArsinh_series.h"
 #include <time.h>
 
+//Kommentar Ludwig: Double ist implementierungs-/ architekturabhängig: Die genauen Eigenschaften und Wertebereiche auf der benutzten Architektur können über die Headerdatei <float.h> ermittelt werden.
+
 static const long int numberOfImplementations = 4;     //number of possible Implementations to choose from
 static const long int maxNumberOfRepetitions = 1000;   //max number of repetitions of the function call to avoid timeout
 static const size_t iterations = 30;                   //iterations of series calculations
@@ -123,6 +125,9 @@ double performance(unsigned int n, double x, int implentation) {
 }
 
 
+//Ludwig: Beachten Sie ebenfalls, dass Ihr Rahmenprogramm etwaige Randfälle korrekt abfangen muss und im Falle eines
+// Fehlers mit einer aussagekräftigen Fehlermeldung auf stderr und einer kurzen Erläuterung zur Benutzung terminieren sollte.
+// TODO: Sie dürfen weitere Optionen implementieren, beispielsweise um vordefinierte Testfälle zu verwenden.
 int main(int argc, char *argv[]) {
 
     long int implementation = 0;          // := choose Implementation
