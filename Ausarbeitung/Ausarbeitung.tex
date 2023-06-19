@@ -21,8 +21,6 @@
 
 
     \section{Einleitung}
-    \("\)In diesem einleitenden Abschnitt soll die Problemstellung eingeführt und beschrieben werden.
-    Zudem muss die Aufgabenstellung analysiert und ggf. näher spezi- fiziert werden.\("\)\n
     Die gegebene Aufgabenstellung A316 verlangt die Implementierung der Funktion f(x)=arsinh(x) im C17 Standard von C.
     Wie die angewandte Methodik und der mathematische Lösungsansatz aussieht, wird im Folgenden beschrieben.
 
@@ -37,7 +35,7 @@
 
 
     %Motivation
-    Die Gruppe der hyperbolischen Funktionen wird für die Hankel-Transformation~\cite{hankel},
+    Die Gruppe der hyperbolischen Funktionen wird für die Hankel-Transformation~\cite{hankel} ,
     bei der Lösung bestimmter Differenzialgleichungen~\cite{differenzial}, bei der Beschreibung von Katenoiden~\cite{katenoid}
     sowie in den Friedmann-Gleichungen für die zeitliche Entwicklung der Ausdehnung des Universums~\cite{universum1,universum2}~ benötigt.
     Für diese üblicherweise rechenintensiven Anwendungen ist eine effiziente und genaue Implementierung aller dafür verwendeten Funktionen essenziell um Gesamtergebnisse effizient erzielen zu können.
@@ -134,9 +132,6 @@
 
 
     \section{Lösungsansatz}
-    \("\)Der gewählte Lösungsansatz soll klar und nachvollziehbar beschrieben und analy- siert werden.
-    Getroffene Entscheidungen werden diskutiert und begründet, umge- setzte Optimierungen werden erläutert.
-    Wo möglich beinhaltet dies eine Gegenüber- stellung möglicher Lösungsalternativen und Überlegungen zu möglichen weiteren Optimierungen.\("\)
 
     % Theoretischer Teil
     Leiten Sie mathematisch zwei Möglichkeiten her, die Funktion zu berechnen.
@@ -171,43 +166,42 @@
 
 
     \section{Genauigkeit}
-    \("\)Die Korrektheit bzw. Genauigkeit (jeweils wo angemessen) der Implementierung und des Ansatzes
-    soll gezeigt und bewertet werden.
-    Nach Möglichkeit sind hierfür auch automatisierte Tests zu implementieren und abzugeben.
-    Außerdem sollen sinnvolle und repräsentative Beispiele für Eingaben und die dazu berechneten Ergebnisse gezeigt werden.\("\)
-
-    Im gegebenen Kontext ist die Genauigkeit der Lösung als die Abweichung vom funktionswert der mathematisch definierten Funktion zu verstehen.
+    Im gegebenen Kontext ist die Genauigkeit der Lösung als die Abweichung der Implementierung $(4)$ vom Funktionswert der mathematisch definierten Funktion $(1)$ zu verstehen.
 
 
     \section{Performanzanalyse}
-    \("\)In diesem Abschnitt soll die Performanz der Implementierung analysiert und bewertet werden.
-    Hierzu sind geeignete Methoden zu wählen, beispielsweise Zeitmessungen.
-    Bei Zeitmessungen ist mindestens eine weitere zur Evaluierung der Implementierung geeignete Vergleichsimplementierung
-    heranzuziehen und diese auf verschiedenen repräsentativen Eingaben auszuführen.
-    Die Wahl der Eingaben ist zu begründen und die Messumgebung und -methodik sind genau zu spezifizieren.
-    Die gewonnenen Ergebnisse sind zu bewerten und Ursachen für beobachtete Performanzunterschiede zu benennen.\("\)
+    Die Performanz der Implementierungen wird anhand der Laufzeit gemessen.
+    Die Laufzeit ist mit der Libaray $time.h$ gemessen worden.
+    Hierbei sind einige Dinge vorab zu definieren.
 
     \subsection{Methodik und Annahmen 0,5Seite}
+    Um optimale Vergleichbarkeit der Ergebnisse sicher zu stellen, versuchen wir eine möglichst exklusive nutzung der Maschine sicher zu stellen.
+    Hierfür wurden alle nicht für das jeweilige Betriebssystem nötigen Prozesse beendet, alle Programme geschlossen, die Maschine an das Stromnetz angeschlossen und die Kühlung manuell auf die höchste Stufe gesetzt.
+    Dies soll Performanceänderungen aufgrund von Überhitzung bei mehrfacher Ausführung vermeiden.
+    Um einen stabilen Mittelwert zu erzielen, wird jede Implementierung mindestens 10 mal ausgeführt, nähere Angaben dazu sind der jeweiligen Messung zu entnehmen.
+
+    Alle Performaztests werden auf folgender Maschine ausgeführt: Name: ____ Prozessor: ____ Takt: ____ Multicore/SingleCore Speicher: ____ Betriebssystem: _____ Compiler: ____ Version: ____ Comilerflags: siehe Makefile
+
+    Die Tests werden mit den Eingaben ____ ausgeführt und ____ mal wiederholt.
+
+    Da es sich in der Aufgabe um eine numerische Berechnung handelt, erwarten wir bei den Performanztests lediglich Algorithmisch bedingte Abweichungen, welche durch die Laufzeitklassen beschrieben werden könnten.
+    Implementierung $A$: $O(7)$
+    Implementierung $B$: $O(1)$
+    Implementierung $C$: $O(1)$
 
     \subsubsection{Zeitmesung der naiven Reihenentwicklung}
 
     \subsubsection{Zeitmesung des naiven Tabellen-Lookup}
 
-    \subsubsection{Zeitmesung der optimierten Reihenentwicklung}
-    \("\)ziehen Sie als weiteren Vergleich eine C-Implementierung unter Nutzung von komplexeren Instruktionen, die beispielsweise eine Wurzelberechnung durchführen, heran.\("\)
-
     \subsubsection{Zeitmesung des optimierten Tabellen-Lookup}
-    \("\)ziehen Sie als weiteren Vergleich eine C-Implementierung unter Nutzung von komplexeren Instruktionen, die beispielsweise eine Wurzelberechnung durchführen, heran.\("\)
+    ziehen Sie als weiteren Vergleich eine C-Implementierung unter Nutzung von komplexeren Instruktionen, die beispielsweise eine Wurzelberechnung durchführen, heran.
 
     \subsection{Bewertung, Einordnung und Erklärung der Ergebnisse}
 
 
     \section{Zusammenfassung und Ausblick}
-    \("\)Neben einer kurzen Zusammenfassung des umgesetzten Projektes sollte dieser Abschnitt einen kurzen Ausblick enthalten.
-    In diesem wird beurteilt, wo zusätzliches Potential für Verbesserungen existiert, ob rückblickend eine andere
-    Lösungsalternative besser wäre.\("\)
     Die Wahl des Datentyp $double$ bietet eine einfache Möglichkeit zur Erhöhung der Genauigkeit oder zur Verkleinerung des Speicherverbrauchs.
-    Gemäß IEEE 754~\cite{StandardforBinaryFloating-PointArithmetic} könnte auch die einfache oder vierfache Genauigkeit der
+    Gemäß IEEE 754 ~\cite{StandardforBinaryFloating} könnte auch die einfache oder vierfache Genauigkeit der
     Fließkommaarithmetik gewählt werden, wodurch sich die Genauigkeit auf $23*\log10(2) \approx 6,92$ dezimale Nachkommastellen
     bzw. $112*\log10(2) \approx 33,72$ dezimale Nachkommastellen respektive verändern würde.
     Der Speicherverbrauch würde sich bei einfacher Genauigkeit von 64 bit auf 32 bit halbieren, bei vierfacher Genauigkeit von 64bit auf 128bit verdoppeln.
