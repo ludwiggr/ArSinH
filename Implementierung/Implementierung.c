@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
+#include <getopt.h>
 #include <stddef.h>
 #include <errno.h>
 #include <math.h>
@@ -137,8 +138,12 @@ int main(int argc, char *argv[]) {
     errno = 0;
     char *endptr;
     int opt;
-
-    while ((opt = getopt(argc, argv, "V:B:h:-:")) != -1) {
+    int option_index = 0;
+    struct option long_options[] = {
+        {"help", no_argument, NULL, 'h'},
+        {NULL, 0, NULL, 0}
+    };
+    while ((opt = getopt_long(argc, argv, "V:B:h:", long_options, &option_index)) != -1) {
         switch (opt) {
             case 'V':
                 implementation = strtol(optarg, &endptr, 10);
@@ -169,14 +174,6 @@ int main(int argc, char *argv[]) {
             case 'h'  :
                 help();
                 return EXIT_SUCCESS;
-            case '-'  :
-                if (strcmp(optarg, "help") == 0) {
-                    help();
-                    return EXIT_SUCCESS;
-                } else {
-                    fprintf(stderr, "Unknown Option --\n");
-                    return EXIT_FAILURE;
-                }
             case '?':
                 if (optopt == 'V' || optopt == 'B')
                     fprintf(stderr, "Options -V and -B require an Argument\n");
