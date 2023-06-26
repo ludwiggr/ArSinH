@@ -13,7 +13,7 @@
 //Kommentar Ludwig: Double ist implementierungs-/ architekturabhängig: Die genauen Eigenschaften und Wertebereiche auf der benutzten Architektur können über die Headerdatei <float.h> ermittelt werden.
 
 static const long int numberOfImplementations = 4;     //number of possible Implementations to choose from
-static const long int maxNumberOfRepetitions = 1000;   //max number of repetitions of the function call to avoid timeout
+static const long int maxNumberOfRepetitions = 1000000;   //max number of repetitions of the function call to avoid timeout
 static const size_t iterations = 30;                   //iterations of series calculations
 
 void help(void) {                            //prints options and use cases of the program
