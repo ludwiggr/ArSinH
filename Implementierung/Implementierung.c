@@ -1,6 +1,6 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <getopt.h>
 #include <stddef.h>
 #include <errno.h>
@@ -17,7 +17,32 @@ static const long int maxNumberOfRepetitions = 1000000;   //max number of repeti
 static const size_t iterations = 30;                   //iterations of series calculations
 
 void help(void) {                            //prints options and use cases of the program
-    printf("When parsing a negative number, make sure to use a double dash beforhand. \nElse it will be interpreted as a flags.\n");
+    printf( "-----------------------------------------------------------------------------------------------\n"
+            "| Help Desk -- Options and Use Cases Of the Program.                                          |\n"
+            "| This program calculates the arsinh(x), which is equal to ln(x + sqrt(x^2 + 1))              |\n"
+            "|                                                                                             |\n"
+            "| You can parse the value x at any point within the program arguments.                        |\n"
+            "| The program will only calculate the result for the first number, that is parsed.            |\n"
+            "| When parsing a negative number, make sure to place it after the options and use a           |\n"
+            "| double dash beforhand.Else it will be interpreted as an option.                             |\n"
+            "| If no valid number is entered, the program will calculate arsinh(0).                        |\n"
+            "|                                                                                             |\n"
+            "| You can choose between different implementations using the -V option.                       |\n"
+            "| You have the following options: (the default implementation is 0)                           |\n"
+            "| - 0: LookUp-Table: this approximates the arsinh(x) using a logarithmic lookup-table.        |\n"
+            "|      this approximation is significantly faster than the series approximation, but also more|\n"
+            "|      inaccurate, since all values in between two values in the lookup-table can only be     |\n"
+            "|      estimated linearly.                                                                    |\n"
+            "| - 1: Series-Approximation: this uses two different series approximations for the intervals  |\n"
+            "|      |x|<1 and |x|>1. Both approximations use a variation of the Taylor series.             |\n"
+            "|      The number of iterations and runtime is much higher for values of x, close to 1.       |\n"
+            "| - 2: Pre-Build Functions: this approximation uses the predefined functions log and sqrt     |\n"
+            "|      from the math-library to calculate the arsinh(x).                                      |\n"
+            "|                                                                                             |\n"
+            "| You can use the Option -B to run a runtime analysis.                                        |\n"
+            "| It requires your wanted number of iterations of the function as an argument and will return |\n"
+            "| the total time, the program took for the calculation.                                       |\n"
+            "-----------------------------------------------------------------------------------------------\n");
 }
 
 double approxArsinh_series(double x);
@@ -61,7 +86,7 @@ double relative_error(double x, int implementation) {
 
 double performance(unsigned int n, double x, int implentation) {
     /*
-    n = number of repititions (should be at least 20)
+    n = number of repetitions (should be at least 20)
     x = input value
     implementation = 1: series ; 0: lookup table ; 2: impl with complex functions
     */
@@ -143,7 +168,7 @@ int main(int argc, char *argv[]) {
         {"help", no_argument, NULL, 'h'},
         {NULL, 0, NULL, 0}
     };
-    while ((opt = getopt_long(argc, argv, "V:B:h:", long_options, &option_index)) != -1) {
+    while ((opt = getopt_long(argc, argv, "V:B:h", long_options, &option_index)) != -1) {
         switch (opt) {
             case 'V':
                 implementation = strtol(optarg, &endptr, 10);
