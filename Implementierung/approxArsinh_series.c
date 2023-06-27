@@ -1,5 +1,5 @@
 #include "approxArsinh_lookup.h"
-
+#include <string.h>
 
 #define LOG_TWO log(2.0)
 
@@ -9,7 +9,8 @@ void printOutOfRange(void) {
 
 double approxXBelowOne(double x) {      //this is the regular Series for |x|<1 
     signed long long mask = 0x7FF0000000000000;
-    signed long long xToBit = *(unsigned long long*)&x;
+    signed long long xToBit;
+    memcpy(&xToBit, &x, 8);
     signed long long exp = ((xToBit & mask) >> 52) -1022; //subtract bias, but add one for the calculation of relevant iterations
     size_t iterations = exp<0 ? ((52 / -exp +1) / 2) : 52 + ((xToBit & 0xFFFFFFFFFFFFF) >> 36);  
     //52/-exp is the highest power of x that will not be completely canceled when being added to x
@@ -43,10 +44,12 @@ double approxLnTaylor(double x) {  //this is the Tayler Series for ln x around 1
 
 double approxLn(double x) {       //converts ln(x) to ln(x'*2^n) = ln(x')+n*ln(2) so that the Taylor series can be applied to x
     signed long long mask = 0x7FF0000000000000;        //
-    signed long long xToBit = *(signed long long*) &x;
+    signed long long xToBit;
+    memcpy(&xToBit, &x, 8);
     signed long long exp = ((xToBit & mask) >> 52) -1023;
     signed long long xLowerTwo = (xToBit & 0xBFFFFFFFFFFFFFFF) | 0x3FF0000000000000;
-    double xNew = *(double*) &xLowerTwo;
+    double xNew;
+    memcpy(&xNew, &xLowerTwo, 8);
     if(xNew > 1.3333333333333333){  //this ensures, that x is as close to 1 as possible
         xNew /= 2;                  //so the result is more accurate
         exp++;
@@ -56,7 +59,8 @@ double approxLn(double x) {       //converts ln(x) to ln(x'*2^n) = ln(x')+n*ln(2
 
 double approxAsymptoticExpansionRest(double x) {   
     signed long long mask = 0x7FF0000000000000;
-    signed long long xToBit = *(signed long long*)&x;
+    signed long long xToBit;
+    memcpy(&xToBit, &x, 8);
     signed long long exp = ((xToBit & mask) >> 52) - 1023;
     size_t iterations = exp>0 ? 52 / (2*exp) : 52 + (0x10000-((xToBit & 0xFFFFFFFFFFFFF) >> 36));
     //52/exp is the highest power of x that will not be completely canceled when being added to x

@@ -1,12 +1,12 @@
 # Comiler flags
-CFLAGS = -O0 -g2 -Wall -Werror -Wextra -pedantic -std=c17 -D_POSIX_C_SOURCE=200809L
+CFLAGS = -O3 -g2 -Wall -Werror -Wextra -pedantic -std=c17 -D_POSIX_C_SOURCE=200809L
 # Compiler
 CC = gcc
 # Libraries
 LIBRARYS = -lm
 
 # The resulting executable files to be created
-output = approxArsinh_lookup.o approxArsinh_series.o Implementierung.o
+output = approxArsinh_lookup.o approxArsinh_lookup2.o approxArsinh_series.o Implementierung.o
 
 # The command 'make' will execute the first target entry (this) in the file
 Implementierung: $(output)

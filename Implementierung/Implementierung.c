@@ -7,6 +7,7 @@
 #include <math.h>
 #include <string.h>
 #include "approxArsinh_lookup.h"
+#include "approxArsinh_lookup2.h"
 #include "approxArsinh_series.h"
 #include <time.h>
 
@@ -48,6 +49,8 @@ double approxArsinh_series(double x);
 
 double approxArsinh_lookup(double x);
 
+double approxArsinh_lookup2(double x);
+
 double approxArsinh_predefined(double x) {
     if(x>1e16){
         return log(2)+log(x);
@@ -58,7 +61,7 @@ double approxArsinh_predefined(double x) {
 double calculate_result(double x, int implementation){  //just calculates the result and returns the double
     switch (implementation) {
         case 0:
-            return approxArsinh_lookup(x);
+            return approxArsinh_lookup2(x);
             break;
         case 1:
             return approxArsinh_series(x);
@@ -77,7 +80,7 @@ double relative_error(double x, int implementation) {      //returns the relativ
     double approx = 0.0;
     switch (implementation) {
         case 0:
-            approx = approxArsinh_lookup(x);
+            approx = approxArsinh_lookup2(x);
             break;
         case 1:
             approx = approxArsinh_series(x);
@@ -90,7 +93,7 @@ double relative_error(double x, int implementation) {      //returns the relativ
             return -1;
             break;
     }
-    return fabs((approx - exact) / exact);
+    return fabs(approx - exact); // exact;
 }
 
 double performance(unsigned int n, double x, int implementation) {
@@ -255,7 +258,7 @@ int main(int argc, char *argv[]) {
 
     if (relativeError==0 && iterations == 0) {
         double result = calculate_result(number, implementation);
-        printf("Calculating arsinh(%f) with implementation number %li results in %f.\n", number, implementation, result);
+        printf("Calculating arsinh(%f) with implementation number %li results in %.*f.\n", number, implementation, 15, result);
         return EXIT_SUCCESS;
     }
     else if(relativeError == 1){
