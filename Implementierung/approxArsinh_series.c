@@ -11,7 +11,7 @@ double approxXBelowOne(double x) {      //this is the regular Series for |x|<1
     signed long long mask = 0x7FF0000000000000;
     signed long long xToBit = *(unsigned long long*)&x;
     signed long long exp = ((xToBit & mask) >> 52) -1022; //subtract bias, but add one for the calculation of relevant iterations
-    size_t iterations = exp<0 ? ((52 / -exp +1) / 2) : 52 + ((xToBit & 0xFFFFFFFFFFFFF) >> 40);  
+    size_t iterations = exp<0 ? ((52 / -exp +1) / 2) : 52 + ((xToBit & 0xFFFFFFFFFFFFF) >> 36);  
     //52/-exp is the highest power of x that will not be completely canceled when being added to x
     //the lower the exponent of x is the fewer iterations you need, because x^n will converge to 0 way faster
     //for x close to 1 we need a lot of iterations, because the terms further down the series still influence the endresult
@@ -45,7 +45,7 @@ double approxLn(double x) {       //converts ln(x) to ln(x'*2^n) = ln(x')+n*ln(2
     signed long long mask = 0x7FF0000000000000;        //
     signed long long xToBit = *(signed long long*) &x;
     signed long long exp = ((xToBit & mask) >> 52) -1023;
-    signed long long xLowerTwo = xToBit & 0xBFFFFFFFFFFFFFFF| 0x3FF0000000000000;
+    signed long long xLowerTwo = (xToBit & 0xBFFFFFFFFFFFFFFF) | 0x3FF0000000000000;
     double xNew = *(double*) &xLowerTwo;
     if(xNew > 1.3333333333333333){  //this ensures, that x is as close to 1 as possible
         xNew /= 2;                  //so the result is more accurate
@@ -58,7 +58,7 @@ double approxAsymptoticExpansionRest(double x) {
     signed long long mask = 0x7FF0000000000000;
     signed long long xToBit = *(signed long long*)&x;
     signed long long exp = ((xToBit & mask) >> 52) - 1023;
-    size_t iterations = exp>0 ? 52 / (2*exp) : 52 + (0x1000-((xToBit & 0xFFFFFFFFFFFFF) >> 40));
+    size_t iterations = exp>0 ? 52 / (2*exp) : 52 + (0x10000-((xToBit & 0xFFFFFFFFFFFFF) >> 36));
     //52/exp is the highest power of x that will not be completely canceled when being added to x
     //for x close to 1 we need a lot of iterations, because the terms further down the series still influence the endresult
     //we set the maximum number of iterations to ca. 4150, which gives us a definite accuracy of the result of 20 bit
@@ -74,7 +74,7 @@ double approxAsymptoticExpansionRest(double x) {
         prev *= ((double) num / (double) den) * minusInvSqr;
         sum += prev;
     }
-    return (double) iterations;
+    return sum;
 }
 
 double approxArsinh_series(double x) {
@@ -82,8 +82,7 @@ double approxArsinh_series(double x) {
         return x;
     }
     else if(x >= 1){
-        return approxAsymptoticExpansionRest(x);
-        //return LOG_TWO + approxLn(x) + approxAsymptoticExpansionRest(x);
+        return LOG_TWO + approxLn(x) + approxAsymptoticExpansionRest(x);
     }
     else if(x>=0){
         return approxXBelowOne(x);
