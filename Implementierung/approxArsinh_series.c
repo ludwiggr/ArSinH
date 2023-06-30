@@ -1,4 +1,4 @@
-#include "approxArsinh_lookup.h"
+#include "approxArsinh_series.h"
 #include <string.h>
 
 #define LOG_TWO log(2.0)
@@ -8,24 +8,22 @@ void printOutOfRange(void) {
 }
 
 double approxXBelowOne(double x) {      //this is the regular Series for |x|<1 
-    signed long long mask = 0x7FF0000000000000;
-    signed long long xToBit;
-    memcpy(&xToBit, &x, 8);
-    signed long long exp = ((xToBit & mask) >> 52) -1022; //subtract bias, but add one for the calculation of relevant iterations
-    size_t iterations = exp<0 ? ((52 / -exp +1) / 2) : 26; 
+    //signed long long mask = 0x7FF0000000000000;
+    //signed long long xToBit;
+    //memcpy(&xToBit, &x, 8);
+    //signed long long exp = ((xToBit & mask) >> 52) -1022; //subtract bias, but add one for the calculation of relevant iterations
+    size_t iterations = 26;//exp<0 ? ((52 / -exp +1) / 2) : 26; 
     //52/-exp is the highest power of x that will not be completely canceled when being added to x
     //the lower the exponent of x is the fewer iterations you need, because x^n will converge to 0 way faster
     //for x close to 1 we need a lot of iterations, because the terms further down the series still influence the endresult
     //with >>40 we set the maximum number of iterations to 2^12, else it would be 2^52
     //with a maximum of 4150 iterations we get a guaranteed accuracy of the result of 20 bit
-    double sum = x;
+    double sum = 0;
     double prev = x;
-    double minusSqrt = -x * x;
-    for (size_t k = 1; k < iterations; k++) {
-        size_t num = (2 * k - 1) * (2 * k - 1);
-        size_t den = (2 * k) * (2 * k + 1);
-        prev = prev * (double) num * minusSqrt / (double) den;
-        sum += prev;
+    double Sqr = x * x;
+    for (size_t k = 0; k <= iterations; k++) {
+        sum += prev * coeffs_below[k];
+        prev *= Sqr;
     }
     return sum;
 }
@@ -33,13 +31,13 @@ double approxXBelowOne(double x) {      //this is the regular Series for |x|<1
 double approxLnTaylor(double x) {  //this is the Tayler Series for ln x around 1 (applicable for 0<x<2)
     double fak = x-1;               //it's more accurate, the closer the number is to 1
     double prev = fak;
-    double sum = fak;
-    size_t iterations = 10;     //Since -0.33<=fak<=0.33, after at most 33 iterations of the series, the terms ^don't matter for the end result,
-    for(size_t k = 2; k <= iterations; k++){    // due to floating point cancellation (0,33^33 < 2^-52)
+    double sum = 0;
+    size_t iterations = 20;     //Since -0.33<=fak<=0.33, after at most 33 iterations of the series, the terms ^don't matter for the end result,
+    for(size_t k = 0; k <= iterations; k++){    // due to floating point cancellation (0,33^33 < 2^-52)
+        sum += prev * coeffs_taylor[k];
         prev *= fak;
-        sum += prev * tab[k];
     }
-    return -sum;
+    return sum;
 }
 
 double approxLn(double x) {       //converts ln(x) to ln(x'*2^n) = ln(x')+n*ln(2) so that the Taylor series can be applied to x
@@ -58,25 +56,23 @@ double approxLn(double x) {       //converts ln(x) to ln(x'*2^n) = ln(x')+n*ln(2
 }
 
 double approxAsymptoticExpansionRest(double x) {   
-    signed long long mask = 0x7FF0000000000000;
-    signed long long xToBit;
-    memcpy(&xToBit, &x, 8);
-    signed long long exp = ((xToBit & mask) >> 52) - 1023;
-    size_t iterations = exp>0 ? 52 / (2*exp) : 26;
+    //signed long long mask = 0x7FF0000000000000;
+    //signed long long xToBit;
+    //memcpy(&xToBit, &x, 8);
+    //signed long long exp = ((xToBit & mask) >> 52) - 1023;
+    size_t iterations = 26; //exp>0 ? 52 / (2*exp) : 26;
     //52/exp is the highest power of x that will not be completely canceled when being added to x
     //for x close to 1 we need a lot of iterations, because the terms further down the series still influence the endresult
     //we set the maximum number of iterations to ca. 4150, which gives us a definite accuracy of the result of 20 bit
     if(iterations==0){                        //if x > ca. 10^8, arsinh(x) can be approximated with ln(2x), therefore this rest is 0
         return 0.;
     }
-    double minusInvSqr = -1.0/(x*x);
-    double prev = minusInvSqr / (-4);
-    double sum = prev;
-    for(size_t k = 2; k <= iterations; k++){
-        size_t num = (2 * k - 1) * (2 * k - 2);
-        size_t den = 4 * k * k;
-        prev *= ((double) num / (double) den) * minusInvSqr;
-        sum += prev;
+    double InvSqr = 1.0/(x*x);
+    double prev = InvSqr;
+    double sum = 0;
+    for(size_t k = 0; k < iterations; k++){
+        sum += prev * coeffs_rest[k];
+        prev*=InvSqr;
     }
     return sum;
 }

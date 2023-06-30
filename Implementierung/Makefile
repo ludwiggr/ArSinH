@@ -1,5 +1,5 @@
 # Comiler flags
-CFLAGS = -O0 -g2 -Wall -Werror -Wextra -pedantic -std=c17 -D_POSIX_C_SOURCE=200809L
+CFLAGS = -O3 -g2 -Wall -Werror -Wextra -pedantic -std=c17 -D_POSIX_C_SOURCE=200809L
 # Compiler
 CC = gcc
 # Libraries
