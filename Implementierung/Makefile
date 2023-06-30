@@ -19,7 +19,7 @@ Implementierung: $(output)
 # will run regardless of whether a file named clean exists or what it's contents are
 .PHONY: clean
 clean:
-	rm -f main $(output)
+	rm -f main $(output) Implementierung
 
 # Source/Reference: https://www.gnu.org/software/make/manual/make.html
 # Source/Reference: https://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
