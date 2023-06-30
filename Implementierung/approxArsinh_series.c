@@ -12,7 +12,7 @@ double approxXBelowOne(double x) {      //this is the regular Series for |x|<1
     //signed long long xToBit;
     //memcpy(&xToBit, &x, 8);
     //signed long long exp = ((xToBit & mask) >> 52) -1022; //subtract bias, but add one for the calculation of relevant iterations
-    size_t iterations = 20;//exp<0 ? ((52 / -exp +1) / 2) : 26; 
+    size_t iterations = 18;//exp<0 ? ((52 / -exp +1) / 2) : 26; 
     //52/-exp is the highest power of x that will not be completely canceled when being added to x
     //the lower the exponent of x is the fewer iterations you need, because x^n will converge to 0 way faster
     //for x close to 1 we need a lot of iterations, because the terms further down the series still influence the endresult
