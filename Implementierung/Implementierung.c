@@ -7,7 +7,6 @@
 #include <math.h>
 #include <string.h>
 #include "approxArsinh_lookup.h"
-#include "approxArsinh_lookup2.h"
 #include "approxArsinh_series.h"
 #include <time.h>
 
@@ -49,7 +48,6 @@ double approxArsinh_series(double x);
 
 double approxArsinh_lookup(double x);
 
-double approxArsinh_lookup2(double x);
 
 double approxArsinh_predefined(double x) {
     if(x>1e16){
@@ -61,7 +59,7 @@ double approxArsinh_predefined(double x) {
 double calculate_result(double x, int implementation){  //just calculates the result and returns the double
     switch (implementation) {
         case 0:
-            return approxArsinh_lookup2(x);
+            return approxArsinh_lookup(x);
             break;
         case 1:
             return approxArsinh_series(x);
@@ -80,7 +78,7 @@ double relative_error(double x, int implementation) {      //returns the relativ
     double approx = 0.0;
     switch (implementation) {
         case 0:
-            approx = approxArsinh_lookup2(x);
+            approx = approxArsinh_lookup(x);
             break;
         case 1:
             approx = approxArsinh_series(x);
