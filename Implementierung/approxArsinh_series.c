@@ -12,7 +12,7 @@ double approxXBelowOne(double x) {      //this is the regular Series for |x|<1
     signed long long xToBit;
     memcpy(&xToBit, &x, 8);
     signed long long exp = ((xToBit & mask) >> 52) -1022; //subtract bias, but add one for the calculation of relevant iterations
-    size_t iterations = exp<0 ? ((52 / -exp +1) / 2) : 52 + ((xToBit & 0xFFFFFFFFFFFFF) >> 36);  
+    size_t iterations = exp<0 ? ((52 / -exp +1) / 2) : 52;  
     //52/-exp is the highest power of x that will not be completely canceled when being added to x
     //the lower the exponent of x is the fewer iterations you need, because x^n will converge to 0 way faster
     //for x close to 1 we need a lot of iterations, because the terms further down the series still influence the endresult
@@ -62,7 +62,7 @@ double approxAsymptoticExpansionRest(double x) {
     signed long long xToBit;
     memcpy(&xToBit, &x, 8);
     signed long long exp = ((xToBit & mask) >> 52) - 1023;
-    size_t iterations = exp>0 ? 52 / (2*exp) : 52 + (0x10000-((xToBit & 0xFFFFFFFFFFFFF) >> 36));
+    size_t iterations = exp>0 ? 52 / (2*exp) : 52;
     //52/exp is the highest power of x that will not be completely canceled when being added to x
     //for x close to 1 we need a lot of iterations, because the terms further down the series still influence the endresult
     //we set the maximum number of iterations to ca. 4150, which gives us a definite accuracy of the result of 20 bit
