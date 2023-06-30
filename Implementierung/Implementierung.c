@@ -98,7 +98,7 @@ double relative_error(double x, int implementation) {      //returns the relativ
 
 double performance(unsigned int n, double x, int implementation) {
     /*
-    n = number of repetitions in multiples of 100
+    n = number of repetitions in multiples of 10000
     x = input value
     implementation =  0: lookup table ; 1: series ; 2: impl with complex functions
     */
@@ -107,7 +107,7 @@ double performance(unsigned int n, double x, int implementation) {
     switch (implementation) {
         case 0:
             c1 = clock_gettime(CLOCK_MONOTONIC, &start);
-            for (unsigned int i = 0; i < n*100; i++) {
+            for (unsigned int i = 0; i < n*10000; i++) {
                 approxArsinh_lookup(x);
             }
             c2 = clock_gettime(CLOCK_MONOTONIC, &end);
@@ -122,7 +122,7 @@ double performance(unsigned int n, double x, int implementation) {
             break;
         case 1:
             c1 = clock_gettime(CLOCK_MONOTONIC, &start);
-            for (unsigned int i = 0; i < n*100; i++) {
+            for (unsigned int i = 0; i < n*10000; i++) {
                 approxArsinh_series(x);
             }
             c2 = clock_gettime(CLOCK_MONOTONIC, &end);
@@ -139,7 +139,7 @@ double performance(unsigned int n, double x, int implementation) {
 
         case 2:
             c1 = clock_gettime(CLOCK_MONOTONIC, &start);
-            for (unsigned int i = 0; i < n; i++) {
+            for (unsigned int i = 0; i < n*10000; i++) {
                 approxArsinh_predefined(x);
             }
             c2 = clock_gettime(CLOCK_MONOTONIC, &end);
