@@ -1,7 +1,4 @@
-import numpy as np
 import math
-import matplotlib.pyplot as plt
-
 
 #coefficients for ln approx series
 c_ln = []
