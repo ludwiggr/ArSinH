@@ -93,17 +93,17 @@ double relative_error(double x, int implementation) {      //returns the relativ
             return -1;
             break;
     }
-    return fabs(approx - exact); // exact;
+    return fabs((approx - exact)/ exact);
 }
 
 double performance(unsigned int n, double x, int implementation) {
     /*
-    n = number of repetitions (should be at least 20)
+    n = number of repetitions in multiples of 100
     x = input value
     implementation =  0: lookup table ; 1: series ; 2: impl with complex functions
     */
     struct timespec start, end;
-    int c;
+    int c1,c2;
     switch (implementation) {
         case 0:
             c = clock_gettime(CLOCK_MONOTONIC, &start);
@@ -111,7 +111,7 @@ double performance(unsigned int n, double x, int implementation) {
                 printf("Error: clock_gettime failed!\n");
                 return EXIT_FAILURE;
             }
-            for (unsigned int i = 0; i < n; i++) {
+            for (unsigned int i = 0; i < n*100; i++) {
                 approxArsinh_lookup(x);
             }
             c = clock_gettime(CLOCK_MONOTONIC, &end);
@@ -121,32 +121,33 @@ double performance(unsigned int n, double x, int implementation) {
             }
             break;
         case 1:
-            c = clock_gettime(CLOCK_MONOTONIC, &start);
-            if (c == -1) {
-                printf("Error: clock_gettime failed!\n");
-                return EXIT_FAILURE;
-            }
-            for (unsigned int i = 0; i < n; i++) {
+            c1 = clock_gettime(CLOCK_MONOTONIC, &start);
+            for (unsigned int i = 0; i < n*100; i++) {
                 approxArsinh_series(x);
             }
             c = clock_gettime(CLOCK_MONOTONIC, &end);
-            if (c == -1) {
+
+            if (c1 == -1) {
+                printf("Error: clock_gettime failed!\n");
+                return EXIT_FAILURE;
+            }
+            if (c2 == -1) {
                 printf("Error: clock_gettime failed!\n");
                 return EXIT_FAILURE;
             }
             break;
 
         case 2:
-            c = clock_gettime(CLOCK_MONOTONIC, &start);
-            if (c == -1) {
-                printf("Error: clock_gettime failed!\n");
-                return EXIT_FAILURE;
-            }
+            c1 = clock_gettime(CLOCK_MONOTONIC, &start);
             for (unsigned int i = 0; i < n; i++) {
                 approxArsinh_predefined(x);
             }
-            c = clock_gettime(CLOCK_MONOTONIC, &end);
-            if (c == -1) {
+            c2 = clock_gettime(CLOCK_MONOTONIC, &end);
+            if (c1 == -1) {
+                printf("Error: clock_gettime failed!\n");
+                return EXIT_FAILURE;
+            }
+            if (c2 == -1) {
                 printf("Error: clock_gettime failed!\n");
                 return EXIT_FAILURE;
             }
