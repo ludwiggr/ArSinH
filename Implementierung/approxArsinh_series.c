@@ -60,7 +60,7 @@ double approxAsymptoticExpansionRest(double x) {
     //signed long long xToBit;
     //memcpy(&xToBit, &x, 8);
     //signed long long exp = ((xToBit & mask) >> 52) - 1023;
-    size_t iterations = 26; //exp>0 ? 52 / (2*exp) : 26;
+    size_t iterations = 9; //exp>0 ? 52 / (2*exp) : 26;
     //52/exp is the highest power of x that will not be completely canceled when being added to x
     //for x close to 1 we need a lot of iterations, because the terms further down the series still influence the endresult
     //we set the maximum number of iterations to ca. 4150, which gives us a definite accuracy of the result of 20 bit
