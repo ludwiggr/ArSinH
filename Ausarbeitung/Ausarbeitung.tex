@@ -1,5 +1,5 @@
 % Diese Zeile bitte -nicht- aendern.
-\documentclass[course=erap]{aspdoc}
+\documentclass[course=erap] {aspdoc}
 
 %eigene Imports
 \usepackage{amsfonts}
@@ -100,7 +100,7 @@
 
 
     Von den beiden geforderten Vergleichsimplementierungen als Reihenentwicklung und als Tabellen-Lookup ist letztere bereits als eine Form der Optimierung zu verstehen.
-    Und kann deshalb bereits mit der Reihe, ceteris paribus, vergleichen werden.
+    Und kann deshalb bereits mit der Reihe, ceteris paribus, verglichen werden.
     Tabellen-Lookup scheint für die gegebene Aufgabe eine gute Optimierung zu sein, da für eine bekannte Menge an Funktionswerten häufige und identische Berechnungen durchgeführt werden.
     Die Wahl der größe eines Tabellen-Lookups ist eine Abwägung zwischen Laufzeit und Speicherplatz, dies wird im Folgendem Kapitel "Optimierungen" weiter erläutert.
 
@@ -174,7 +174,26 @@
     \section{Performanzanalyse}
     Die Performanz der Implementierungen wird anhand der Laufzeit gemessen.
     Die Laufzeit ist mit der Libaray $time.h$ gemessen worden.
-    Hierbei sind einige Dinge vorab zu definieren.
+    Hierbei sind einige Dinge vorab zu definieren: 
+
+    
+    %Voraussetzungen
+    Getestet wurde auf einem System mit Intel i5-10210U Prozessor, 1.60 GHz, 8 GiB Arbeitsspeicher, Ubuntu 22.04.2 LTS, 64 Bit, 5.19.0-46-generic Linux-Kernel. Kompiliert wurde mit GCC 11.3.0 mit der Option -O3. Da die Laufzeit aller drei Implementierungen nur minimal von der Größe der Eingabewerte abhängt, haben wir uns dafür entschieden, die Laufzeitmessung mit einigen repräsentativen Werten verschiedener Größenordnungen durchzuführen. Es wurden mit 10 verschiedenen Werten jeweils 100.000.000 mal die Funktionen aufgerufen, um dann die durchschnittliche Zeit für einen Funktionsaufruf zu ermitteln. Der folgende Graph zeigt die durchschnittliche Laufzeit der drei Implementierungen mit Reihenentwicklung, Tabellenlookup und komplexen Instruktionen der C-library in Nanosekunden.
+
+    %Tabelle
+    \begin{tikzpicture}
+    \begin{axis}[
+    ybar, 
+    width= 8cm, height = 6 cm,
+    enlarge x limits = 0.5, 
+    ylabel = {Dauer einer Berechnung in ns},
+    symbolic x coords = {series, lookup, predefined},
+    xtick=data,
+    ]
+    \addplot coordinates
+    {(series, 20.565) (lookup, 2.613) (predefined, 1.648)};
+    \end{axis}
+    \end{tikzpicture} 
 
     \subsection{Methodik und Annahmen 0,5Seite}
     Um optimale Vergleichbarkeit der Ergebnisse sicher zu stellen, versuchen wir eine möglichst exklusive nutzung der Maschine sicher zu stellen.
