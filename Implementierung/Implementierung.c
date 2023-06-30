@@ -106,16 +106,16 @@ double performance(unsigned int n, double x, int implementation) {
     int c1,c2;
     switch (implementation) {
         case 0:
-            c = clock_gettime(CLOCK_MONOTONIC, &start);
-            if (c == -1) {
-                printf("Error: clock_gettime failed!\n");
-                return EXIT_FAILURE;
-            }
+            c1 = clock_gettime(CLOCK_MONOTONIC, &start);
             for (unsigned int i = 0; i < n*100; i++) {
                 approxArsinh_lookup(x);
             }
-            c = clock_gettime(CLOCK_MONOTONIC, &end);
-            if (c == -1) {
+            c2 = clock_gettime(CLOCK_MONOTONIC, &end);
+            if (c1 == -1) {
+                printf("Error: clock_gettime failed!\n");
+                return EXIT_FAILURE;
+            }
+            if (c2 == -1) {
                 printf("Error: clock_gettime failed!\n");
                 return EXIT_FAILURE;
             }
@@ -125,7 +125,7 @@ double performance(unsigned int n, double x, int implementation) {
             for (unsigned int i = 0; i < n*100; i++) {
                 approxArsinh_series(x);
             }
-            c = clock_gettime(CLOCK_MONOTONIC, &end);
+            c2 = clock_gettime(CLOCK_MONOTONIC, &end);
 
             if (c1 == -1) {
                 printf("Error: clock_gettime failed!\n");
