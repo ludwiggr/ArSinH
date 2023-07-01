@@ -127,40 +127,76 @@
     Eine Implementierung in Assembly ist nicht gefordert und es wird in dieser Ausarbeitung auch darauf verzichtet, da der Fokus im Folgenden auf Genauigkeit und nicht auf Performanz liegen wird.
     Ebenso verzichten wir auf Mikro-Optimierungen, da es allgemein schwer ist moderne Compiler in Optimierungsaufgaben zu schlagen und der Code hierdurch schwerer zu lesen, fehleranfälliger und schwerer zu warten wird.
     Dies steht allgemein best-practices im Software-Engineering entgegen.
-
+    
     %% TODO: benötigt?
     Intervalle werden größer an den Rändern, weil double precision nicht so genau ist.
     Relativer Fehler bleibt gleich an jeder Stelle.
-
-
+    
+    
     \section{Lösungsansatz}
+    \subsection{Reihendarstellung}
+    Bei der Reihendarstellung werden 3 verschiedene Reihen verwendet: die herkömmliche Taylor-Reihe für $x\in[-1;1]$, 
+    eine Reihe für die Annäherung des natürlichen Logarithmus und eine Reihe für den Fehler-Term.
+    
+    Die Taylor-Reihe lautet:
+    \[
+        arsinh(x) = \sum_{k = 0}^{\infty} \frac{(2k-1)!!(-x^2)^k}{(2k)!!(2k + 1)}
+                 = \sum_{k = 0}^{\infty} \frac{(-1)^k(2k)!x^{2k + 1}}{(2k + 1)(2^k*k!)^2}
+        
+    \]
+    Durch das Auflösen der Doppelfakultäten erhalten wir eine deutlich leichter implementierbare Formel. 
+    Diese Reihe verliert jedoch ihre Aussagekraft für $|x| > 1$, also ziehen wir für Werte außerhalb dieses Wertebereichs die anderen Reihen heran.
+
+    
+    Die Reihe des natürlichen Logarithmus folgt aus folgender Annäherung für etwas größere Inputwerte:
+    \[
+        arsinh(x) = ln(x + \sqrt{x^2 + 1}) = ln(2x) + error(x)  
+    \]
+    Der Fehler dieser Annäherung kann durch die dritte Reihe berechnet werden, was für einen geringen Fehler für $|x| < 1000$ essentiell ist:
+    \[
+        error(x) =  \sum_{k = 1}^{\infty} \frac{(-1)^{k - 1}(2k)!x^{2k + 1}}{2k(2^k*k!)^2} \cdot \frac{1}{x^{2k}}
+    \]
+    Desweiteren können wir uns das Double Datenformat zunutze machen,um die Logarithmus Berechnung zu optimieren:
+    \[
+        x = M\cdot2^E           M = impizierte Mantisse    E = implizierter Exponent
+        arsinh(x) \approx ln(2x) = ln(2) + ln(x) = ln(2) + ln(M\cdot2^E) = ln(2) + Eln(2) + ln(M) 
+    \]
+    $\right_arrow$Somit bleibt bei dieser Annäherung nur noch $ln(M)$ als Reihe zu approximieren
+    Wir benutzen dabei eine Reihe mit Geltungsbereich $0 \leq x \leq 2$ was für die Mantisse gilt
+    \[
+        ln(x) = \sum_{k = 1}^{\infty} \frac{(-1)^{k + 1}}{k}(x - 1)^k
+    \]
+
+    Wir können nun alle Koeffizienten vor Runtime berechnen und über diese Liste loopen, wobei wir in der Loop auch die Potenzen von x aktualisieren. Die
+    Anzahl an Koeffizienten, die wir benutzen besteht aus einer Abwägung zwischen Performanz, Genauigkeit welche in nachfolgenden Kapiteln erläutert wird.
+
+    \subsection{Lookup-Table}
+    
 
     % Theoretischer Teil
     In diesem Absatz rechtfertigen wir die beiden Ansätze der Reihenentwicklung und des Tabellen-Lookups mathematisch.
     Sowohl die Polynominterpolation als auch die intervallweise lineare Interpolation sind 
 
-    \subsection{Reihendarstellung}
-    Die 
 
 
 
 
 
-    Leiten Sie mathematisch zwei Möglichkeiten her, die Funktion zu berechnen.
-    Verwenden Sie dazu sowohl eine reine Reihendarstellung als auch eine Methodik, die einen Tabellen-Lookup benutzt.
+    % >>Leiten Sie mathematisch zwei Möglichkeiten her, die Funktion zu berechnen.
+    % Verwenden Sie dazu sowohl eine reine Reihendarstellung als auch eine Methodik, die einen Tabellen-Lookup benutzt.
 
-    Ideen: Reihenentwicklung nicht zur Runtime, sondern zur Compiletime berechnen.
-    Runge Effekt: zwischen Integralgrenzen gut angenähert, wenn mit Polynom genähert wird. -> Deshalb funktioniert die Reihenentwicklung nicht.
-    Lösung: Splines über großen Bereich mit x^3 Polynom annähern. Intervall gleich verteilt. alpha x^3 + beta x^2 + gamma x + delta
-    Annäherung für große Werte: x^2 + 1 = x^2
-    Ableitung per Tailor-Reihe
-    Idee: 1. Chilliger Lookup Table mit Interpolation 2. Splines Lookup Table
-    Entwicklung als echte Reihendarstellung muss begrenzt werden im Wertebereich.
+    % Ideen: Reihenentwicklung nicht zur Runtime, sondern zur Compiletime berechnen.
+    % Runge Effekt: zwischen Integralgrenzen gut angenähert, wenn mit Polynom genähert wird. -> Deshalb funktioniert die Reihenentwicklung nicht.
+    % Lösung: Splines über großen Bereich mit x^3 Polynom annähern. Intervall gleich verteilt. alpha x^3 + beta x^2 + gamma x + delta
+    % Annäherung für große Werte: x^2 + 1 = x^2
+    % Ableitung per Tailor-Reihe
+    % Idee: 1. Chilliger Lookup Table mit Interpolation 2. Splines Lookup Table
+    % Entwicklung als echte Reihendarstellung muss begrenzt werden im Wertebereich.
 
-    Grunstätzlich möglichst wenig zur Runtime berechnen.
-    Reihe: Basisfunktionen + Lineares Gleichungssystem
-    Lagrange Polynome
-    Tailor-Reihe / Tailor Entweicklung
+    % Grunstätzlich möglichst wenig zur Runtime berechnen.
+    % Reihe: Basisfunktionen + Lineares Gleichungssystem
+    % Lagrange Polynome
+    % Tailor-Reihe / Tailor Entweicklung<<
 
     \subsection{Naive Implementierung Reihenentwicklung ]-1/1[}
 
@@ -211,7 +247,7 @@
     Input nur sehr billige arithmetische Ausdrücke zum linearen Interpolieren verwenden. Die Reihenentwicklung andererseits verwendet 
     viele Multiplikationen und Divisionen über mehrere Iterationen, was jedoch als Reihendarstellung mit Polynomen von uns erwartet
     wurde. Die Implementierung mit komplexen Instruktionen ist noch etwas schneller als unser Lookuptable, ist jedoch als Teil der 
-    C-library schwer zu unterbieten. Bei unseren einem unserer 3 grundlegenden Ziele: Genauigkeit wird die Reihenentwicklung folglich von demä
+    C-library schwer zu unterbieten. Bei einem unserer 3 grundlegenden Ziele: Genauigkeit wird die Reihenentwicklung folglich von dem
     Lookup-Table stark outperformt. 
 
     \subsection{Methodik und Annahmen 0,5Seite}
