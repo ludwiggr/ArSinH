@@ -24,8 +24,8 @@ ax = fig.add_subplot(1,1,1)
 
 ax.grid(which = 'both')
 ax.set_xscale("log", base = 2)
-plt.plot(x[:100], rel_err1[:100], label="series")
-plt.plot(x[:100], rel_err2[:100], label="lookup")
+plt.scatter(x[50:70], rel_err1[50:70], label="series")
+plt.scatter(x[50:70], rel_err2[50:70], label="lookup")
 #plt.yscale("log", base = 2)
 plt.legend()
 

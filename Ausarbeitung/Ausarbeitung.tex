@@ -136,6 +136,16 @@
     \section{Lösungsansatz}
 
     % Theoretischer Teil
+    In diesem Absatz rechtfertigen wir die beiden Ansätze der Reihenentwicklung und des Tabellen-Lookups mathematisch.
+    Sowohl die Polynominterpolation als auch die intervallweise lineare Interpolation sind 
+
+    \subsection{Reihendarstellung}
+    Die 
+
+
+
+
+
     Leiten Sie mathematisch zwei Möglichkeiten her, die Funktion zu berechnen.
     Verwenden Sie dazu sowohl eine reine Reihendarstellung als auch eine Methodik, die einen Tabellen-Lookup benutzt.
 
@@ -195,6 +205,15 @@
     \end{axis}
     \end{tikzpicture} 
 
+    %Folgerungen
+    Wie in Abb.7 zu sehen ist, ist die reine Reihen-Implementierung um ein Vielfaches(bis zu 12x) langsamer als die anderen
+    beiden Vergleichsimplementierungen. Hier liegt wirklich die Stärke einer Implementierung durch Lookuptable, da wir hier für jeden
+    Input nur sehr billige arithmetische Ausdrücke zum linearen Interpolieren verwenden. Die Reihenentwicklung andererseits verwendet 
+    viele Multiplikationen und Divisionen über mehrere Iterationen, was jedoch als Reihendarstellung mit Polynomen von uns erwartet
+    wurde. Die Implementierung mit komplexen Instruktionen ist noch etwas schneller als unser Lookuptable, ist jedoch als Teil der 
+    C-library schwer zu unterbieten. Bei unseren einem unserer 3 grundlegenden Ziele: Genauigkeit wird die Reihenentwicklung folglich von demä
+    Lookup-Table stark outperformt. 
+
     \subsection{Methodik und Annahmen 0,5Seite}
     Um optimale Vergleichbarkeit der Ergebnisse sicher zu stellen, versuchen wir eine möglichst exklusive nutzung der Maschine sicher zu stellen.
     Hierfür wurden alle nicht für das jeweilige Betriebssystem nötigen Prozesse beendet, alle Programme geschlossen, die Maschine an das Stromnetz angeschlossen und die Kühlung manuell auf die höchste Stufe gesetzt.
@@ -221,6 +240,9 @@
 
 
     \section{Zusammenfassung und Ausblick}
+
+
+
     Die Wahl des Datentyp $double$ bietet eine einfache Möglichkeit zur Erhöhung der Genauigkeit oder zur Verkleinerung des Speicherverbrauchs.
     Gemäß IEEE 754 ~\cite{StandardforBinaryFloating} könnte auch die einfache oder vierfache Genauigkeit der
     Fließkommaarithmetik gewählt werden, wodurch sich die Genauigkeit auf $23*\log10(2) \approx 6,92$ dezimale Nachkommastellen
