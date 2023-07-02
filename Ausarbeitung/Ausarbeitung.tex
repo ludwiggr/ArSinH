@@ -134,11 +134,11 @@
     Diese Reihe verliert ihre Aussagekraft für $|x| > 1$, deshalb werden für Werte außerhalb dieses Wertebereichs die anderen Reihen herangezogen.
 
 
-    Die Reihe des natürlichen Logarithmus folgt aus folgender Annäherung für größere $x$:
+    Die Reihe des natürlichen Logarithmus folgt aus folgender Näherung für größere $x$:
     \[
         arsinh(x) = \ln(x + \sqrt{x^2 + 1}) = \ln(2x) + error(x)
     \]
-    Der Fehler dieser Annäherung kann durch eine dritte Reihe berechnet werden, was für den Funktionswert für $|x| < 1000$ essentiell ist:
+    Der Fehler dieser Näherung kann durch eine dritte Reihe berechnet werden, was für den Funktionswert für $|x| < 1000$ essentiell ist:
     \[
         error(x) =  \sum_{k = 1}^{\infty} \frac{(-1)^{k - 1}(2k)!x^{2k + 1}}{2k(2^k*k!)^2} \cdot \frac{1}{x^{2k}}
     \]
@@ -147,7 +147,7 @@
         x = M\cdot2^E \,\,\, mit \,\,\, M = impizierte Mantisse \,\,\, E = implizierter Exponent\\
         arsinh(x) \approx \ln(2x) = \ln(2) + \ln(x) = \ln(2) + \ln(M\cdot2^E) = \ln(2) + E\cdot\ln(2) + \ln(M)\\
     \end{gather*}
-    Bei dieser Annäherung bleibt lediglich $\ln(M)$ als Reihe zu approximieren.
+    Bei dieser Approximation bleibt lediglich $\ln(M)$ als Reihe zu approximieren.
     Wir benutzen dabei eine Reihe im Geltungsbereich $0 \leq x \leq 2$ wobei für die Mantisse gilt:
     \[
         \ln(x) = \sum_{k = 1}^{\infty} \frac{(-1)^{k + 1}}{k}(x - 1)^k
