@@ -121,41 +121,48 @@
     \section{Lösungsansatz}
 
     \subsection{Reihendarstellung}
-    Bei der Reihendarstellung werden 3 verschiedene Reihen verwendet: die herkömmliche Taylor-Reihe für $x\in[-1;1]$,
-    eine Reihe für die Annäherung des natürlichen Logarithmus und eine Reihe für den Fehler-Term.
-
-    Die Taylor-Reihe lautet:
+    Da Reihenentwicklungen in der Regel nur begrenzte Gültigkeitsbereiche haben, verwenden wir verschiedene Reihen für die Intervalle $|x| < 1$ und $|x| > 1$:
+      \[ \operatorname{arsinh}(x) =
+    \begin{cases}
+        \sum_{k = 0}^{\infty} \frac{(-1)^k(2k)!x^{2k + 1}}{(2k + 1)(2^k*k!)^2}     & \text{ falls } |x| < 1 \\
+        ln(2x) + \sum_{k = 1}^{\infty} \frac{(-1)^{k - 1}(2k)!x^{2k + 1}}{2k(2^k\cdot k!)^2} \cdot \frac{1}{x^{2k}}  & \text{ falls } |x| >1 \\
+        x     & \text{ falls } x \in \{\pm\inf, \pm Nan\}\\
+    \end{cases}\]
+    Diese Berechnungen sollen im Folgenden näher erläutert werden:
+    
+    Für $|x| < 1$ wird die Taylor-Reihe des $arsinh(x)$ um den Entwicklungspunkt 0 verwendet:
     \[
         arsinh(x) = \sum_{k = 0}^{\infty} \frac{(2k-1)!!(-x^2)^k}{(2k)!!(2k + 1)}
         = \sum_{k = 0}^{\infty} \frac{(-1)^k(2k)!x^{2k + 1}}{(2k + 1)(2^k*k!)^2}
-
     \]
     Durch das Auflösen der Doppelfakultäten entsteht eine deutlich leichter implementierbare Formel.
-    Diese Reihe verliert ihre Aussagekraft für $|x| > 1$, deshalb werden für Werte außerhalb dieses Wertebereichs die anderen Reihen herangezogen.
+    Da diese Reihe nur gültig ist für $|x| < 1$, werden für Werte außerhalb dieses Wertebereichs die anderen Reihen herangezogen.
+    %x>1
 
-
-    Die Reihe des natürlichen Logarithmus folgt aus folgender Näherung für größere $x$:
+    Die Berechnung für $|x| > 1$ folgt aus folgender Näherung:
     \[
         arsinh(x) = \ln(x + \sqrt{x^2 + 1}) = \ln(2x) + error(x)
     \]
-    Der Fehler dieser Näherung kann durch eine dritte Reihe berechnet werden, was für den Funktionswert für $|x| < 1000$ essentiell ist:
+    Der Fehler dieser Näherung kann durch eine dritte Reihe berechnet werden, was für den Funktionswert für $|x| < 2^{8}$ essentiell ist:
     \[
-        error(x) =  \sum_{k = 1}^{\infty} \frac{(-1)^{k - 1}(2k)!x^{2k + 1}}{2k(2^k*k!)^2} \cdot \frac{1}{x^{2k}}
+        error(x) =  \sum_{k = 1}^{\infty} \frac{(-1)^{k - 1}(2k)!x^{2k + 1}}{2k(2^k\cdot k!)^2} \cdot \frac{1}{x^{2k}}
     \]
-    Des weiteren können wir uns das $double$ Datenformat zunutze machen, um die Logarithmus Berechnung zu optimieren:
-    \begin{gather*}
-        x = M\cdot2^E \,\,\, mit \,\,\, M = impizierte Mantisse \,\,\, E = implizierter Exponent\\
-        arsinh(x) \approx \ln(2x) = \ln(2) + \ln(x) = \ln(2) + \ln(M\cdot2^E) = \ln(2) + E\cdot\ln(2) + \ln(M)\\
-    \end{gather*}
-    Bei dieser Approximation bleibt lediglich $\ln(M)$ als Reihe zu approximieren.
-    Wir benutzen dabei eine Reihe im Geltungsbereich $0 \leq x \leq 2$ wobei für die Mantisse gilt:
+    Für die Berechnung von $\ln(2x)$ verwenden wir die Taylorreihe des natürlichen Logarithmus um den Entwicklungspunkt 1. Es gilt zu beachten, dass diese Reihe nur im Wertebereich $[0, 2]$ Gültigkeit hat.
     \[
         \ln(x) = \sum_{k = 1}^{\infty} \frac{(-1)^{k + 1}}{k}(x - 1)^k
     \]
+    Aufgrund der begrenzten Gültigkeit müssen wir uns das $double$ Datenformat zunutze machen, um die Berechnung zu optimieren. Durch Pointerdereferzierung lassen sich mithilfe einer bitmaske einfach Exponent und Mantisse von $x$ ermitteln. Mit Exponent und Mantisse lässt sich nun folgende Umformung treffen:
+    \begin{gather*}
+        x = M\cdot2^E \,\,\, mit \,\,\, M = implizierte Mantisse \,\,\, E = implizierter Exponent\\
+        arsinh(x) \approx \ln(2x) = \ln(2) + \ln(x) = \ln(2) + \ln(M\cdot2^E) = \ln(2) + E\cdot\ln(2) + \ln(M)\\ = (E+1)\cdot\ln(2) + \ln(M)
+    \end{gather*}
+    Da $M\in[1, 2[$ liegt, kann nun die die Taylorreihe für die Berechnung von $\ln(M)$ verwendet werden. Um weniger Reihenglieder der Taylorreihe für ein exaktes Ergebnis zu benötigen, haben wir uns zudem dafür entschieden, alle Werte der Mantisse, die über $1.\overline{3}$ liegen, nochmal zu halbieren und stattdessen den Exponenten um 1 zu erhöhen, damit der Eingabewert für die Taylorreihe möglichst nahe an 1 liegt. Es gilt damit $M\in[0.\overline{6}, 1.\overline{3}]$. 
 
-    Basierend darauf können alle Koeffizienten vor Runtime berechnet werden und über diese Liste iteriert werden, wobei in der Schleife auch die Potenzen von $x$ aktualisiert werden.
+    Zusammenfassend wir arsin(x) also folgendermaßen berechnet:
+   
+
+    Die Koeffizienten der einzelnen Reihenglieder zu berechnen ist extrem Laufzeitaufwendig, da insbesondere die Berechnung der Fakultät viel Zeit kostet. Daher haben wir beschlossen, die Berechnung zu optimieren, indem die Koeffizienten aller drei Reihen bereits vor Runtime berechnet und in einer eigenen Lookuptabelle gespeichert werden. Für die Berechnung eines Reihengliedes muss nun nur noch der entsprechende Koeffizient auf die jeweilige Potens von $x$ multipliziert werden. Hierbei wird die nächste Potenz von x jeweils aus der Potenz im vorherigen Reihenglied berechnet, um unnötigen Overhead durch erneute Potenzierung zu vermeiden.
     Die Anzahl an benutzten Koeffizienten, entsteht aus einer Abwägung zwischen Performanz und Genauigkeit welche in folgenden Kapiteln erläutert wird.
-
     \subsection{Tabellen-Lookup}
 
     % Theoretischer Teil
