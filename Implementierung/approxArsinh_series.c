@@ -1,7 +1,7 @@
 #include "approxArsinh_series.h"
 #include <string.h>
 
-#define LOG_TWO log(2.0)
+static const double LOG_TWO = 0.69314718055994530941;
 
 void printOutOfRange(void) {
     printf("Error: Input out of range!\nTry using the lookup table implementation instead.\n");
@@ -12,7 +12,7 @@ double approxXBelowOne(double x) {      //this is the regular Series for |x|<1
     //signed long long xToBit;
     //memcpy(&xToBit, &x, 8);
     //signed long long exp = ((xToBit & mask) >> 52) -1022; //subtract bias, but add one for the calculation of relevant iterations
-    size_t iterations = 20;//exp<0 ? ((52 / -exp +1) / 2) : 26; 
+    size_t iterations = 13;//exp<0 ? ((52 / -exp +1) / 2) : 26; 
     //52/-exp is the highest power of x that will not be completely canceled when being added to x
     //the lower the exponent of x is the fewer iterations you need, because x^n will converge to 0 way faster
     //for x close to 1 we need a lot of iterations, because the terms further down the series still influence the endresult
@@ -32,7 +32,7 @@ double approxLnTaylor(double x) {  //this is the Tayler Series for ln x around 1
     double fak = x - 1;               //it's more accurate, the closer the number is to 1
     double prev = fak;
     double sum = 0;
-    size_t iterations = 5;     //Since -0.33<=fak<=0.33, after at most 33 iterations of the series, the terms ^don't matter for the end result,
+    size_t iterations = 27;     //Since -0.33<=fak<=0.33, after at most 33 iterations of the series, the terms ^don't matter for the end result,
     for (size_t k = 0; k <= iterations; k++) {    // due to floating point cancellation (0,33^33 < 2^-52)
         sum += prev * coeffs_taylor[k];
         prev *= fak;
@@ -61,7 +61,7 @@ double approxAsymptoticExpansionRest(double x) {
     //signed long long xToBit;
     //memcpy(&xToBit, &x, 8);
     //signed long long exp = ((xToBit & mask) >> 52) - 1023;
-    size_t iterations = 15; //exp>0 ? 52 / (2*exp) : 26;
+    size_t iterations = 13; //exp>0 ? 52 / (2*exp) : 26;
     //52/exp is the highest power of x that will not be completely canceled when being added to x
     //for x close to 1 we need a lot of iterations, because the terms further down the series still influence the endresult
     //we set the maximum number of iterations to ca. 4150, which gives us a definite accuracy of the result of 20 bit
