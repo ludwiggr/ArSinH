@@ -250,7 +250,7 @@ int main(int argc, char *argv[]) {
 
     if (relativeError == 0 && iterations == 0) {
         double result = calculate_result(number, implementation);
-        printf("Calculating arsinh(%f) with implementation number %li results in %.*f.\n", number, implementation, 15,
+        printf("Calculating arsinh(%f) with implementation number %li results in %.*g.\n", number, implementation, 20,
                result);
         return EXIT_SUCCESS;
     } else if (relativeError == 1) {
