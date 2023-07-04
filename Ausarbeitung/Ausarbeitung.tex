@@ -1,4 +1,4 @@
-% Diese Zeile bitte -nicht- aendern.
+ %Diese Zeile bitte -nicht- aendern.
 \documentclass[course=erap] {aspdoc}
 
 %eigene Imports
@@ -7,6 +7,7 @@
 \usepackage{ulem}
 \usepackage{amssymb}
 \pgfplotsset{compat=1.16}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% TODO: Ersetzen Sie in den folgenden Zeilen die entsprechenden -Texte-
@@ -32,15 +33,15 @@
     %Allgemeine Einführung und Abwägung bei Optimierungen
     Im Folgenden wird ein Problem aus dem Bereich der optimierung von Programmen behandelt.
     Diese Optimierung kann unter verschiedenen im Folgenden erläuterten Kriterien erfolgen.
-    Die Optimierung vom Programmen ist im Allgemeinen immer ein Abwägen zwischen Implementierungsaufwand/Laufzeit in Zyklen/Laufzeit in Zeit/Energieaufwand/Portabilität/Speicherverbrauch und weiteren Anwendungsspezifischen Faktoren.
+    Die Optimierung vom Programmen ist im Allgemeinen immer ein Abwägen zwischen Implementierungsaufwand/Laufzeit in Zyklen/Laufzeit in Zeit/Energieaufwand/Portabilität/Speicherverbrauch und weiteren Anwendungsspezifischen Faktoren. $[das bissl Schmarrn]$
     Diese Abwägungen werden im Folgenden auch bei den Implementierungen getroffen und und es wird versucht ein 'optimales' Ergebnis in verschiedenen Dimensionen zu erzielen, zu messen und zu bewerten.
     Hierbei dient uns der Vergleich als Bewertungskriterium und die bewerteten Dimensionen werden in den weiteren Kapiteln noch genauer spezifiziert.
     Eine Bewertung der Ergebnisse erfolgt am Ende des Kapitels Performanzanalyse.
 
     %Motivation
-    Die Gruppe der hyperbolischen Funktionen wird für die Hankel-Transformation~\cite{hankel},
+    Die Gruppe der hyperbolischen Funktionen wird für die Hankel-Transformation~\cite{hankel}, $[bro wasis das]$
     bei der Lösung bestimmter Differenzialgleichungen~\cite{differenzial}, bei der Beschreibung von Katenoiden~\cite{katenoid}
-    sowie in den Friedmann-Gleichungen für die zeitliche Entwicklung der Ausdehnung des Universums~\cite{universum1,universum2}~ benötigt.
+    sowie in den Friedmann-Gleichungen für die zeitliche Entwicklung der Ausdehnung des Universums~\cite{universum1,universum2}~ benötigt. 
     Für diese üblicherweise rechenintensiven Anwendungen ist eine effiziente und genaue Implementierung aller dafür verwendeten Funktionen essenziell um Gesamtergebnisse effizient erzielen zu können.
     Deshalb widmed sich diese Ausarbeitung im folgenden der Implementierung einer hyperbolischen Funktion, dem $arsinh$.
 
@@ -58,7 +59,7 @@
     $$ (2) \operatorname{arsinh}(x) = \int_{0}^{1} \frac{x}{\sqrt{x^2 y^2 + 1}} \,\mathrm{dy} \, mit \, x \in \mathbb{R} $$
 
     Im Limit kann er durch die Funktion $ (3) f(x)\to \pm \ln(2|x|)$ angenähert werden.
-    Als für die Implementierung relevante mathematische Eigenschaft die Punktsymmetrie zum Ursprung $(0,0)$ bereits hier zu erwähnen.
+    Als für die Implementierung relevante mathematische Eigenschaft die Punktsymmetrie zum Ursprung $(0,0)$ bereits hier zu erwähnen. In der folgenden Analyse werden wir daher primär den Wertebereich $x \leq 0$ analysieren. Der negative Fall verhält sich jeweils symmetrisch.
     %Die Familie der hyperbolischen Funktionen sind quadratische rationale Funktionen von der Exponentialfunktion $\exp$,
     %die über die Mitternachtsformel gelöst werden könnten und mit dem natürlichen Logarithmus $\ln$ ausgedrückt werden.
     %Überleitung
@@ -106,12 +107,12 @@
 
     Ebenso wird zum Vergleich eine Implementierung (D) basierend auf der <math.h> Bibliothek verwendet.
 
-    Im folgenden werden die Implementierungen mit den respektiven Buchstaben $(A)$ - $(D)$ referenziert, die nummerierten Formeln und Definitionen analog mit den Zahlen $(1)$ - $(4)$.
-    $A$ wird im Folgenden als naive Implementierung und $(D)$ als Benchmark für die Performanz und Genauigkeit verwendet.
+    Im folgenden werden die Implementierungen mit den respektiven Buchstaben $(A)$ - $(D)$ referenziert, die nummerierten Formeln und Definitionen analog mit den Zahlen $(1)$ - $(4)$. 
+    $A$ wird im Folgenden als naive Implementierung und $(D)$ als Benchmark für die Performanz und Genauigkeit verwendet. 
 
 
     Das Rahmenprogramm unterstützt die Funktionen $-V<Zahl>$ für die Wahl der Implementierung, $-B<Zahl>$ für die Wiederholungen des Funktionsaufrufs, $<Floating Point Zahl>$ für den Wert $x$, $-h$ oder $--help$ für die Beschreibung der Optionen des Programms und Verwendungsbeispiele hierfür.
-
+   
 
     Eine Implementierung in Assembly ist nicht gefordert und es wird in dieser Ausarbeitung auch darauf verzichtet, da der Fokus im Folgenden auf Genauigkeit und nicht auf Performanz liegen wird.
     Ebenso wird auf Mikro-Optimierungen verzichtet, da es allgemein schwer ist moderne Compiler in Optimierungsaufgaben zu schlagen und der Code hierdurch schwerer zu lesen, fehleranfälliger und schwerer zu warten wird.
@@ -120,6 +121,7 @@
 
     \section{Lösungsansatz}
 
+    Sowohl für die Implementierung mit einer Reihendarstellung, als auch für die Lookuptabelle haben wir uns die Punktsymmetrie der $arsinh$-Funktion zunutze gemacht: $arsinh(-x) = -arsinh(x)$. Die Funktionswerte für negative Eingabewerte, werden als $-arsinh(|x|)$ berechnet.
     \subsection{Reihendarstellung}
     Da Reihenentwicklungen in der Regel nur begrenzte Gültigkeitsbereiche haben, verwenden wir verschiedene Reihen für die Intervalle $|x| < 1$ und $|x| > 1$:
       \[ \operatorname{arsinh}(x) =
@@ -151,20 +153,22 @@
     \[
         \ln(x) = \sum_{k = 1}^{\infty} \frac{(-1)^{k + 1}}{k}(x - 1)^k
     \]
-    Aufgrund der begrenzten Gültigkeit müssen wir uns das $double$ Datenformat zunutze machen, um die Berechnung zu optimieren. Durch Pointerdereferzierung lassen sich mithilfe einer bitmaske einfach Exponent und Mantisse von $x$ ermitteln. Mit Exponent und Mantisse lässt sich nun folgende Umformung treffen:
+    Aufgrund der begrenzten Gültigkeit müssen wir uns das $double$ Datenformat zunutze machen, um die Berechnung zu optimieren. Durch eine Bitmaske lassen sich effizient Exponent und Mantisse von $x$ ermitteln. Mit Exponent und Mantisse lässt sich nun folgende Umformung treffen:
     \begin{gather*}
         x = M\cdot2^E \,\,\, mit \,\,\, M = implizierte Mantisse \,\,\, E = implizierter Exponent\\
         arsinh(x) \approx \ln(2x) = \ln(2) + \ln(x) = \ln(2) + \ln(M\cdot2^E) = \ln(2) + E\cdot\ln(2) + \ln(M)\\ = (E+1)\cdot\ln(2) + \ln(M)
     \end{gather*}
-    Da $M\in[1, 2[$ liegt, kann nun die die Taylorreihe für die Berechnung von $\ln(M)$ verwendet werden. Um weniger Reihenglieder der Taylorreihe für ein exaktes Ergebnis zu benötigen, haben wir uns zudem dafür entschieden, alle Werte der Mantisse, die über $1.\overline{3}$ liegen, nochmal zu halbieren und stattdessen den Exponenten um 1 zu erhöhen, damit der Eingabewert für die Taylorreihe möglichst nahe an 1 liegt. Es gilt damit $M\in[0.\overline{6}, 1.\overline{3}]$. 
-
-    Zusammenfassend wir arsin(x) also folgendermaßen berechnet:
-   
-
-    Die Koeffizienten der einzelnen Reihenglieder zu berechnen ist extrem Laufzeitaufwendig, da insbesondere die Berechnung der Fakultät viel Zeit kostet. Daher haben wir beschlossen, die Berechnung zu optimieren, indem die Koeffizienten aller drei Reihen bereits vor Runtime berechnet und in einer eigenen Lookuptabelle gespeichert werden. Für die Berechnung eines Reihengliedes muss nun nur noch der entsprechende Koeffizient auf die jeweilige Potens von $x$ multipliziert werden. Hierbei wird die nächste Potenz von x jeweils aus der Potenz im vorherigen Reihenglied berechnet, um unnötigen Overhead durch erneute Potenzierung zu vermeiden.
+    Da $M\in[1, 2[$ liegt, kann nun die Taylorreihe für die Berechnung von $\ln(M)$ verwendet werden. Es gilt jedoch zu beachten, dass die Taylorreihe berits für wenige Reihenglieder exaktere Ergebnisse liefert, je näher der zu berechnende Wert an Eins liegt. Um weniger Reihenglieder der Taylorreihe für ein exaktes Ergebnis zu benötigen, haben wir uns daher dafür entschieden, alle Werte der Mantisse, die über $1.\overline{3}$ liegen, nochmal zu halbieren und stattdessen den Exponenten um 1 zu erhöhen, damit der Eingabewert für die Taylorreihe möglichst nahe an 1 liegt. Es gilt damit $M\in[0.\overline{6}, 1.\overline{3}]$. 
+    $\\$
+    Die Koeffizienten der einzelnen Reihenglieder zu berechnen ist extrem Laufzeitaufwendig, da insbesondere die Berechnung der Fakultät viel Zeit kostet. Daher haben wir beschlossen, die Berechnung zu optimieren, indem die Koeffizienten aller drei Reihen bereits vor Runtime berechnet und in einer eigenen Lookuptabelle gespeichert werden. Für die Berechnung eines Reihengliedes muss nun nur noch der entsprechende Koeffizient auf die jeweilige Potens von $x$ multipliziert werden. Hierbei wird die nächste Potenz von x jeweils aus der Potenz im vorherigen Reihenglied berechnet, um unnötigen Overhead durch erneute Potenzierung zu vermeiden. 
     Die Anzahl an benutzten Koeffizienten, entsteht aus einer Abwägung zwischen Performanz und Genauigkeit welche in folgenden Kapiteln erläutert wird.
+    \subsubsection{Abwägung Genauigkeit und Performanz}
+    \subsubsection{Problematik der "reinen" Reihenentwicklung}
+    
+
     \subsection{Tabellen-Lookup}
 
+    
     % Theoretischer Teil
     %In diesem Absatz rechtfertigen wir die beiden Ansätze der Reihenentwicklung und des Tabellen-Lookups mathematisch.
     %Sowohl die Polynominterpolation als auch die intervallweise lineare Interpolation sind
@@ -183,58 +187,91 @@
     % Tailor-Reihe / Tailor Entweicklung<<
 
     \subsection{Implementierung mit komplexen Instruktionen}
-    Für die Implementierung mit freier Wahl der Instruktionen und der Herangehensweise wurden zunächst verscheidene Ansätze implementiert und getestet.
-    Daraufhin ist die Entscheidung für ... als beste Option für Genauigkeit und Geschwindigkeit gefallen.
-
+    
+    Als Vergleichsimplementierung wurde eine weiter Funktion zu Rate gezogen, die komplexe Instruktionen der C-Math Bibiliothek verwendet. Die Verwendung solcher Instruktionen hat den Vorteil, dass dass die C-Math Bibiliothek hoch optimiert ist und somit sehr schnell ein exaktes Ergebnis liefern kann. Prinzipiell kann für die Berechnung die allgemeine Formel $ arsinh(x) = ln \left(x + \sqrt{x^2 + 1} \right)$ verwendet werden. Es kann allerdings bei der Berechnung von $x^2$ zu einem double Overflow kommen, falls x zu groß ist. Das ist genau dann der Fall, wenn $|x| > 2^{512}$, da dann $x^2 > 2^{1024}$ und damit außerhalb des durch double dargestellten Wertebereichs liegt. Damit für solche Werte nicht $\pm \inf$ zurückgegeben wird, verwenden wir für große x wie auch in der Reihenentwicklung die Näherung $arsinh(x)\approx ln(2x)$. Im Allgemeinen liefert diese Implementierung sehr exakte Werte. Eine Ausnahme stellen sehr kleine Werte dar, was im folgenden Abschnitt Genauigkeit noch näher erläutert werden soll.
 
     \section{Genauigkeit}
-    Im gegebenen Kontext ist die Genauigkeit der Lösung als die Abweichung der Implementierung $(4)$ vom Funktionswert der mathematisch definierten Funktion $(1)$ zu verstehen.
+    Als Maßstab für die Genauigkeit unserer Ergebnisse wird im Folgenden der relative Fehler der Implementierung bezüglich des tatsächlichen mathematischen Funktionswert verwendet. Die folgenden Diagramme wurden erstellt, indem mithilfe einer C-Hilfsmethode für eine große Anzahl an Eingabewerten jeweils die Funktionswerte für alle drei Implementierungen brechnet und in Arrays gespeichert wurden. Anschließend wurden diese Funktionswerte in einem Python-Programm zu den jeweilgen relativen Fehlern ausgewertet und mithilfe der Bibiliothek matplotlib als Graph dargestellt.
 
+    [weiß noch ned so genau wie man Bilder einfügt]
+    
+    \subsection{Reihenentwicklung}
+    Wie deutlich im ersten Diagramm erkennbar, liefert die Reihenentwicklung außerhalb der Intervalle $0.25<x<4$ nahezu immer den exakten Funktionswert. Es gibt einige Ausnahmen mit einem verschwindend geringen relativen Fehler $\leq2^{-50}$ , welche sich durch floating-point-Rundungsfehler bei der Umrechnung der Polynomkoeffizienten erklären lassen.
+    Für einen Großteil der Eingabewerte liefert diese Funktion also tasächlich den genauest möglichen Funktionswert für den Datentyp double. Eine Ausnahme bildet jedoch das Intervall $0.25<x<4$. Wie im zweiten (logarithmisch skalierten) Diagramm deutlich erkennbar, steigt der relative Fehler exponentiell an, je näher der Eingabewert an 1 liegt. Ihren maximalen relativen fehler von circa $2^{-8} \approx 0.39\%$, hat die Reihenentwicklung am Eingabewert 1. Dies lässt sich wie in Kapitel $[?]$ bereits erläutert anhand der Konvergenz der Reihenglieder für verschiedene Eingabewerte erklären. Da die Reihenglieder aller Reihen immer kleiner werden, gilt: je kleiner das letzte berechnete Reihenglied, desto genauer ist auch das Ergebnis. [unfinished]
+    
+    \subsection{Lookuptabelle}
+    Die Genauigkeit des Ergebnisses bei der Verwendung der Lookuptabelle hängt stark von den Eingabewerten ab. Ist der Eingabewert exakt einer der vorgespeicherten Werte in der Tabelle, so liefert die Funktion logischerweise das exakte Ergebnis. Am ungenauesten ist die Funktion für Eingabewerte, die genau zwischen zwei gespeicherten Tabellenwerten liegen. Um dies angemessen zu repräsentieren, haben wir für die Erstellung der Diagramme gut verteilte Eingabewerte gewählt, von denen manche näher an einem Eintrag in der Lookuptabelle liegen und manche genau zwischen zwei Einträgen.  
+    
+    Im ersten Diagramm ist zudem deutlich erkennbar, dass die Funktion wie auch die Reihenentwicklung deutlich ungenauere Ergebnisse für Eingabewerte nahe an 1 liefert. Dies lässt sich mithilfe des Krümmunsverhaltens der Funktion begründen. Der folgende Graph zeigt die zweite Ableitung des $arsinh''(x) = \frac{-x}{x^2\cdot \sqrt{x^2+1}+\sqrt{x^2+1}}$
 
+    
+    \begin{tikzpicture}
+        \begin{axis}[
+            width = 15 cm,
+            height = 5 cm,
+            xmin = -10, xmax = 10,
+            ymin = -0.5, ymax = 0.5,
+            axis lines=middle, 
+            axis line style={->},
+            domain= -20: 20,
+            samples = 500,
+            ]
+            \addplot[] {-x/((x*x)* sqrt((x*x)+1) + sqrt((x*x)+1))};
+            \addplot [color=blue, mark = *] coordinates {
+                (-0.707106781093, 0.3849001794598)
+            };
+            \addplot [color=blue, mark = *] coordinates {
+                (0.707106781093, -0.3849001794598)
+            };
+        \end{axis}
+    \end{tikzpicture}
+
+    Wie man sieht, hat der $arsinh(x)$ eine maximale Krümmung bei circa $\pm 0.707$. Dementsprechend wird auch eine lineare Interpolation im Bereich dieser Stellen eine maximale Ungenauigkeit aufweisen.
+    
+    \subsection{Implementierung mit komplexen Instruktionen}
+    Wie im ersten Diagramm zu sehen liefert die Implementierung mit komplexen mathematischen Instruktionen der C-Math Bibliothek für den Großteil des Wertebereichs den genauest möglichen Funktionswert für den Datentyp double. Eine Ausnahme bilden sehr kleine x-Werte. Dies lässt sich mit der Absorption beziehungsweise Auslöschung von bits begründen, welche bei der Addition von doubles unterschiedlicher Größenordnung unvermeidbar auftritt. Betrachten wir nun zunächst den Term $\sqrt{x^2 + 1}$ der allgemeinen Gleichung für den $arsinh(x)$. Ab $|x|<2^{-26}$ gilt stets $x^2<2^{-52}$. $x^2$ wird damit bei der Addition mit 1 vollständig absorbiert und $\sqrt{x^2 + 1}$ evaluiert zu 1. Hierdurch entsteht ein für kleinere $x$ immer größerer relativer Fehler. Ab $|x|<2^{-52}$ wird zudem x bei Addition auf 1 immer absorbiert, wodurch $\ln{(x+\sqrt{x^2 + 1})}$ automatisch zu 0 evaluiert. Für $|x|<2^{-52}$ ist die Implementierung mit komplexen mathematischen Instruktionen demnach kaum noch anwendbar, da das Ergebnis (mit Ausnahme von 0) immer einen relativen Fehler von $100\%$ haben wird.
+    
     \section{Performanzanalyse}
     Die Performanz der Implementierungen wird anhand der Laufzeit gemessen.
     Diese wird im Folgenden mit der Libaray $time.h$ gemessen.
 
     \subsection{Methodik und Annahmen 0,5Seite}
-    Um optimale Vergleichbarkeit der Ergebnisse sicher zu stellen, versuchen wir eine möglichst exklusive nutzung der Maschine sicher zu stellen.
-    Hierfür wurden alle nicht für das jeweilige Betriebssystem nötigen Prozesse beendet, alle Programme geschlossen, die Maschine an das Stromnetz angeschlossen und die Kühlung manuell auf die höchste Stufe gesetzt.
-    Dies soll Performanceänderungen aufgrund von Überhitzung bei mehrfacher Ausführung vermeiden.
-    Um einen stabilen Mittelwert zu erzielen, wird jede Implementierung mindestens 10 mal ausgeführt, nähere Angaben dazu sind der jeweiligen Messung zu entnehmen.
-
-    Alle Performaztests werden auf folgender Maschine ausgeführt: Name: ____ Prozessor: ____ Takt: ____ Multicore/SingleCore Speicher: ____ Betriebssystem: _____ Compiler: ____ Version: ____ Comilerflags: siehe Makefile
-
-    Die Tests werden mit den Eingaben ____ ausgeführt und ____ mal wiederholt.
-
-    Da es sich in der Aufgabe um eine numerische Berechnung handelt, erwarten wir bei den Performanztests lediglich Algorithmisch bedingte Abweichungen, welche durch die Laufzeitklassen beschrieben werden könnten.
-    Implementierung $A$: $O(7)$
-    Implementierung $B$: $O(1)$
-    Implementierung $C$: $O(1)$
-
 
     %Voraussetzungen
     Gemessen wurde auf einem System mit Intel i5-10210U Prozessor, 1.60 GHz, 8 GiB Arbeitsspeicher, Ubuntu 22.04.2 LTS, 64 Bit, 5.19.0-46-generic Linux-Kernel.
-    Kompiliert wurde mit GCC 11.3.0 mit der Option -O3.
-    Da die Laufzeit aller drei Implementierungen nur bedingt von der Größe der Eingabewerte abhängt,
-    wurde die Laufzeitmessung mit repräsentativen Werten verschiedener Größenordnungen durchgeführt.
+    Kompiliert wurde mit GCC 11.3.0 mit der Option -O3. Um eine optimale Vergleichbarkeit der Ergebnisse zu garantieren, wurden alle nicht für das Betriebssystem nötigen Prozesse beendet. 
+
+    Da die Reihenentwicklung zwei sehr verschiedene Berechnungen für $|x|>1$ und $|x|\geq 1$ durchführt, wurden bei der Laufzeitmessung diese beiden Fälle unterschieden.
+    Ansonsten hängt die Laufzeit aller drei Implementierungen nur bedingt von der Größenordnung der Eingabewerte ab, daher wurde die Laufzeitmessung für die beiden Intervalle jeweils mit repräsentativen Werten verschiedener Größenordnungen durchgeführt.
     Die Methoden wurden mit 10 verschiedenen Werten jeweils 100.000.000 mal aufgerufen, um dann das arithmetische Mittel der Zeit für einen Funktionsaufruf zu ermitteln.
 
     \subsubsection{Zeitmessung der Implementierungen}
 
-    Der folgende Graph zeigt die durchschnittliche Laufzeit eines Funktionsaufrufes der drei Implementierungen mit Reihenentwicklung, Tabellen-Lookup und der eigenen Implementierung in Nanosekunden.
+    Der folgende Graph zeigt die durchschnittliche Laufzeit eines Funktionsaufrufes der drei Implementierungen mit Reihenentwicklung, Tabellen-Lookup und der Implementierung mithilfe komplexer Instruktionen der C-math-library in Nanosekunden:
 
     %Tabelle
     \begin{tikzpicture}
         \begin{axis}
             [
             ybar,
-            width= 14cm, height = 6 cm,
-            enlarge x limits = 0.5,
-            ylabel = {Zeit in ns},
-            symbolic x coords = {(A) Reihe, (B) Lookup, (C) predefined},
+            width = 10 cm,
+            height= \axisdefaultheight,
+            bar width = 0.3 cm,
+            enlarge x limits = {abs = 1.5 cm},
+            symbolic x coords = {Reihe, Lookup,  predefined},
+            xtick={Reihe, Lookup, predefined},
+            ylabel={Zeit in ns},
+            xlabel={Implementierung},
+            legend style={at={(0.6, 0.9)},
+              anchor=north,legend columns=-1},
             xtick=data,
+            nodes near coords,
+            nodes near coords align={vertical},
+            bar width = 0.9cm,
             ]
-            \addplot coordinates
-                {(Reihe, 20.565) (Lookup, 2.613) (predefined, 1.648)};
+            \addplot coordinates {(Reihe, 6.369) (Lookup, 2.613) (predefined, 1.648)};
+            \addplot coordinates {(Reihe, 29.212) (Lookup, 2.613) (predefined, 1.648)};
+            \legend{$|x|<1$  ., $|x|\geq 1$}
         \end{axis}
     \end{tikzpicture}
 
@@ -244,10 +281,12 @@
     beiden Vergleichsimplementierungen.
     Hier liegt die Stärke einer Implementierung durch Lookup-Tabelle, da wir hier für jeden
     Input nur sehr billige arithmetische Ausdrücke zum linearen Interpolieren verwenden.
-    Die Reihenentwicklung andererseits verwendet viele Multiplikationen und Divisionen über mehrere Iterationen, was jedoch als Reihendarstellung mit Polynomen nicht zu vermeiden ist.
+    Die Reihenentwicklung andererseits verwendet viele Multiplikationen und Summen über mehrere Iterationen, was jedoch als Reihendarstellung mit Polynomen nicht zu vermeiden ist.
     \sout{Die Implementierung mit komplexen Instruktionen ist noch etwas schneller als unser Lookuptable, ist jedoch als Teil der
     C-library schwer zu unterbieten.} Bei dem Maß Genauigkeit wird die Reihenentwicklung von dem Lookup-Table übertroffen.
 
+    \section{Zusammenfassung und Ausblick}
+    \subsection{Zusammenfassung}
     Zusammenfassend lässt sich feststellen, dass der Trade-off zwischen Performance, Genauigkeit und Speicherverbrauch für die beiden Implementierungen mit einem Tabellenlookup beziehungsweise einer Reihenentwicklung sehr unterschiedlich ist.
     Der Tabellenlookup ist zwar sehr schnell, benötigt allerdings auch immer mehr Speicherplatz, je genauere Werte man erhalten möchte.
     In unserer Implementierung, die insgesamt ca. 30000 Werte in einer Lookuptabelle speichert, hat die Berechnung einen maximalen relativen Fehler von bis zu etwa 0.01 Prozent.
@@ -257,7 +296,8 @@
     Auch für die 20 Reihenglieder, für die wir uns entschieden haben, benötigt die Reihenentwicklung bis zu 12 mal so lange für die Berechnung, dafür benötigt sie auch deutlich weniger Speicherplatz.
 
 
-    \section{Zusammenfassung und Ausblick}
+    
+    \subsection{Anwendung}
     Welches Programm verwendet werden sollte, hängt von den Rahmenbedingungen ab.
     In der Statistik kann der Areasinus Hyperbolicus zur Modellierung von Verteilungen verwendet werden, während er im Bereich des Ingenierwesens
     %TODO: Quelle für diese Aussage
@@ -269,7 +309,8 @@
     \subsection{Ausblick}
 
     In unserer Implementierung des $areasinus hyperbolicus$ haben wir uns auf eine reine Reihenentwicklung und eine einfache Lookup-Tabelle mit linearer Näherung beschränkt.
-    Unter weniger strengen Rahmenbedingungen ließe sich die Implementierung allerdings sowohl in Bezug auf Laufzeit, als auch Genauigkeit noch signifikant optimieren.
+    Unter weniger strengen Rahmenbedingungen ließe sich die Implementierung allerdings sowohl in Bezug auf Laufzeit, als auch Genauigkeit noch signifikant optimieren. 
+    
     Ein möglicher Ansatz ist die Verwendung von Splines in der Lookup-Tabelle: Statt der bisher linearen Näherung zwischen zwei Messpunkten in der Lookup-Tabelle, könnte man den $areasinus hyperbolicus$ in diesem Intervall durch eine Kurve annähern.
     Hierzu werden in der Regel Polynome vom Grad drei verwendet.
     Dadurch verbessert sich die Genauigkeit, insbesondere für x-Werte die genau zwischen zwei Werten in der Lookup-Tabelle liegen deutlich, während sich die Laufzeit nur minimal erhöht.
@@ -278,7 +319,7 @@
      Ein weiterer Ansatz wäre, eine Kombination aus Reihenentwicklung und Lookuptabelle zu verwenden: 
     Wie zuvor beobachtet liefert die Berechnung mit einer Reihenentwicklung für x-Werte, die nicht nahe an Eins liegen, besonders genaue Ergebnisse. Für |x|<0.125 brauchen wir beispielsweise nur 13 Reihenglieder, für |x|>8 brauchen wir 13 Reihenglieder der Restreihe, sowie bis zu 33 Reihenglieder der Taylorreihe für ein exaktes Ergebnis. In diesen Intervallen bietet es sich also durchaus an eine reine Reihenentwicklung zu verwenden. In dem Intervall 0.125<=|x|<=8 braucht man allerdings mehr Reihenglieder, wodurch es zu Performanzeinbußen kommt. Es wäre demnach sinnvoll in diesem Intervall eine Lookuptabelle zu verwenden. Da der Wertebereich nun deutlich kleiner ist, lassen sich bereits in kleinen Lookuptabellen, deutlich exaktere Werte speichern, wodurch der maximale relative Fehler minimal gehalten wird. Dieser Ansatz zielt besonders auf die Genauigkeit des Ergebnisses ab. Durch die Verwendung einer Lookuptabelle erhöht sich zudem die Performanz, da für die verbleibenden x-Werte weniger Reihenglieder berechnet werden müssen, um ein exaktes Ergebnis zu erhalten. 
 
-
+    Anzumerken ist zudem, dass sich insbesondere die Reihenentwicklung durch die Verwendung von Assemblerinstruktionen noch signifikant auf Laufzeit optimieren lässt. 
 
 % TODO: Fuegen Sie Ihre Quellen der Datei Ausarbeitung.bib hinzu
 % Referenzieren Sie diese dann mit \cite{}.
