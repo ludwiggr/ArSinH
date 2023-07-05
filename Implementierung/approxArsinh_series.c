@@ -132,5 +132,3 @@ double approxArsinh_series(double x) {
 
 
 
-
-
