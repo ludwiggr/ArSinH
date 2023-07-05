@@ -153,20 +153,27 @@
     \[
         \ln(x) = \sum_{k = 1}^{\infty} \frac{(-1)^{k + 1}}{k}(x - 1)^k
     \]
-    Aufgrund der begrenzten Gültigkeit müssen wir uns das $double$ Datenformat zunutze machen, um die Berechnung zu optimieren. Durch eine Bitmaske lassen sich effizient Exponent und Mantisse von $x$ ermitteln. Mit Exponent und Mantisse lässt sich nun folgende Umformung treffen:
+    Aufgrund der begrenzten Gültigkeit der Reihe müssen wir uns das $double$ Datenformat zunutze machen, um die Berechnung zu optimieren. Durch eine Bitmaske lassen sich effizient Exponent und Mantisse von $x$ ermitteln. Mit Exponent und Mantisse lässt sich nun folgende Umformung treffen:
     \begin{gather*}
         x = M\cdot2^E \,\,\, mit \,\,\, M = implizierte Mantisse \,\,\, E = implizierter Exponent\\
         arsinh(x) \approx \ln(2x) = \ln(2) + \ln(x) = \ln(2) + \ln(M\cdot2^E) = \ln(2) + E\cdot\ln(2) + \ln(M)\\ = (E+1)\cdot\ln(2) + \ln(M)
     \end{gather*}
     Da $M\in[1, 2[$ liegt, kann nun die Taylorreihe für die Berechnung von $\ln(M)$ verwendet werden. Es gilt jedoch zu beachten, dass die Taylorreihe berits für wenige Reihenglieder exaktere Ergebnisse liefert, je näher der zu berechnende Wert an Eins liegt. Um weniger Reihenglieder der Taylorreihe für ein exaktes Ergebnis zu benötigen, haben wir uns daher dafür entschieden, alle Werte der Mantisse, die über $1.\overline{3}$ liegen, nochmal zu halbieren und stattdessen den Exponenten um 1 zu erhöhen, damit der Eingabewert für die Taylorreihe möglichst nahe an 1 liegt. Es gilt damit $M\in[0.\overline{6}, 1.\overline{3}]$. 
     $\\$
-    Die Koeffizienten der einzelnen Reihenglieder zu berechnen ist extrem Laufzeitaufwendig, da insbesondere die Berechnung der Fakultät viel Zeit kostet. Daher haben wir beschlossen, die Berechnung zu optimieren, indem die Koeffizienten aller drei Reihen bereits vor Runtime berechnet und in einer eigenen Lookuptabelle gespeichert werden. Für die Berechnung eines Reihengliedes muss nun nur noch der entsprechende Koeffizient auf die jeweilige Potens von $x$ multipliziert werden. Hierbei wird die nächste Potenz von x jeweils aus der Potenz im vorherigen Reihenglied berechnet, um unnötigen Overhead durch erneute Potenzierung zu vermeiden. 
-    Die Anzahl an benutzten Koeffizienten, entsteht aus einer Abwägung zwischen Performanz und Genauigkeit welche in folgenden Kapiteln erläutert wird.
+    Die Koeffizienten der einzelnen Reihenglieder zu berechnen ist extrem Laufzeitaufwendig, da insbesondere die Berechnung der Fakultät viel Zeit kostet. Daher haben wir beschlossen, die Berechnung zu optimieren, indem die Koeffizienten aller drei Reihen bereits vor Runtime berechnet werden. Für die Berechnung eines Reihengliedes muss nun nur noch der entsprechende Koeffizient auf die jeweilige Potenz von $x$ multipliziert werden. Hierbei wird die nächste Potenz von x jeweils aus der Potenz im vorherigen Reihenglied berechnet, um unnötigen Overhead durch erneute Potenzierung zu vermeiden. 
+    Die Anzahl an benutzten Reihenglieder, entsteht aus einer Abwägung zwischen Performanz und Genauigkeit welche in folgenden Kapiteln erläutert wird.
+    
+    \subsection{Tabellen-Lookup}
+    Unsere Implementierung des Tabellen-Lookups besteht funktional aus 2 Teilen: Das effiziente Mapping vom Inputwert auf
+    die zugehörigen Werte in der Tabelle und das Interpolieren zwischen diesen.
+    
+    %Mapping
+    Das Mapping ist eine simple Hashfunktion, die die 19 höchstwertigsten Bit (ohne das Signbit) des Double-Inputwerts als Index benutzt. Daran kann man sehen, dass
+    unsere Tabelle logarithmisch aufgebaut ist $\rightarrow$ Jeder Exponent im Wertebereich hat dieselbe Anzahl an Werten gespeichert
     \subsubsection{Abwägung Genauigkeit und Performanz}
     \subsubsection{Problematik der "reinen" Reihenentwicklung}
     
 
-    \subsection{Tabellen-Lookup}
 
     
     % Theoretischer Teil
