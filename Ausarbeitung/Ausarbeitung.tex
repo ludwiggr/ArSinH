@@ -209,10 +209,10 @@
  
      \subsection{Implementierung mit komplexen Instruktionen}
      
-     Als Vergleichsimplementierung wurde eine weiter Funktion zu Rate gezogen, die komplexe Instruktionen der C-Math Bibiliothek verwendet. Die Verwendung solcher Instruktionen hat den Vorteil, dass dass die C-Math Bibiliothek hoch optimiert ist und somit sehr schnell ein exaktes Ergebnis liefern kann. Prinzipiell kann für die Berechnung die allgemeine Formel $ arsinh(x) = ln \left(x + \sqrt{x^2 + 1} \right)$ verwendet werden. Es kann allerdings bei der Berechnung von $x^2$ zu einem double Overflow kommen, falls x zu groß ist. Das ist genau dann der Fall, wenn $|x| > 2^{512}$, da dann $x^2 > 2^{1024}$ und damit außerhalb des durch double dargestellten Wertebereichs liegt. Damit für solche Werte nicht $\pm \inf$ zurückgegeben wird, verwenden wir für große x wie auch in der Reihenentwicklung die Näherung $arsinh(x)\approx ln(2x)$. Im Allgemeinen liefert diese Implementierung sehr exakte Werte. Eine Ausnahme stellen sehr kleine Werte dar, was im folgenden Abschnitt Genauigkeit noch näher erläutert werden soll.
+     Als Vergleichsimplementierung wurde eine weitere Funktion zu Rate gezogen, die komplexe Instruktionen der C-Math Bibiliothek verwendet. Die Verwendung solcher Instruktionen hat den Vorteil, dass die C-Math Bibiliothek hoch optimiert ist und somit sehr schnell ein exaktes Ergebnis liefern kann. Prinzipiell kann für die Berechnung die allgemeine Formel $ arsinh(x) = ln \left(x + \sqrt{x^2 + 1} \right)$ verwendet werden. Es kann allerdings bei der Berechnung von $x^2$ zu einem double Overflow kommen, falls x zu groß ist. Das ist genau dann der Fall, wenn $|x| > 2^{512}$, da dann $x^2 > 2^{1024}$ und damit außerhalb des durch double dargestellten Wertebereichs liegt. Damit für solche Werte nicht $\pm \inf$ zurückgegeben wird, verwenden wir für große x wie auch in der Reihenentwicklung die Näherung $arsinh(x)\approx ln(2x)$. Im Allgemeinen liefert diese Implementierung sehr exakte Werte. 
  
      \section{Genauigkeit}
-     Als Maßstab für die Genauigkeit unserer Ergebnisse wird im Folgenden der relative Fehler der Implementierung bezüglich des tatsächlichen mathematischen Funktionswert verwendet. Die folgenden Diagramme wurden erstellt, indem mithilfe einer C-Hilfsmethode für eine große Anzahl an Eingabewerten jeweils die Funktionswerte für alle drei Implementierungen brechnet und in Arrays gespeichert wurden. Anschließend wurden diese Funktionswerte in einem Python-Programm zu den jeweilgen relativen Fehlern ausgewertet und mithilfe der Bibiliothek matplotlib als Graph dargestellt.
+     Als Maßstab für die Genauigkeit unserer Ergebnisse haben wir den relative Fehler der Implementierung bezüglich des tatsächlichen mathematischen Funktionswert verwendet. Die folgenden Diagramme wurden erstellt, indem mithilfe einer C-Hilfsmethode für eine große Anzahl an Eingabewerten jeweils die Funktionswerte für alle drei Implementierungen brechnet und in Arrays gespeichert wurden. Anschließend wurden diese Funktionswerte in einem Python-Programm zu den jeweilgen relativen Fehlern ausgewertet und mithilfe der Bibiliothek matplotlib als Graph dargestellt.
  
      [weiß noch ned so genau wie man Bilder einfügt]
      
@@ -263,8 +263,8 @@
      Kompiliert wurde mit GCC 11.3.0 mit der Option -O3. Um eine optimale Vergleichbarkeit der Ergebnisse zu garantieren, wurden alle nicht für das Betriebssystem nötigen Prozesse beendet. 
  
      Da die Reihenentwicklung zwei sehr verschiedene Berechnungen für $|x|>1$ und $|x|\geq 1$ durchführt, wurden bei der Laufzeitmessung diese beiden Fälle unterschieden.
-     Ansonsten hängt die Laufzeit aller drei Implementierungen nur bedingt von der Größenordnung der Eingabewerte ab, daher wurde die Laufzeitmessung für die beiden Intervalle jeweils mit repräsentativen Werten verschiedener Größenordnungen durchgeführt.
-     Die Methoden wurden mit 10 verschiedenen Werten jeweils 100.000.000 mal aufgerufen, um dann das arithmetische Mittel der Zeit für einen Funktionsaufruf zu ermitteln.
+     Ansonsten hängt die Laufzeit aller drei Implementierungen nicht von der Größenordnung der Eingabewerte ab, daher wurde die Laufzeitmessung für die beiden Intervalle jeweils mit repräsentativen Werten verschiedener Größenordnungen durchgeführt.
+     Jede Funktion wurde 20 mal mit unterschiedlichen Werten auf Performanz geprüft und dabei zwischen den beiden Messpunkten jeweils 100.000.000 mal aufgerufen worden. Danach wurde daraus die durchschnittliche Zeit für einen Funktionsaufruf ermittelt.
  
      \subsubsection{Zeitmessung der Implementierungen}
  
@@ -300,11 +300,12 @@
      %Folgerungen
      Wie in der Abbildung zu sehen ist, ist die reine Reihen-Implementierung um ein Vielfaches (bis zu 12x) langsamer als die anderen
      beiden Vergleichsimplementierungen.
-     Hier liegt die Stärke einer Implementierung durch Lookup-Tabelle, da wir hier für jeden
-     Input nur sehr billige arithmetische Ausdrücke zum linearen Interpolieren verwenden.
-     Die Reihenentwicklung andererseits verwendet viele Multiplikationen und Summen über mehrere Iterationen, was jedoch als Reihendarstellung mit Polynomen nicht zu vermeiden ist.
+     Hier liegt auch die Stärke der Implementierung durch Lookup-Tabelle, die sogar mit der C-library mithalten kann.
+     Der Grund für die Effizienz der Lookup-Tabelle ist, dass wir hier für jeden
+     Input nur wenige billige arithmetische Ausdrücke sowohl für die Hashfunktion als auch zum linearen Interpolieren benötigen.
+     Die Reihenentwicklung andererseits verwendet eine große Anzahl an Multiplikationen und Summen über eine Menge von Iterationen, was jedoch für eine Reihendarstellung mit Polynomen nicht zu vermeiden ist.
      \sout{Die Implementierung mit komplexen Instruktionen ist noch etwas schneller als unser Lookuptable, ist jedoch als Teil der
-     C-library schwer zu unterbieten.} Bei dem Maß Genauigkeit wird die Reihenentwicklung von dem Lookup-Table übertroffen.
+     C-library schwer zu unterbieten.}
  
      \section{Zusammenfassung und Ausblick}
      \subsection{Zusammenfassung}
@@ -329,17 +330,20 @@
  
      \subsection{Ausblick}
  
-     In unserer Implementierung des $areasinus hyperbolicus$ haben wir uns auf eine reine Reihenentwicklung und eine einfache Lookup-Tabelle mit linearer Näherung beschränkt.
+     In unserer Implementierung des $areasinus hyperbolicus$ haben wir uns auf eine reine Reihenentwicklung und eine einfache Lookup-Tabelle mit linearer Näherung beschränken müssen.
      Unter weniger strengen Rahmenbedingungen ließe sich die Implementierung allerdings sowohl in Bezug auf Laufzeit, als auch Genauigkeit noch signifikant optimieren. 
      
-     Ein möglicher Ansatz ist die Verwendung von Splines in der Lookup-Tabelle: Statt der bisher linearen Näherung zwischen zwei Messpunkten in der Lookup-Tabelle, könnte man den $areasinus hyperbolicus$ in diesem Intervall durch eine Kurve annähern.
-     Hierzu werden in der Regel Polynome vom Grad drei verwendet.
+     Ein möglicher Ansatz ist die Verwendung von Splines in der Lookup-Tabelle: Statt der bisher linearen Näherung zwischen zwei Messpunkten in der Lookup-Tabelle, könnte man den $areasinus hyperbolicus$ in den Intervallen durch ein Polynom annähern.
+     Hierzu werden in der Regel Polynome vom Grad drei verwendet. Das wäre eine Kombination der Genauigkeit und Speichereffizienz der Reihendarstellung und der Performanz der Lookup-Tabelle. 
      Dadurch verbessert sich die Genauigkeit, insbesondere für x-Werte die genau zwischen zwei Werten in der Lookup-Tabelle liegen deutlich, während sich die Laufzeit nur minimal erhöht.
-     Dafür steigt allerdings der benötigte Speicherplatz, da nun für jedes Intervall ein Polynom gespeichert werden muss.
- 
-      Ein weiterer Ansatz wäre, eine Kombination aus Reihenentwicklung und Lookuptabelle zu verwenden: 
+     Dafür könnte allerdings der benötigte Speicherplatz steigen, da nun für jedes Intervall die Koeffizienten des Polynoms gespeichert werden müssten. Es könnte sich jedoch genauso herausstellen, dass durch die Polynominterpolation für eine hohe Genauigkeit eine geringere Dichte der Tabelleneinträge erforderlich ist, wodurch der Speicheraufwand wiederum sinken könnte.
+
+     Ein weiterer Ansatz wäre, eine andere Art der Kombination aus Reihenentwicklung und Lookuptabelle zu verwenden: 
      Wie zuvor beobachtet liefert die Berechnung mit einer Reihenentwicklung für x-Werte, die nicht nahe an Eins liegen, besonders genaue Ergebnisse. Für |x|<0.125 brauchen wir beispielsweise nur 13 Reihenglieder, für |x|>8 brauchen wir 13 Reihenglieder der Restreihe, sowie bis zu 33 Reihenglieder der Taylorreihe für ein exaktes Ergebnis. In diesen Intervallen bietet es sich also durchaus an eine reine Reihenentwicklung zu verwenden. In dem Intervall 0.125<=|x|<=8 braucht man allerdings mehr Reihenglieder, wodurch es zu Performanzeinbußen kommt. Es wäre demnach sinnvoll in diesem Intervall eine Lookuptabelle zu verwenden. Da der Wertebereich nun deutlich kleiner ist, lassen sich bereits in kleinen Lookuptabellen, deutlich exaktere Werte speichern, wodurch der maximale relative Fehler minimal gehalten wird. Dieser Ansatz zielt besonders auf die Genauigkeit des Ergebnisses ab. Durch die Verwendung einer Lookuptabelle erhöht sich zudem die Performanz, da für die verbleibenden x-Werte weniger Reihenglieder berechnet werden müssen, um ein exaktes Ergebnis zu erhalten. 
- 
+     
+     Welche Implementierung man nun wählt, hängt stark von der persönlichen Problemstellung ab. In den Fällen, in denen eine hohe Genauigkeit essentiell ist, wäre eine Variation mit Elementen einer Reihenentwicklung sinnvoll, solange man nicht eine große Menge Speicher zur Verfügung hat.
+     Wenn die Implementatierung besonders schnell sein soll, sollte andererseits ein Lookup-Table benutzt werden.
+
      Anzumerken ist zudem, dass sich insbesondere die Reihenentwicklung durch die Verwendung von Assemblerinstruktionen noch signifikant auf Laufzeit optimieren lässt. 
  
  % TODO: Fuegen Sie Ihre Quellen der Datei Ausarbeitung.bib hinzu
