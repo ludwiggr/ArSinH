@@ -1,7 +1,8 @@
 #include "approxArsinh_series.h"
 #include <string.h>
 
-#define LOG_TWO log(2.0)
+static const double LOG_TWO = 0.69314718055994530941;
+// static const double ROOT_TWO = 0x3FF6A09E667F3BCD;
 
 void printOutOfRange(void) {
     printf("Error: Input out of range!\nTry using the lookup table implementation instead.\n");
@@ -40,20 +41,19 @@ double approxLnTaylor(double x) {  //this is the Tayler Series for ln x around 1
     return sum;
 }
 
-double
-approxLn(double x) {       //converts ln(x) to ln(x'*2^n) = ln(x')+n*ln(2) so that the Taylor series can be applied to x
+double approxLn(double x) {       //converts ln(x) to ln(x'*2^n) = ln(x')+n*ln(2) so that the Taylor series can be applied to x
     signed long long mask = 0x7FF0000000000000;        //
     signed long long xToBit;
     memcpy(&xToBit, &x, 8);
     signed long long exp = ((xToBit & mask) >> 52) - 1023;
     signed long long xLowerTwo = (xToBit & 0xBFFFFFFFFFFFFFFF) | 0x3FF0000000000000;
-    double xNew;
-    memcpy(&xNew, &xLowerTwo, 8);
-    if (xNew > 1.3333333333333333) {  //this ensures, that x is as close to 1 as possible
-        xNew /= 2;                  //so the result is more accurate
+    double mantissa;
+    memcpy(&mantissa, &xLowerTwo, 8);
+    if (mantissa > 1.3333333333333333) {  //this ensures, that x is as close to 1 as possible
+        mantissa /= 2;                  //so the result is more accurate
         exp++;
     }
-    return approxLnTaylor(xNew) + exp * LOG_TWO;
+    return approxLnTaylor(mantissa) + exp * LOG_TWO;
 }
 
 double approxAsymptoticExpansionRest(double x) {
@@ -73,6 +73,42 @@ double approxAsymptoticExpansionRest(double x) {
         prev *= InvSqr;
     }
     return sum;
+}
+
+
+double approx_root(double x, size_t iterations){
+    // signed long long mask = 0x7FF0000000000000;        //
+    // signed long long xToBit;
+    // double root = 0;
+    // memcpy(&xToBit, &x, 8);
+    // signed long long exp = xToBit & mask;
+    // signed long long xLowerTwo = (xToBit & 0xBFFFFFFFFFFFFFFF) | 0x3FF0000000000000;
+    // if(exp&0x001 == 1){
+    //     root = ROOT_TWO;
+    // }
+    // double mantissa;
+    // memcpy(&mantissa, &xLowerTwo, 8);
+    double x0 = (x + 1)/4 + x/(x + 1);
+
+    for(size_t i = 0;i<iterations;i++){
+        x0 = (x0 + x/x0)/2;
+    }
+
+
+    return x0;
+}
+
+double approxArsinh_series2(double x) {
+    if (x == -INFINITY || x == INFINITY || x == NAN || x == -NAN) {
+        return x;
+    }
+    else if(x<0){
+        return -(approxLn(x + approx_root(x*x + 1, 3)));
+    }
+    else if(x<10){
+        return approxLn(x + approx_root(x*x + 1, 3));
+    }
+    return LOG_TWO + approxLn(x);
 }
 
 double approxArsinh_series(double x) {
