@@ -28,103 +28,47 @@
 
 
     \section{Einleitung}
-    Die gegebene Aufgabenstellung A316 verlangt die Implementierung der Funktion $\operatorname{f}(x) = arsinh(x)$ im C17 Standard von C.
-    Wie die angewandte Methodik und der mathematische Lösungsansatz aussieht, wird im Folgenden beschrieben.
+    In den Bereichen der Mathematik, Ingenieurwissenschaften und Datenverarbeitung gibt es zahlreiche Anwendungen, in denen die Berechnung bestimmter mathematischer Funktionen von großer Bedeutung ist. Eine dieser Funktionen ist der \textit{Areasinus Hyperbolicus} ($arsinh(x)$), der unter anderem die Beschreibung nichtlinearer Beziehungen und Modellierung komplexer Zusammenhänge ermöglicht. Um die Genauigkeit und Effizienz solcher Berechnungen zu garantieren, ist es von entscheidender Bedeutung, die Berechnung des $arsinh(x)$ effizient umzusetzen.  
 
-    \subsection{Einführung}
-    %Allgemeine Einführung und Abwägung bei Optimierungen
-    Im Folgenden wird ein Problem aus dem Bereich der optimierung von Programmen behandelt.
-    Diese Optimierung kann unter verschiedenen im Folgenden erläuterten Kriterien erfolgen.
-    Die Optimierung vom Programmen ist im Allgemeinen immer ein Abwägen zwischen Implementierungsaufwand/Laufzeit in Zyklen/Laufzeit in Zeit/Energieaufwand/Portabilität/Speicherverbrauch und weiteren Anwendungsspezifischen Faktoren. $[das bissl Schmarrn]$
-    Diese Abwägungen werden im Folgenden auch bei den Implementierungen getroffen und und es wird versucht ein 'optimales' Ergebnis in verschiedenen Dimensionen zu erzielen, zu messen und zu bewerten.
-    Hierbei dient uns der Vergleich als Bewertungskriterium und die bewerteten Dimensionen werden in den weiteren Kapiteln noch genauer spezifiziert.
-    Eine Bewertung der Ergebnisse erfolgt am Ende des Kapitels Performanzanalyse.
+    \subsection{Der Areasinus Hyperbolicus}
+    Der arsinh(x) kann auf verschiedene Arten definiert werden.
 
-    %Motivation
-    Die Gruppe der hyperbolischen Funktionen wird für die Hankel-Transformation~\cite{hankel}, $[bro wasis das]$
-    bei der Lösung bestimmter Differenzialgleichungen~\cite{differenzial}, bei der Beschreibung von Katenoiden~\cite{katenoid}
-    sowie in den Friedmann-Gleichungen für die zeitliche Entwicklung der Ausdehnung des Universums~\cite{universum1,universum2}~ benötigt. 
-    Für diese üblicherweise rechenintensiven Anwendungen ist eine effiziente und genaue Implementierung aller dafür verwendeten Funktionen essenziell um Gesamtergebnisse effizient erzielen zu können.
-    Deshalb widmed sich diese Ausarbeitung im folgenden der Implementierung einer hyperbolischen Funktion, dem $arsinh$.
+     1. Mit der Formel: $\ln \left(x + \sqrt{x^2 + 1} \right)$
 
-    \subsection{Aufgabenstellung analysiert und spezifiziert}
-    Die gestellte Aufgabe verlangt die numerische Berechnung der Funktion f(x) = arsinh(x) im C17 Standard von C.
+     
+    2. Über das Integral: $\int_{0}^{1} {\frac{x}{\sqrt{x^2 y^2 + 1}} \,\mathrm{dy}}$
+
+    
+    3. Als Umkehrfunktion des Sinus Hyperbolicus:  $\operatorname{sinh}(x) = \frac{e^x-e^{-x}}{2}$
+    
+    Im Limit kann er durch $\pm \ln(2|x|)$ angenähert werden.
+    Als für die Implementierung relevante mathematische Eigenschaft sei die Punktsymmetrie zum Ursprung bereits hier zu erwähnen. 
 
 
-    %Mathematische Analyse
-    Über den komplexen Zahlen $\mathbb{C}$ bildet die Funktion $arsinh$ mehrwertig ab, weshalb die Einschränkung auf die reellen Zahlen $\mathbb{R}$ getroffen wird.
-    Die Funktion area sinus hyperbolicus bildet über $\mathbb{R}$ nach $\mathbb{R}$ ab und ist im Bereich $-\infty < x < + \infty$ definiert.
-    Der area sinus hyperbolicus kann über den Logarithmus oder über ein Integral definiert werden.
 
-    $$ (1) \operatorname{arsinh}(x) = \ln \left(x + \sqrt{x^2 + 1} \right) \, mit \, x \in \mathbb{R}$$
-
-    $$ (2) \operatorname{arsinh}(x) = \int_{0}^{1} \frac{x}{\sqrt{x^2 y^2 + 1}} \,\mathrm{dy} \, mit \, x \in \mathbb{R} $$
-
-    Im Limit kann er durch die Funktion $ (3) f(x)\to \pm \ln(2|x|)$ angenähert werden.
-    Als für die Implementierung relevante mathematische Eigenschaft die Punktsymmetrie zum Ursprung $(0,0)$ bereits hier zu erwähnen. In der folgenden Analyse werden wir daher primär den Wertebereich $x \leq 0$ analysieren. Der negative Fall verhält sich jeweils symmetrisch.
-    %Die Familie der hyperbolischen Funktionen sind quadratische rationale Funktionen von der Exponentialfunktion $\exp$,
-    %die über die Mitternachtsformel gelöst werden könnten und mit dem natürlichen Logarithmus $\ln$ ausgedrückt werden.
-    %Überleitung
-    Bei der Abbildung einer stetigen Funktion in ein endliches System müssen zudem Einschränkungen im Wertebereich sowie bei der Genauigkeit getroffen werden.
-
-    %Implementierung
-    Letzteres wird im eigens dafür vorgesehenen Kapitel Genauigkeit diskutiert, allgemein kann jedoch bereits zum Datentyp $double$ erwähnt werden, dass bei 52 Fragment-bits eine dezimale Genauigkeit von $53*\log10(2) \approx 15,96$ Nachkommastellen die Grenze des Datentyps darstellt.~\cite{StandardforBinaryFloating}
-    Erstere Grenze gibt die Aufgabenstellung indirekt durch die doppelte Genauigkeit der Fließkommaarithmetik vor.
-    Der Wertebereich der Implementierung ist ebenso durch den Datentypen $double$ beschränkt $\min(double) \approx 2,2250738585072014* 10^{308}$ und $\max(double) \approx 1,7976931348623157 * 10^{308}$
-    Die Werte $\pm \infty$ und $\pm NaN$ sind bei $double$ besonders zu beachten.
-    Da die Funktion streng monoton steigend ist, definieren wir:
-    \[(4) \operatorname{arsinh}(x) =
-    \begin{cases}
-        arsinh(x)     & \text{ falls } x < \infty \wedge \, x > -\infty \\
-        +NaN  & \text{ falls } x = +NaN \\
-        -NaN  & \text{ falls } x = -NaN \\
-        +\infty     & \text{ falls } x = +\inf \\
-        -\infty     & \text{ falls } x = -\inf \\
-        +NaN     & \text{ sonst }
-
-    \end{cases}\]
-    Ein Problem bei $double$ ist zudem die Endianness, die nicht in IEEE 754~\cite{StandardforBinaryFloating-PointArithmetic} spezifiziert ist.
-    Es könnte also zu Fehlern zwischen Systemen kommen, die Behandlung dessen übersteigt den Umfang diese Ausarbeitung und wird deshalb aus dem Themenbereich ausgeschlossen.
-
-    Neben den sich aus dem Datentyp ergebenden Einschränkungen stellt die Aufgabenstellung ebenso Einschränkungen an arithmetischen Operatoren.
-    In den naiven Ausarbeitungen dürfen nur grundlegende Berechnungen, also die vier Grundrechenarten sowie shifts verwendet werden.
-    In der weiterführenden Ausarbeitung sind komplexe Berechnungen wie $exp$ oder $log$ sowie SIMD, SSE zugelassen und weitere Optimierungen wie Loop-unrolling, Endrekursion, die Wahl anderer Algorithmen und Datenstrukturen erlaubt und erwünscht.
-
-
-    Von den beiden geforderten Vergleichsimplementierungen als Reihenentwicklung und als Tabellen-Lookup ist letztere bereits als eine Form der Optimierung zu verstehen und kann deshalb bereits mit der Reihe, ceteris paribus, verglichen werden.
-    Tabellen-Lookup scheint für die gegebene Aufgabe eine gute Optimierung zu sein, da für eine bekannte Menge an Funktionswerten häufige und identische Berechnungen durchgeführt werden.
-    Die Wahl der größe eines Tabellen-Lookups ist eine Abwägung zwischen Genauigkeit, Laufzeit und Speicherplatz, dies wird im Folgendem Kapitel Optimierungen weiter erläutert.
-
-
-    Gemäß Aufgabenstellung werden drei C-Implementierungen erarbeitet und verglichen.
-
-
-    (A) Implementierung als reine Reihendarstellung mit grundlegenden Berechnungen
-
-
-    (B) Implementierung als Tabellen-Lookup mit grundlegenden Berechnungen
-
-
-    (C) Hauptimplementierung: Eine Implementierung nach freier Wahl mit komplexen Instruktionen
-
-    Ebenso wird zum Vergleich eine Implementierung (D) basierend auf der <math.h> Bibliothek verwendet.
-
-    Im folgenden werden die Implementierungen mit den respektiven Buchstaben $(A)$ - $(D)$ referenziert, die nummerierten Formeln und Definitionen analog mit den Zahlen $(1)$ - $(4)$. 
-    $A$ wird im Folgenden als naive Implementierung und $(D)$ als Benchmark für die Performanz und Genauigkeit verwendet. 
-
-
-    Das Rahmenprogramm unterstützt die Funktionen $-V<Zahl>$ für die Wahl der Implementierung, $-B<Zahl>$ für die Wiederholungen des Funktionsaufrufs, $<Floating Point Zahl>$ für den Wert $x$, $-h$ oder $--help$ für die Beschreibung der Optionen des Programms und Verwendungsbeispiele hierfür.
+    \subsection{Analyse und Spezifikation der Aufgabenstellung}
+    Diese Arbeit zielt darauf ab, die verschiedenen Algorithmen und Techniken zur Implementierung des $arsinh(x)$ in C zu untersuchen und zu vergleichen. Hierbei wird zum einen eine reine Reihendarstellung und zum anderen eine Methodik, die einen Tabellenlookup verwendet, hergeleitet.  Sowohl für Lookuptabelle, als auch Reihenentwicklung sollen keine komplexen mathematischen Instruktionen verwendet werden, wir beschränken uns in erster Linie auf die vier Grundrechenarten. Als Vergleichsimplementierung wird eine weitere Funktion unter Verwendung komplexerer Instruktionen herangezogen. 
+    Bei der Optimierung aller Implementierungen gilt es stets zwischen Performanz, Speicherplatz und Genauigkeit des Ergebnisses abzuwägen und einen guten Mittelweg zu finden.
    
+    Für unsere Implementierung haben wir folgende Annahmen getroffen.
+    Mit der \textbf{"reinen"  Reihenentwicklung} bezeichnen wir eine Implementierung, welche mit exakt einer Reihendarstellung die Funktionswerte berechnet. Fallunterscheidungen nach x sollen in dieser Implementierung also grundsätzlich nicht gemacht werden. Hierbei soll eine Reihe gewählt werden, deren Konvergenzbereich am ehesten für ein mögliches Anwendungsgebiet geeignet ist.
+   
+    Da die reine Reihenentwicklung nicht für alle Eingabewerte konvergiert, soll zudem eine weitere Funktion umgesetzt werden, die \textbf{mehrere Reihenentwicklungen für verschiedene Intervalle} der Eingabe verwendet. Es soll dennoch die Anzahl der Fallunterscheidungen minimal gehalten werden, indem  möglichst wenige verschiedene Reihenentwicklungen und eine feste Anzahl an berechneten Reihengliedern verwendet werden.
 
-    Eine Implementierung in Assembly ist nicht gefordert und es wird in dieser Ausarbeitung auch darauf verzichtet, da der Fokus im Folgenden auf Genauigkeit und nicht auf Performanz liegen wird.
-    Ebenso wird auf Mikro-Optimierungen verzichtet, da es allgemein schwer ist moderne Compiler in Optimierungsaufgaben zu schlagen und der Code hierdurch schwerer zu lesen, fehleranfälliger und schwerer zu warten wird.
-    Dies steht allgemein best-practices im Software-Engineering entgegen.
+    Für die Implementierung der \textbf{Lookuptabelle} haben wir die Annahme getroffen, dass nur begrenzt Speicherplatz zu Verfügung steht, also keine beliebige Menge an Tabelleneinträgen gespeichert werden kann. Eine Abwägung zwischen Speicherplatz und Genauigkeit findet sich in Kapitel 2.2. Wir haben uns zudem aufgrund der schweren Umsetzbarkeit gegen die Verwendung von Splines bei der Näherung und für eine Lookuptabelle mit linearer Interpolation entschieden.
+
+    Als \textbf{Vergleichsimplementierung} verwenden wir die arsinh(x) Funktion der C math Bibiliothek. Diese wird in erster Linie für die Bewertung der Genauigkeit zu Rate gezogen. Es sei an dieser Stelle bereits erwähnt, dass Funktionen der C-Mathematikbibliothek auf Maschinenebene implementiert sind bestimmte Hardwarefunktionen nutzen können. Daher wird diese Implementierung an Performanz kaum zu übertreffen sein.
+
+    Diese vier Implementierungen sollen in Kapitel 3 und 4 auf Performanz und Genauigkeit untersucht, verglichen und anhand der Ergebnisse bewertet werden.
+    
 
 
     \section{Lösungsansatz}
 
     Sowohl für die Implementierung mit einer Reihendarstellung, als auch für die Lookuptabelle haben wir uns die Punktsymmetrie der $arsinh$-Funktion zunutze gemacht: $arsinh(-x) = -arsinh(x)$. Die Funktionswerte für negative Eingabewerte, werden als $-arsinh(|x|)$ berechnet.
-    \subsection{Reihendarstellung}
+    \subsection{Reine Reihendarstellung}
+    
+    \subsection{Reihendarstellung mit verschiedenen Reihen}
     Da Reihenentwicklungen in der Regel nur begrenzte Gültigkeitsbereiche haben, verwenden wir verschiedene Reihen für die Intervalle $|x| < 1$ und $|x| > 1$: 
       \[ \operatorname{arsinh}(x) =
     \begin{cases}
@@ -190,11 +134,11 @@
     Wie man sieht, benötigt man für Eingabewerte nahe an 1 eine unvertretbar hohe Anzahl an Reihengliedern für ein exaktes Ergebnis. Damit die Reihenentwicklung performanztechnisch noch ansatzweise mit der Lookuptabelle mithalten kann, haben wir uns also dafür entschieden, die Anzahl der zu berechnenden Reihenglieder für \textit{TaylorArsinh} und \textit{Restreihe} bei 13 zu belassen und damit einen geringen relativen Fehler in den Intervallen $0.25<|x|<4$ in Kauf zu nehmen. 
     Relativer fehler und Performanz werden in den folgenden Kapiteln noch näher untersucht.
     
-    Es sei an dieser Stelle bereits erwähnt, dass sich ausgehend von diesen Untersuchungen eine weitere Optimierung umsetzen lassen würde, die (beispielsweise mithilfe des Exponenten des Eingabewertes) jeweils die Anzahl der nötigen Reihenglieder bestimmt und dann nur diese berechnet. Durch diese Optimierung würde unnötiger Overhead durch die Berechnung von Reihenglieder, die nichts am Endergebnis ändern, vermieden. Aufgrund der Beschränkung auf eine "reine" Reihenentwicklung haben wir allerdings auf diese Optimierung verzichtet. 
+    Es sei an dieser Stelle bereits erwähnt, dass sich ausgehend von diesen Untersuchungen eine weitere Optimierung umsetzen lassen würde, die (beispielsweise mithilfe des Exponenten des Eingabewertes) jeweils die Anzahl der nötigen Reihenglieder bestimmt und dann nur diese berechnet. Durch diese Optimierung würde unnötiger Overhead durch die Berechnung von Reihenglieder, die nichts am Endergebnis ändern, vermieden. Da wir die Fallunterscheidungen minimieren wollten, haben wir allerdings auf diese Optimierung verzichtet.
 
 
     
-    \subsubsection{Problematik der "reinen" Reihenentwicklung}
+    %\subsubsection{Problematik der "reinen" Reihenentwicklung}
 
     
     \subsection{Tabellen-Lookup}
@@ -224,17 +168,22 @@
     % Lagrange Polynome
     % Tailor-Reihe / Tailor Entweicklung<<
 
-    \subsection{Implementierung mit komplexen Instruktionen}
-    
-    Als Vergleichsimplementierung wurde eine weiter Funktion zu Rate gezogen, die komplexe Instruktionen der C-Math Bibiliothek verwendet. Die Verwendung solcher Instruktionen hat den Vorteil, dass dass die C-Math Bibiliothek hoch optimiert ist und somit sehr schnell ein exaktes Ergebnis liefern kann. Prinzipiell kann für die Berechnung die allgemeine Formel $ arsinh(x) = ln \left(x + \sqrt{x^2 + 1} \right)$ verwendet werden. Es kann allerdings bei der Berechnung von $x^2$ zu einem double Overflow kommen, falls x zu groß ist. Das ist genau dann der Fall, wenn $|x| > 2^{512}$, da dann $x^2 > 2^{1024}$ und damit außerhalb des durch double dargestellten Wertebereichs liegt. Damit für solche Werte nicht $\pm \inf$ zurückgegeben wird, verwenden wir für große x wie auch in der Reihenentwicklung die Näherung $arsinh(x)\approx ln(2x)$. Im Allgemeinen liefert diese Implementierung sehr exakte Werte. Eine Ausnahme stellen sehr kleine Werte dar, was im folgenden Abschnitt Genauigkeit noch näher erläutert werden soll.
+    %\subsection{Implementierung mit komplexen Instruktionen}
+
+    %Als Vergleichsimplementierung wurde eine weiter Funktion zu Rate gezogen, die komplexe Instruktionen der C-Math Bibiliothek verwendet. Die Verwendung solcher Instruktionen hat den Vorteil, dass dass die C-Math Bibiliothek hoch optimiert ist und somit sehr schnell ein exaktes Ergebnis liefern kann. Prinzipiell kann für die Berechnung die allgemeine Formel $ arsinh(x) = ln \left(x + \sqrt{x^2 + 1} \right)$ verwendet werden. Es kann allerdings bei der Berechnung von $x^2$ zu einem double Overflow kommen, falls x zu groß ist. Das ist genau dann der Fall, wenn $|x| > 2^{512}$, da dann $x^2 > 2^{1024}$ und damit außerhalb des durch double dargestellten Wertebereichs liegt. Damit für solche Werte nicht $+\inf$ zurückgegeben wird, verwenden wir für große x wie auch in der Reihenentwicklung die Näherung $arsinh(x)\approx ln(2x)$. Im Allgemeinen liefert diese Implementierung sehr exakte Werte. Eine Ausnahme stellen sehr kleine Werte dar, was im folgenden Abschnitt Genauigkeit noch näher erläutert werden soll.
 
     \section{Genauigkeit}
     Als Maßstab für die Genauigkeit unserer Ergebnisse wird im Folgenden der relative Fehler der Implementierung bezüglich des tatsächlichen mathematischen Funktionswert verwendet. Die folgenden Diagramme wurden erstellt, indem mithilfe einer C-Hilfsmethode für eine große Anzahl an Eingabewerten jeweils die Funktionswerte für alle drei Implementierungen brechnet und in Arrays gespeichert wurden. Anschließend wurden diese Funktionswerte in einem Python-Programm zu den jeweilgen relativen Fehlern ausgewertet und mithilfe der Bibiliothek matplotlib als Graph dargestellt.
 
-    \includegraphics[scale = 0.17]{Figure_1.png}
-    \includegraphics[scale = 0.33]{Figure_2.png}
+    \includegraphics[scale = 0.17,]{Figure_1.png}
+    \includegraphics[scale = 0.33,]{Figure_2.png}
     
-    \subsection{Reihenentwicklung}
+    \subsection{Reine Reihenentwicklung}
+    
+
+
+    
+    \subsection{Reihenentwicklung mit mehreren Reihen}
     Wie deutlich im ersten Diagramm erkennbar, liefert die Reihenentwicklung außerhalb der Intervalle $0.25<x<4$ nahezu immer den exakten Funktionswert. Es gibt einige Ausnahmen mit einem verschwindend geringen relativen Fehler $\leq2^{-50}$ , welche sich durch floating-point-Rundungsfehler bei der Umrechnung der Polynomkoeffizienten erklären lassen.
     Für einen Großteil der Eingabewerte liefert diese Funktion also tasächlich den genauest möglichen Funktionswert für den Datentyp double. Eine Ausnahme bildet jedoch das Intervall $0.25<|x|<4$. 
     
@@ -258,7 +207,7 @@
     
     
     \subsection{Lookuptabelle}
-    Die Genauigkeit des Ergebnisses bei der Verwendung der Lookuptabelle hängt stark von den Eingabewerten ab. Ist der Eingabewert exakt einer der vorgespeicherten Werte in der Tabelle, so liefert die Funktion logischerweise das exakte Ergebnis. Am ungenauesten ist die Funktion für Eingabewerte, die genau zwischen zwei gespeicherten Tabellenwerten liegen. Um dies angemessen zu repräsentieren, haben wir für die Erstellung der Diagramme gut verteilte Eingabewerte gewählt, von denen manche näher an einem Eintrag in der Lookuptabelle liegen und manche genau zwischen zwei Einträgen.  
+    Die Genauigkeit des Ergebnisses bei der Verwendung der Lookuptabelle hängt stark von den Eingabewerten ab. Ist der Eingabewert exakt einer der vorgespeicherten Werte in der Tabelle, so liefert die Funktion logischerweise das exakte Ergebnis. Am ungenauesten ist die Funktion für Eingabewerte, die genau zwischen zwei gespeicherten Tabellenwerten liegen. Diese Unterschiede lassen sich deutlich an der großen vertikalen Streuung der Fehlerwerte erkennen.
     
     Im ersten Diagramm ist zudem deutlich erkennbar, dass die Funktion wie auch die Reihenentwicklung deutlich ungenauere Ergebnisse für Eingabewerte nahe an 1 liefert. Dies lässt sich mithilfe des Krümmunsverhaltens der Funktion begründen. Der folgende Graph zeigt die zweite Ableitung des $arsinh''(x) = \frac{-x}{x^2\cdot \sqrt{x^2+1}+\sqrt{x^2+1}}$
 
