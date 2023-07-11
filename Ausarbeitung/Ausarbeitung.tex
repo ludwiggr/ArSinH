@@ -202,8 +202,10 @@
      \section{Genauigkeit}
      Als Maßstab für die Genauigkeit unserer Ergebnisse wird im Folgenden der relative Fehler der Implementierung bezüglich des tatsächlichen mathematischen Funktionswert verwendet. Die folgenden Diagramme wurden erstellt, indem mithilfe einer C-Hilfsmethode für eine große Anzahl an Eingabewerten jeweils die Funktionswerte für alle drei Implementierungen brechnet und in Arrays gespeichert wurden. Anschließend wurden diese Funktionswerte in einem Python-Programm zu den jeweilgen relativen Fehlern ausgewertet und mithilfe der Bibiliothek matplotlib als Graph dargestellt.
  
-     \includegraphics[scale = 0.17,]{Figure_1.png}
-     \includegraphics[scale = 0.33,]{Figure_2.png}
+     \includegraphics[]{Figure1.pdf}
+     \includegraphics[]{Figure2.pdf}
+     \includegraphics[]{Figure3.pdf}
+
      
      \subsection{Reine Reihenentwicklung}
      
@@ -292,8 +294,8 @@
              height= \axisdefaultheight,
              bar width = 0.3 cm,
              enlarge x limits = {abs = 1.5 cm},
-             symbolic x coords = {Reihe, Lookup,  predefined},
-             xtick={Reihe, Lookup, predefined},
+             symbolic x coords = {gemischte Reihe, reine Reihe,  Lookup,  predefined},
+             xtick={gemischte Reihe, reine Reihe, Lookup, predefined},
              ylabel={Zeit in ns},
              xlabel={Implementierung},
              legend style={at={(0.6, 0.9)},
