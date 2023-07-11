@@ -28,14 +28,30 @@
  
  
      \section{Einleitung}
-     In den Bereichen der Control-Theory und Datenverarbeitung gibt es zahlreiche Anwendungen, in denen die Berechnung bestimmter mathematischer Funktionen von großer Bedeutung ist. Eine dieser Funktionen ist der \textit{Areasinus Hyperbolicus} ($arsinh(x)$), der unter anderem die Beschreibung nichtlinearer Beziehungen und Modellierung von Sättigungsprozessen ermöglicht. Das liegt an der Eigenschaft des $arsinh(x)$ für größer werdende Inputwerte immer langsamer zu steigen, aber ohne eine Asymptote zu besitzen. Um die Genauigkeit und Effizienz solcher Berechnungen zu garantieren, ist es von entscheidender Bedeutung, die Berechnung des $arsinh(x)$ effizient umzusetzen.  
+     In den Bereichen der Control-Theory und Datenverarbeitung gibt es zahlreiche Anwendungen, in denen die Berechnung bestimmter mathematischer Funktionen von großer Bedeutung ist. Eine dieser Funktionen ist der \textit{Areasinus Hyperbolicus} ($arsinh(x)$), der unter anderem die Beschreibung nichtlinearer Beziehungen und Modellierung von Sättigungsprozessen ermöglicht. Um die Genauigkeit und Effizienz solcher Berechnungen zu garantieren, ist es von entscheidender Bedeutung, die Berechnung des $arsinh(x)$ effizient umzusetzen.  
+          \begin{tikzpicture}
+         \begin{axis}[
+             legend pos = north west,
+             width = 15 cm,
+             height = 5 cm,
+             xmin = -12, xmax = 12,
+             ymin = -4, ymax = 4,
+             axis lines=middle, 
+             axis line style={->},
+             domain= -20: 20,
+             samples = 500
+             ]
+             \addplot[] {ln(x + sqrt(x*x+1))};
+             \legend{$arsinh(x) = ln(x + \sqrt{x^2 + 1})$}
+             
+         \end{axis}
+     \end{tikzpicture}
      
  
-     \subsection{Der Areasinus Hyperbolicus}
  
  
      \subsection{Analyse und Spezifikation der Aufgabenstellung}
-     Unsere Aufgabe ist hierbei eben diesen $arsinh(x)$ zu approximieren.
+     Unsere Aufgabe ist eben diesen $arsinh(x)$ zu approximieren.
      Genauergesagt verlangt die Aufgabenstellung explizit zwei Implementierungen, die nur auf einfachen arithmetischen Ausdrücken basiert sowie eine Vergleichsimplementierung, die komplexe Instruktionen benutzen darf. Eine dieser Implementierungen muss soll dabei eine reine Reihe sein, während die andere einen Tabellen-Lookup benutzen soll.
     
      Für unsere Implementierung haben wir folgende Annahmen getroffen.
@@ -66,8 +82,8 @@
      
      \[ \operatorname{arsinh}(x) =
      \begin{cases}
-        \sum_{k = 0}^{\infty} \frac{(-1)^k(2k)!x^{2k + 1}}{(2k + 1)(2^k*k!)^2}     & \text{ falls } |x| < 1 \\
-        ln(2x) + \sum_{k = 1}^{\infty} \frac{(-1)^{k - 1}(2k)!x^{2k + 1}}{2k(2^k\cdot k!)^2} \cdot \frac{1}{x^{2k}}  & \text{ falls } |x| >1 \\
+        \textit{TaylorArsinh}     & \text{ falls } |x| < 1 \\
+        ln(2x) + error(x)  & \text{ falls } |x| >1 \\
         x     & \text{ falls } x \in \{\pm\inf, \pm Nan\}\\
     \end{cases}\]
     Für eine bessere Verständlichkeit werden wir nach diesem Kapitel die drei Reihen mit \textit{TaylorArsinh}, \textit{TaylorLn} und \textit{Restreihe} bezeichnen.
@@ -96,15 +112,20 @@
      \[
          \textbf{\textit{TaylorLn}}\coloneqq\ln(x) = \sum_{k = 1}^{\infty} \frac{(-1)^{k + 1}}{k}(x - 1)^k
      \]
-     Aufgrund der begrenzten Gültigkeit der Reihe müssen wir uns das $double$ Datenformat zunutze machen, um die Berechnung zu optimieren. Durch eine Bitmaske lassen sich effizient Exponent und Mantisse von $x$ ermitteln. Mit Exponent und Mantisse lässt sich nun folgende Umformung treffen:
+     Aufgrund der begrenzten Gültigkeit der Reihe machen wir uns bei der gemischten Implementierung das $double$ Datenformat zunutze machen, um die Berechnung zu optimieren. Durch eine Bitmaske lassen sich effizient Exponent und Mantisse von $x$ ermitteln. Mit Exponent und Mantisse lässt sich nun folgende Umformung treffen:
      \begin{gather*}
          x = M\cdot2^E \,\,\, mit \,\,\, M = implizierte Mantisse \,\,\, E = implizierter Exponent\\
          arsinh(x) \approx \ln(2x) = \ln(2) + \ln(x) = \ln(2) + \ln(M\cdot2^E) = \ln(2) + E\cdot\ln(2) + \ln(M)\\
      \end{gather*}
      Da $M\in[1, 2[$ liegt, kann nun \textit{TaylorLn} für die Berechnung von $\ln(M)$ verwendet werden. Da die Reihe bereits für wenige Reihenglieder exaktere Ergebnisse liefert, je näher der zu berechnende Wert an Eins liegt, haben wir uns dafür entschieden, alle Werte der Mantisse, die über $1.\overline{3}$ liegen, nochmal zu halbieren und stattdessen den Exponenten um 1 zu erhöhen. Es gilt damit $M\in[0.\overline{6}, 1.\overline{3}]$. 
-     \begin{gather*}\end{gather*}
 
-     Die Koeffizienten der einzelnen Reihenglieder zu berechnen ist extrem Laufzeitaufwendig, da insbesondere die Berechnung der Fakultät viel Zeit kostet. Daher lässt sich die Berechnung optimieren, indem die Koeffizienten aller drei Reihen bereits vor Runtime berechnet werden. Durch das Horner-Schema lässt sich nun die Reihe besonders effizient berechnen. 
+     Bei unserer Hauptimplementierung jedoch benutzen wir die Folgende Umformung:
+     \[
+            arsinh(x)\approx ln(2x) + error(x) = ln(2) - ln(\frac{1}{x}) + error(x)
+     \]
+     Dadurch bekommen wir im Argument des natürlichen Logarithmus wieder einen Wert für den die \textbf{TaylorLn} gilt. Um nun die reine Reihe zu erhalten, werden die beiden Reihen zu einer vereinigt. Es lassen sich nämlich durch Ausmultiplizieren der ersten n Reihenglieder die Koeffizienten bestimmen und eine herkömmliche Reihe der Form $\sum_{k=0}^{n} a_k x^{-k}$ erstellen.
+
+     Die Koeffizienten der einzelnen Reihenglieder zu berechnen ist jedoch extrem Laufzeitaufwendig, da insbesondere die Berechnung der Fakultät viel Zeit kostet. Daher lässt sich die Berechnung optimieren, indem die Koeffizienten aller drei Reihen bereits vor Runtime berechnet werden. Durch das Horner-Schema lässt sich nun die Reihe besonders effizient berechnen. 
      
  
      \subsubsection{Abwägung Genauigkeit und Performanz}
@@ -120,17 +141,16 @@
      
      Betrachten wir nun \textit{TaylorArsinh}. Das k-te Reihenglied hat den Betrag
      \[
-     \frac{(2k)!}{(2k + 1)(2^k*k!)^2}\cdot \frac{1}{x^{2k}}
+     \frac{(2k)!}{(2k + 1)(2^k*k!)^2}\cdot x^{2k+1}
      \]
      Aus dieser Formel lässt sich bereits ablesen, dass ein Reihenglied kleiner ist, je kleiner x ist. Die Reihe liefert demnach bereits mit weniger Reihengliedern genauere Ergebnisse, je näher x an 0 liegt. Setzt man versuchsweise bestimmte Werte von x in die Formel ein, so lässt sich feststellen, dass für x = 0.25 alle Reihenglieder ab dem etwa 13. Glied keinen Einfluss mehr auf das Endergebnis haben. Für x = 0.5 müssen hingegen 26 Reihenglieder berechnet werden. Für x = 0.99 sind wir bereits bei etwa 1500 Reihengliedern. 
      
-     Für die \textit{Restreihe}, kann eine äquivalente Überlegung getroffen werden, die ebenfalls belegt, dass exponentiell mehr Reihenglieder benötigt werden, je näher sich x 1 annähert.
+     Für die \textit{Restreihe}, kann eine äquivalente Überlegung getroffen werden, die ebenfalls belegt, dass exponentiell mehr Reihenglieder benötigt werden, je näher x an 1 liegt.
      
+     Wie man sieht, benötigt man für Eingabewerte nahe an 1 eine unverhältnismäßig hohe Anzahl an Reihengliedern für ein exaktes Ergebnis. Aufgrund dieses exponentiellen Wachstums, haben wir uns also dafür entschieden, die Anzahl der zu berechnenden Reihenglieder für \textit{TaylorArsinh} und \textit{Restreihe} bei 13 zu belassen und damit einen geringen relativen Fehler in den Intervallen $0.25<|x|<4$ in Kauf zu nehmen. 
+     Das Gegenspiel von relativen Fehler und Performanz werden in den folgenden Kapiteln noch näher untersucht und belegt.
      
-     Wie man sieht, benötigt man für Eingabewerte nahe an 1 eine unvertretbar hohe Anzahl an Reihengliedern für ein exaktes Ergebnis. Damit die Reihenentwicklung performanztechnisch noch ansatzweise mit der Lookuptabelle mithalten kann, haben wir uns also dafür entschieden, die Anzahl der zu berechnenden Reihenglieder für \textit{TaylorArsinh} und \textit{Restreihe} bei 13 zu belassen und damit einen geringen relativen Fehler in den Intervallen $0.25<|x|<4$ in Kauf zu nehmen. 
-     Relativer fehler und Performanz werden in den folgenden Kapiteln noch näher untersucht.
-     
-     Es sei an dieser Stelle bereits erwähnt, dass sich ausgehend von diesen Untersuchungen eine weitere Optimierung umsetzen lassen würde, die (beispielsweise mithilfe des Exponenten des Eingabewertes) jeweils die Anzahl der nötigen Reihenglieder bestimmt und dann nur diese berechnet. Durch diese Optimierung würde unnötiger Overhead durch die Berechnung von Reihenglieder, die nichts am Endergebnis ändern, vermieden. Da wir die Fallunterscheidungen minimieren wollten, haben wir allerdings auf diese Optimierung verzichtet.
+     Es sei an dieser Stelle erwähnt, dass sich ausgehend von diesen Untersuchungen eine weitere Optimierung umsetzen lassen würde, die (beispielsweise mithilfe des Exponenten des Eingabewertes) jeweils die Anzahl der nötigen Reihenglieder bestimmt und dann eben diese (falls die Anzahl kleiner als 13 ist) berechnet. Durch diese Optimierung würde unnötiger Overhead durch die Berechnung von Reihenglieder, die nichts am Endergebnis ändern, vermieden. Da wir die Fallunterscheidungen ausschließen wollten, haben wir allerdings auf diese Optimierung verzichtet.
  
  
      
@@ -141,7 +161,18 @@
      Die Lookuptabelle speichert einige vorberechnete Werte der $arsinh$-Funktion und interpoliert für die verbleibenden Werte linear zwischen den beiden nächstgelegenen Tabellenwerten.
      Bei der Implementierung galt es zunächst zwischen Speicherplatz der Tabelle und Genauigkeit des Ergebnisses abzuwägen. Um in einem realistisch umsetzbaren Rahmen zu bleiben, haben wir uns für ein Limit von 1 MB für die Lookuptabelle entschieden. Diese Größe ermöglicht das Speichern von etwa 40000 Werten. Wir haben uns für eine logarithmische Verteilung der Werte entschieden, da auch die Verteilung aller möglichen Werte im Datentyp $double$ logarithmisch ist. Für alle positiven Eingabewerte wurde für jeden möglichen Exponenten $[-1023, +1023]$ eine feste Anzahl an Werten vorberechnet. Durch unser Speicherlimit wurden wir hierbei auf 16 Werte pro Exponent beschränkt, wodurch insgesamt 32753 Werte gespeichert werden müssen. Die Ergebnisse für diese Designentscheidung werden im Kapitel Genauigkeit noch näher analysiert.
      
-     Diese Verteilung ermöglicht zudem ein effizientes Mapping der Eingabewerte auf den zugehörigen Index in der Lookuptabelle. Durch eine Bitmaske lassen sich Exponent und die ersten 4 Bits der Mantisse ermitteln. Diese 15 bits bilden den Index des nächstkleineren Wertes, der in der Lookuptabelle liegt. Mit diesem und dem nächsten Tabellenwert, kann das Ergebnis nun linear interpoliert werden. Der Funktionswert für negative Werte wird wieder über den negativen Funktionswert ihres Betrages errechnet.
+     Diese Verteilung ermöglicht zudem ein besonders effizientes Mapping der Eingabewerte auf den zugehörigen Index in der Lookuptabelle durch eine Hashfunktion. Durch eine Bitmaske lassen sich Exponent und die ersten 4 Bits der Mantisse ermitteln. Diese 15 bits bilden den Index des nächstkleineren Wertes, der in der Lookuptabelle liegt. Mit diesem und dem nächsten Tabellenwert, kann das Ergebnis nun linear interpoliert werden.
+     Nachdem nun die Hashfunktion einen Index $i=hash(x)$ liefert, gilt: $table[i] \leq arsinh(x) \leq table[i+1]$. 
+     Nun interpolieren wir in diesem Abschnitt linear mit $y_j = table[j]$:
+     \[
+         arsinh(x) \approx \frac{y_{i+1}-y_i}{\Delta x_{table}}\cdot (x-y_i) + y_i
+     \]
+     Da $\Delta x_{table}$ jedoch von $i$ abhängt, muss dieses erst bestimmt werden mit:
+     \[
+            \Delta x_{table} = x - x_i
+     \]
+     Dies geschieht durch eine Bitmaske sehr effizient.
+     
      
  
  
