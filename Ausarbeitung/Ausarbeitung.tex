@@ -64,12 +64,16 @@
 
 
     \section{Lösungsansatz}
-
-    Sowohl für die Implementierung mit einer Reihendarstellung, als auch für die Lookuptabelle haben wir uns die Punktsymmetrie der $arsinh$-Funktion zunutze gemacht: $arsinh(-x) = -arsinh(x)$. Die Funktionswerte für negative Eingabewerte, werden als $-arsinh(|x|)$ berechnet.
     \subsection{Reine Reihendarstellung}
+    \subsubsection{Problematik und Ansätze}
+    Reihendarstellungen verwenden in der Regel Polynome zur Berechnung eines Näherungswertes. Die einzelnen Potenzen der Reihenglieder können sowohl positiv, als auch negativ sein. Reihenglieder mit positive Potenzen werden für große Eingabewerte $|x|>>1$, Reihenglieder mit negativen Potenzen für Eingabewerte $|x|<<1$ zu einem Double Overflow führen.  Es ist aus diesem Grund allein aus Darstellungsgründen nicht möglich, eine reine Reihenentwicklung zu finden, die für alle als double darstellbaren Eingabewerte eine sinnvolle Näherung liefert und nicht bei bestimmten Eingaben zu $\pm \inf$ evaluiert. Auch die Entwicklung einer Laurent-Reihe, die in der Regel den gesamten Definitionsbereich einer Funktion annähert, ist nicht möglich, da die arsinh-Funktion keine Singularitäten aufweist. 
+
+    Wir versuchen also eine Reihenentwicklung zu finden, die für einen sinnvollen Konvergenzbereich möglichst genaue Ergebnisse liefert. Hierzu haben wir unter anderem die Methode der kleinsten Quadrate verwendet, um geeignet Koeffizienten für Reihenglieder mit positiven oder negativen Potenzen zu finden. Die auf diese Weise hergeleitete Reihenentwicklung liefert allerdings für Werte zwischen den verwendeten Datenpunkten sehr ungenaue Ergebnisse, da es sich bei der arsinh-Funktion nicht um ein lineares Modell handelt. Wir haben daher stattdess eine Reihenentwicklung für das Intervall $$$$ hergeleitet, die im folgenden näher erläutert werden soll.
+    \subsubsection{Umsetzung}
     
     \subsection{Reihendarstellung mit verschiedenen Reihen}
-    Da Reihenentwicklungen in der Regel nur begrenzte Gültigkeitsbereiche haben, verwenden wir verschiedene Reihen für die Intervalle $|x| < 1$ und $|x| > 1$: 
+    Sowohl für diese Implementierung, als auch für die Lookuptabelle haben wir uns die Punktsymmetrie der $arsinh$-Funktion zunutze gemacht: $arsinh(-x) = -arsinh(x)$. Die Funktionswerte für negative Eingabewerte, werden als $-arsinh(|x|)$ berechnet.
+    Da Reihenentwicklungen in der Regel nur begrenzte Gültigkeitsbereiche haben, verwenden wir verschiedene Reihen für die Intervalle $|x| < 1$ und $|x| > 1$:
       \[ \operatorname{arsinh}(x) =
     \begin{cases}
         \sum_{k = 0}^{\infty} \frac{(-1)^k(2k)!x^{2k + 1}}{(2k + 1)(2^k*k!)^2}     & \text{ falls } |x| < 1 \\
