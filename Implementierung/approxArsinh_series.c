@@ -1,126 +1,95 @@
 #include "approxArsinh_series.h"
 #include <string.h>
 
-static const double LOG_TWO = 0.69314718055994530941;
-// static const double ROOT_TWO = 0x3FF6A09E667F3BCD;
+static const double LOG_TWO = 0.69314718055994530941;  
 
-void printOutOfRange(void) {
-    printf("Error: Input out of range!\nTry using the lookup table implementation instead.\n");
-}
-
-double approxXBelowOne(double x) {      //this is the regular Series for |x|<1 
-    //signed long long mask = 0x7FF0000000000000;
-    //signed long long xToBit;
-    //memcpy(&xToBit, &x, 8);
-    //signed long long exp = ((xToBit & mask) >> 52) -1022; //subtract bias, but add one for the calculation of relevant iterations
-    size_t iterations = 13;//exp<0 ? ((52 / -exp +1) / 2) : 26; 
-    //52/-exp is the highest power of x that will not be completely canceled when being added to x
-    //the lower the exponent of x is the fewer iterations you need, because x^n will converge to 0 way faster
-    //for x close to 1 we need a lot of iterations, because the terms further down the series still influence the endresult
-    //with >>40 we set the maximum number of iterations to 2^12, else it would be 2^52
-    //with a maximum of 4150 iterations we get a guaranteed accuracy of the result of 20 bit
+double approxAsymptoticExpansionRest(double x) {
+    size_t iterations = 13;   //fix number of iterations to avoid case distinctions
+    double InvSqr = 1.0 / (x * x);  //base for terms of the series
+    double prev = InvSqr;
     double sum = 0;
-    double prev = x;
-    double Sqr = x * x;
-    for (size_t k = 0; k <= iterations; k++) {
-        sum += prev * coeffs_below[k];
-        prev *= Sqr;
+    for (size_t k = 0; k < iterations; k++) {
+        sum += prev * coeffs_rest[k];   //use stored coefficients to calculate terms of series
+        prev *= InvSqr;                 //update power of base
     }
     return sum;
 }
 
-double approxLnTaylor(double x) {  //this is the Tayler Series for ln x around 1 (applicable for 0<x<2)
-    double fak = x - 1;               //it's more accurate, the closer the number is to 1
-    double prev = fak;
+double approxLnTaylor(double x) {  //Tayler Series for ln x around 1 (applicable for 0<x<2)
+    double fak = x - 1;               
+    double prev = fak;                //use (x-1) as base for the series
     double sum = 0;
-    size_t iterations = 27;     //Since -0.33<=fak<=0.33, after at most 33 iterations of the series, the terms ^don't matter for the end result,
-    for (size_t k = 0; k <= iterations; k++) {    // due to floating point cancellation (0,33^33 < 2^-52)
-        sum += prev * coeffs_taylor[k];
-        prev *= fak;
+    size_t iterations = 27;     //fix number of iterations to avoid case distinctions
+            //Since -0.33<=fak<=0.33, after at most 27 iterations of the series, 
+            //the terms don't matter for the end result,
+            //due to floating point cancellation 
+    for (size_t k = 0; k <= iterations; k++) {    
+        sum += prev * coeffs_taylor[k]; //use stored coefficients to calculate terms of series
+        prev *= fak;                //update power of base
     }
-    return sum;
+    return sum;         
 }
 
-double approxLn(double x) {       //converts ln(x) to ln(x'*2^n) = ln(x')+n*ln(2) so that the Taylor series can be applied to x
-    signed long long mask = 0x7FF0000000000000;        //
+double approxLn(double x) {       //converts ln(x) to ln(x'*2^n) = ln(x')+n*ln(2) 
+                //so that the Taylor series can be applied to x
+    signed long long mask = 0x7FF0000000000000;        
     signed long long xToBit;
     memcpy(&xToBit, &x, 8);
-    signed long long exp = ((xToBit & mask) >> 52) - 1023;
+    signed long long exp = ((xToBit & mask) >> 52) - 1023; //this is the exponent of x
     signed long long xLowerTwo = (xToBit & 0xBFFFFFFFFFFFFFFF) | 0x3FF0000000000000;
     double mantissa;
-    memcpy(&mantissa, &xLowerTwo, 8);
+    memcpy(&mantissa, &xLowerTwo, 8); //uses a bitmask to set the exponent to 0
     if (mantissa > 1.3333333333333333) {  //this ensures, that x is as close to 1 as possible
         mantissa /= 2;                  //so the result is more accurate
         exp++;
     }
-    return approxLnTaylor(mantissa) + exp * LOG_TWO;
+    return approxLnTaylor(mantissa) + exp * LOG_TWO; //ln(x) = ln(mantissa * 2^exp) = ln(mantissa) * exp ln(2)
 }
 
-double approxAsymptoticExpansionRest(double x) {
-    //signed long long mask = 0x7FF0000000000000;
-    //signed long long xToBit;
-    //memcpy(&xToBit, &x, 8);
-    //signed long long exp = ((xToBit & mask) >> 52) - 1023;
-    size_t iterations = 13; //exp>0 ? 52 / (2*exp) : 26;
-    //52/exp is the highest power of x that will not be completely canceled when being added to x
-    //for x close to 1 we need a lot of iterations, because the terms further down the series still influence the endresult
-    //we set the maximum number of iterations to ca. 4150, which gives us a definite accuracy of the result of 20 bit
-    double InvSqr = 1.0 / (x * x);
-    double prev = InvSqr;
+double approxXAboveOne(double x){     //uses the approximation arsinh(x) = ln(2x) + error(x)
+    if(x>0){ //use symmetry of the arsinh function
+        return LOG_TWO + approxLn(x) + approxAsymptoticExpansionRest(x); 
+    }
+    else{
+        return -(LOG_TWO + approxLn(-x) + approxAsymptoticExpansionRest(-x));
+    }
+    //already converts ln(2x) to ln(2)+ln(x)
+}
+
+double approxXBelowOne(double x) {      //Regular Series for |x|<1 
+                                        //Taylor of arsinh(x) around 1
+    size_t iterations = 13; //fixed number of series terms to avoid case distinctions
     double sum = 0;
-    for (size_t k = 0; k < iterations; k++) {
-        sum += prev * coeffs_rest[k];
-        prev *= InvSqr;
+    double prev = x;
+    double Sqr = x * x;                 //x^2 as base for terms of the series
+    for (size_t k = 0; k <= iterations; k++) {
+        sum += prev * coeffs_below[k];  //use stored coefficients to calculate terms of series
+        prev *= Sqr;                    //update power of base
     }
     return sum;
 }
 
-
-double approx_root(double x, size_t iterations){
-    // signed long long mask = 0x7FF0000000000000;        //
-    // signed long long xToBit;
-    // double root = 0;
-    // memcpy(&xToBit, &x, 8);
-    // signed long long exp = xToBit & mask;
-    // signed long long xLowerTwo = (xToBit & 0xBFFFFFFFFFFFFFFF) | 0x3FF0000000000000;
-    // if(exp&0x001 == 1){
-    //     root = ROOT_TWO;
-    // }
-    // double mantissa;
-    // memcpy(&mantissa, &xLowerTwo, 8);
-    double x0 = (x + 1)/4 + x/(x + 1);
-
-    for(size_t i = 0;i<iterations;i++){
-        x0 = (x0 + x/x0)/2;
+double approxArsinh_series(double x) { //only uses the series around 0 without cas distinctions
+                                    //only returns meaningful results for [-1; +1]
+    size_t iterations = 13; //fixed number of series terms to avoid case distinctions
+    double sum = 0;
+    double prev = x;
+    double Sqr = x * x;                 //x^2 as base for terms of the series
+    for (size_t k = 0; k <= iterations; k++) {
+        sum += prev * coeffs_below[k];  //use stored coefficients to calculate terms of series
+        prev *= Sqr;                    //update power of base
     }
-
-
-    return x0;
+    return sum;
 }
 
-double approxArsinh_series2(double x) {
-    if (x == -INFINITY || x == INFINITY || x == NAN || x == -NAN) {
+double approxArsinh_differentSeries(double x) {
+    if (x == -INFINITY || x == INFINITY || x == NAN || x == -NAN) { //catch edgecases
         return x;
+    } else if (x >= 1 || x<=-1) {   //for |x|>=1
+        return approxXAboveOne(x);  //use ln(2x)+error(x)
+    } else {                        //for ]-1; +1[
+        return approxXBelowOne(x);  //use TaylorSeries of arsinh around 0 
     }
-    else if(x<0){
-        return -(approxLn(x + approx_root(x*x + 1, 3)));
-    }
-    else if(x<10){
-        return approxLn(x + approx_root(x*x + 1, 3));
-    }
-    return LOG_TWO + approxLn(x);
-}
-
-double approxArsinh_series(double x) {
-    if (x == -INFINITY || x == INFINITY || x == NAN || x == -NAN) {
-        return x;
-    } else if (x >= 1) {
-        return LOG_TWO + approxLn(x) + approxAsymptoticExpansionRest(x);
-    } else if (x >= 0) {
-        return approxXBelowOne(x);
-    } else if (x <= -1) {
-        return -(LOG_TWO + approxLn(-x) + approxAsymptoticExpansionRest(-x));
-    } else return -approxXBelowOne(-x);
 }
 
 

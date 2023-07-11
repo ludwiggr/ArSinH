@@ -11,7 +11,7 @@
 #include <time.h>
 
 static const long int numberOfImplementations = 4;     //number of possible Implementations to choose from
-static const long int maxNumberOfRepetitions = 1000000;   //max number of repetitions of the function call to avoid timeout
+static const long int maxNumberOfRepetitions = 10000000000;   //max number of repetitions of the function call to avoid timeout
 
 void help(void) {                            //prints options and use cases of the program
     printf("-----------------------------------------------------------------------------------------------\n"
@@ -30,10 +30,12 @@ void help(void) {                            //prints options and use cases of t
            "|      this approximation is significantly faster than the series approximation, but also more|\n"
            "|      inaccurate, since all values in between two values in the lookup-table can only be     |\n"
            "|      estimated linearly.                                                                    |\n"
-           "| - 1: Series-Approximation: this uses two different series approximations for the intervals  |\n"
+           "| - 1: Pure                                                                    |\n"
+
+           "| - 2: Series-Approximation: this uses two different series approximations for the intervals  |\n"
            "|      |x|<1 and |x|>1. Both approximations use a variation of the Taylor series.             |\n"
            "|      The number of iterations and runtime is much higher for values of x, close to 1.       |\n"
-           "| - 2: Pre-Build Functions: this approximation uses the predefined functions log and sqrt     |\n"
+           "| - 3: Pre-Build Functions: this approximation uses the predefined functions log and sqrt     |\n"
            "|      from the math-library to calculate the arsinh(x).                                      |\n"
            "|                                                                                             |\n"
            "| You can use the Option -B to run a runtime analysis.                                        |\n"
@@ -45,6 +47,8 @@ void help(void) {                            //prints options and use cases of t
 double approxArsinh_series(double x);
 
 double approxArsinh_lookup(double x);
+
+double approxArsinh_differentSeries(double x);
 
 
 double approxArsinh_predefined(double x) {
@@ -61,6 +65,8 @@ double calculate_result(double x, int implementation) {  //just calculates the r
         case 1:
             return approxArsinh_series(x);
         case 2:
+            return approxArsinh_differentSeries(x);
+        case 3:
             return approxArsinh_predefined(x);
         default:
             fprintf(stderr, "No such implementation.\n");
@@ -70,7 +76,7 @@ double calculate_result(double x, int implementation) {  //just calculates the r
 
 double relative_error(double x,
                       int implementation) {      //returns the relative error using the implementation of the math library as comparism
-    double exact = approxArsinh_predefined(x);
+    double exact = asinh(x);
     double approx;
     switch (implementation) {
         case 0:
@@ -80,6 +86,9 @@ double relative_error(double x,
             approx = approxArsinh_series(x);
             break;
         case 2:
+            approx = approxArsinh_differentSeries(x);
+            break;
+        case 3:
             approx = approxArsinh_predefined(x);
             break;
         default:
@@ -89,6 +98,8 @@ double relative_error(double x,
     return fabs((approx - exact) / exact);
 }
 
+
+//TODO: n can't be in multiples, default value should be chosen wisely
 double performance(unsigned int n, double x, int implementation) {
     /*
     n = number of repetitions in multiples of 10000
@@ -100,7 +111,7 @@ double performance(unsigned int n, double x, int implementation) {
     switch (implementation) {
         case 0:
             c1 = clock_gettime(CLOCK_MONOTONIC, &start);
-            for (unsigned int i = 0; i < n * 10000; i++) {
+            for (unsigned int i = 0; i < n; i++) {
                 approxArsinh_lookup(x);
             }
             c2 = clock_gettime(CLOCK_MONOTONIC, &end);
@@ -115,7 +126,7 @@ double performance(unsigned int n, double x, int implementation) {
             break;
         case 1:
             c1 = clock_gettime(CLOCK_MONOTONIC, &start);
-            for (unsigned int i = 0; i < n * 10000; i++) {
+            for (unsigned int i = 0; i < n; i++) {
                 approxArsinh_series(x);
             }
             c2 = clock_gettime(CLOCK_MONOTONIC, &end);
@@ -129,10 +140,26 @@ double performance(unsigned int n, double x, int implementation) {
                 return EXIT_FAILURE;
             }
             break;
-
         case 2:
             c1 = clock_gettime(CLOCK_MONOTONIC, &start);
-            for (unsigned int i = 0; i < n * 10000; i++) {
+            for (unsigned int i = 0; i < n; i++) {
+                approxArsinh_differentSeries(x);
+            }
+            c2 = clock_gettime(CLOCK_MONOTONIC, &end);
+
+            if (c1 == -1) {
+                printf("Error: clock_gettime failed!\n");
+                return EXIT_FAILURE;
+            }
+            if (c2 == -1) {
+                printf("Error: clock_gettime failed!\n");
+                return EXIT_FAILURE;
+            }
+            break;
+
+        case 3:
+            c1 = clock_gettime(CLOCK_MONOTONIC, &start);
+            for (unsigned int i = 0; i < n; i++) {
                 approxArsinh_predefined(x);
             }
             c2 = clock_gettime(CLOCK_MONOTONIC, &end);
@@ -158,9 +185,6 @@ double performance(unsigned int n, double x, int implementation) {
 }
 
 
-//Ludwig: Beachten Sie ebenfalls, dass Ihr Rahmenprogramm etwaige Randfälle korrekt abfangen muss und im Falle eines
-// Fehlers mit einer aussagekräftigen Fehlermeldung auf stderr und einer kurzen Erläuterung zur Benutzung terminieren sollte.
-// TODO: Sie dürfen weitere Optionen implementieren, beispielsweise um vordefinierte Testfälle zu verwenden.
 int main(int argc, char *argv[]) {
 
     long int implementation = 0;          // := choose Implementation
@@ -176,7 +200,7 @@ int main(int argc, char *argv[]) {
             {"help", no_argument, NULL, 'h'},
             {NULL,   0,           NULL, 0}
     };
-    while ((opt = getopt_long(argc, argv, "V:B:hR", long_options, &option_index)) != -1) {
+    while ((opt = getopt_long(argc, argv, "V:B::hR", long_options, &option_index)) != -1) {
         switch (opt) {
             case 'V':           //choose implementation
                 implementation = strtol(optarg, &endptr, 10);
@@ -197,21 +221,33 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case 'B':           //choose number of iterations for runtime measurement
-                iterations = strtol(optarg, &endptr, 10);
-                if (endptr == optarg || *endptr != '\0') {
-                    fprintf(stderr, "%s could not be converted to long.\nArgument may only contain digits 0-9\n",
-                            optarg);
-                    return EXIT_FAILURE;
-                } else if (errno == ERANGE) {
-                    fprintf(stderr,
-                            "%s over- or underflows long. \nTo choose the iterations of the function, select a number between 1 and %li.\n",
-                            optarg, maxNumberOfRepetitions);
-                    return EXIT_FAILURE;
-                } else if (iterations < 0 || iterations > maxNumberOfRepetitions) {
-                    fprintf(stderr,
-                            "%li is not a valid number of repetitions of the function call.\nChoose a value between 1 and %li.\n",
-                            iterations, maxNumberOfRepetitions);
-                    return EXIT_FAILURE;
+                if(optarg == NULL && optind < argc && argv[optind][0] != '-'){
+                    optarg = argv[optind++];
+                }           //basically checks for whitespace before optional argument
+                if(optarg!=NULL){
+                    iterations = strtol(optarg, &endptr, 10);
+                    if (endptr == optarg || *endptr != '\0') {
+                        fprintf(stderr, "%s could not be converted to long.\nArgument may only contain digits 0-9.\n",
+                                optarg);
+                        printf("If you wanted to parse the input value for the arsinh function, please don't parse it directly after the -B flag.\n");
+                        return EXIT_FAILURE;
+                    } else if (errno == ERANGE) {
+                        fprintf(stderr,
+                                "%s over- or underflows long. \nTo choose the iterations of the function, select a number between 1 and %li.\n",
+                                optarg, maxNumberOfRepetitions);
+                        printf("If you wanted to parse the input value for the arsinh function, please don't parse it directly after the -B flag.\n");
+
+                        return EXIT_FAILURE;
+                    } else if (iterations < 0 || iterations > maxNumberOfRepetitions) {
+                        fprintf(stderr,
+                                "%li is not a valid number of repetitions of the function call.\nChoose a value between 1 and %li.\n",
+                                iterations, maxNumberOfRepetitions);
+                        printf("If you wanted to parse the input value for the arsinh function, please don't parse it directly after the -B flag.\n");
+                        return EXIT_FAILURE;
+                    }
+                } 
+                else{
+                    iterations = 100000000;
                 }
                 break;
             case 'R'  :
@@ -221,8 +257,12 @@ int main(int argc, char *argv[]) {
                 help();
                 return EXIT_SUCCESS;
             case '?':
-                if (optopt == 'V' || optopt == 'B')
-                    fprintf(stderr, "Options -V and -B require an Argument\n");
+                if (optopt == 'B'){
+                    iterations = 100000000;
+                    break;
+                }
+                else if (optopt == 'V')
+                    fprintf(stderr, "Option -V requires an Argument\n");
                 else
                     fprintf(stderr,
                             "Unknown Option -%c\nWhen parsing a negative number, make sure to use a double dash beforhand. \nElse it will be interpreted as a flag.\n",
@@ -252,6 +292,10 @@ int main(int argc, char *argv[]) {
         double result = calculate_result(number, implementation);
         printf("Calculating arsinh(%f) with implementation number %li results in %.*g.\n", number, implementation, 20,
                result);
+        if(implementation == 1 && (number<-1.||number>1.)){
+            printf("WARNING: The Taylor Series of Arsinh only provides meaningful results within its convergence zone [-1; 1].\n");
+            printf("For all other input values consider using the Implementation -V 2, which uses different series for the approximation.\n");
+        }
         return EXIT_SUCCESS;
     } else if (relativeError == 1) {
         double error = relative_error(number, implementation);
@@ -260,8 +304,11 @@ int main(int argc, char *argv[]) {
         return EXIT_SUCCESS;
     } else {
         double time = performance(iterations, number, implementation);
-        printf("The accumilated runtime of %ld iterations of implementation number %ld was %f seconds.\n", iterations,
+        printf("The measured runtime of %ld iterations of implementation number %ld was %f seconds.\n", iterations,
                implementation, time);
+        if(iterations<100000000){
+            printf("WARNING: Using less than 10000000 iterations is not recommended. \nThe program might not run long enough to provide meaningful measurements.");
+        }
         return EXIT_SUCCESS;
     }
 }
