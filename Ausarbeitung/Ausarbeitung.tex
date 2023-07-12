@@ -319,39 +319,38 @@
     Der folgende Graph zeigt die durchschnittliche Laufzeit eines Funktionsaufrufes der drei Implementierungen mit Reihenentwicklung, Tabellen-Lookup und der Implementierung mithilfe komplexer Instruktionen der C-math-library in Nanosekunden:
 
     %Tabelle
-    \begin{tikzpicture}
-        \begin{axis}
-        [
-            ybar,
-            width = 10 cm,
-            height= \axisdefaultheight,
-            bar width = 0.3 cm,
-            enlarge x limits = {abs = 1.5 cm},
-            symbolic x coords = {gemischte Reihe, reine Reihe,  Lookup,  predefined},
-            xtick={gemischte Reihe, reine Reihe, Lookup, predefined},
-            ylabel={Zeit in ns},
-            xlabel={Implementierung},
-            legend style={at={(0.6, 0.9)},
-            anchor=north,legend columns=-1},
-            xtick=data,
-            nodes near coords,
-            nodes near coords align={vertical},
-            bar width = 0.9cm,
-        ]
-            \addplot coordinates {(gemischte Reihe, 6.369) (reine Reihe,6.369) (Lookup, 2.613) (predefined, 0.0)};
-            \addplot coordinates {(gemischte Reihe, 29.212) (reine Reihe, 6.369) (Lookup, 2.613) (predefined, 1.648)};
-            \legend{$|x|<1$  ., $|x|\geq 1$}
-        \end{axis}
-    \end{tikzpicture}
+     \begin{tikzpicture}
+         \begin{axis}[
+             width = 11 cm,
+             height = 6 cm,
+             ybar,
+             enlargelimits = 0.12,
+             symbolic x coords = {gemischte Reihe, reine Reihe,  Lookuptabelle,  komplex},
+             xtick={gemischte Reihe, reine Reihe, Lookuptabelle, komplex},
+             ylabel={Zeit in ns},
+             xlabel={Implementierung},
+             legend style={at={(0.6, 0.9)},
+               anchor=north,legend columns=-1},
+                            ]
 
-    \subsection{Bewertung, Einordnung und Erklärung der Ergebnisse}
-    %Folgerungen
-    Wie in der Abbildung zu sehen ist, ist die reine Reihen-Implementierung um ein Vielfaches (bis zu 12x) langsamer als die anderen
-    beiden Vergleichsimplementierungen.
-    Hier liegt die Stärke einer Implementierung durch Lookup-Tabelle, da wir hier für jeden
-    Input nur sehr billige arithmetische Ausdrücke zum linearen Interpolieren verwenden.
-    Die Reihenentwicklung andererseits verwendet viel mehr Multiplikationen und Summen über mehrere Iterationen, was jedoch als Reihendarstellung mit Polynomen nicht zu vermeiden ist.
+             \addplot coordinates {(gemischte Reihe, 6.569) (reine Reihe,6.369) (Lookuptabelle, 2.613) (komplex, 1.648)};
+             \addplot coordinates {(gemischte Reihe, 29.212) (reine Reihe, 6.369) (Lookuptabelle, 2.613) (komplex, 1.648)};
+             \addplot coordinates {(gemischte Reihe, 29.212) (reine Reihe,6.369) (Lookuptabelle, 2.613) (komplex, 0.0)};
+             \legend{$|x|<1$, $1\leq |x| \leq 10^{16}$, $|x|>10^{16}$};
+         \end{axis}
+     \end{tikzpicture}
+ 
+     \subsection{Bewertung, Einordnung und Erklärung der Ergebnisse}
+     %Folgerungen
 
+     Wie in der Abbildung zu sehen gibt es starke Performanzunterschiede zwischen den verschiedenen Implementierungen. Wir betrachten zunächst die Implementierung mit komplexen Instruktionen. Wie zuvor erwähnt, arbeiten Funktionen der C-Mathematikbibliothek mit Hardwareoptimierungen. Damit ist die Funktion im Vergleich zu den anderen Implementierungen deutlich schneller. Es offenbart sich hierbei auch innerhalb der Funktion eine signifikante Diskrepanz zwischen den Eingabewerten unterhalb von $10^{16}$ und jenen oberhalb von $10^{16}$. 
+     Ab dem gewählten Grenzwert von $10^{16}$ wird die Näherung $arsinh(x) = ln(2x)$ für die Berechnung verwendet. Diese Berechnung wird bei Optimierungsstufe O3 so stark optimiert, dass sogar bei $10^{12}$ Iterationen des Funktionsausfrufs eine kaum noch messbare Laufzeit zustande kommt. Für den Großteil der Werte deren Betrag kleiner ist als $10^{16}$ sind allerdings neben der Logarithmusberechnung zudem Multiplikation, Addition und Wurzelberechnung für die exakte Berechnung erforderlich, wodurch die Funktion in diesem Intervall eine durchschnittliche Laufzeit von etwa 1.648 ns hat. 
+
+     Die Lookuptabelle hat für alle reellen Eingabewerte etwa die gleiche Laufzeit von 2.613 ns, da die Berechnung unabhängig von der Höhe des Eingabewerts ist. Durch die effiziente Hashfunktion mittels Bitmaske, die für das Mapping der Eingabewerte auf den jeweiligen Tabellenwert verwendet wird, ist diese Implementierung nur etwa 1.5 mal so langsam wie die worst-case Laufzeit der Implementierung mit komplexen Instruktionen. Neben der Hashfunktion werden nur wenige einfache Instruktionen für die lineare Interpolation benötigt, was ebenfalls zu der hohen Performanz dieser Implementierung beiträgt.
+
+     Im Vergleich zu der Lookuptabelle, braucht die reine Reihenentwicklung für die von uns beschlossene Anzahl berechneter Reihenglieder mit 6.369 ns etwa 2.5 mal so lange wie die Lookuptabelle. Dies ist damit zu begründen, dass die Reihenentwicklung deutlich mehr Multiplikationen und Summen über mehrere Reihenglieder verwendet, wodurch die Berechnung länger dauert.
+
+     Die Reihendarstellung mit verschiedenen Reihen benötigt für $|x|<1$ etwa gleich viel Zeit wie die reine Reihenentwicklung, da derselbe Algorithmus wiederverwendet wird. Für die Approximation der Eingabewerte $|x|\geq1$ werden allerdings zwei verschiedene Reihen (TaylorLn und Restreihe) sowie einige komplexere Bitoperationen verwendet. Hierdurch benötigt diese Implementierung für $|x|\geq1$ rund 29.212 ns und damit etwa 12 mal so lange wie die Lookuptabelle. Um eine vergleichbare Genauigkeit mit den Eingabewerten $|x|<1$ zu erhalten, sind diese Operationen allerdings notwendig.
 
     \section{Zusammenfassung und Ausblick}
 
