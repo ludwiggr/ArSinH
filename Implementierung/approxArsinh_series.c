@@ -56,18 +56,6 @@ double approxXAboveOne(double x){     //uses the approximation arsinh(x) = ln(2x
     //already converts ln(2x) to ln(2)+ln(x)
 }
 
-double approxXBelowOne(double x) {      //Regular Series for |x|<1 
-                                        //Taylor of arsinh(x) around 1
-    size_t iterations = 13; //fixed number of series terms to avoid case distinctions
-    double sum = 0;
-    double prev = x;
-    double Sqr = x * x;                 //x^2 as base for terms of the series
-    for (size_t k = 0; k <= iterations; k++) {
-        sum += prev * coeffs_below[k];  //use stored coefficients to calculate terms of series
-        prev *= Sqr;                    //update power of base
-    }
-    return sum;
-}
 
 double approxArsinh_series(double x) { //only uses the series around 0 without cas distinctions
                                     //only returns meaningful results for [-1; +1]
@@ -88,7 +76,7 @@ double approxArsinh_differentSeries(double x) {
     } else if (x >= 1 || x<=-1) {   //for |x|>=1
         return approxXAboveOne(x);  //use ln(2x)+error(x)
     } else {                        //for ]-1; +1[
-        return approxXBelowOne(x);  //use TaylorSeries of arsinh around 0 
+        return approxArsinh_series(x);  //use TaylorSeries of arsinh around 0 
     }
 }
 

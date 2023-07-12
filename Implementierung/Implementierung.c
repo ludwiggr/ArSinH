@@ -9,44 +9,36 @@
 #include "approxArsinh_lookup.h"
 #include "approxArsinh_series.h"
 #include <time.h>
+#include <stdbool.h>
 
 static const long int numberOfImplementations = 4;     //number of possible Implementations to choose from
 static const long int maxNumberOfRepetitions = 10000000000;   //max number of repetitions of the function call to avoid timeout
 
-void help(void) {                            //prints options and use cases of the program
-    printf("-----------------------------------------------------------------------------------------------\n"
-           "| Help Desk -- Options and Use Cases Of the Program.                                          |\n"
-           "| This program calculates the arsinh(x), which is equal to ln(x + sqrt(x^2 + 1))              |\n"
-           "|                                                                                             |\n"
-           "| You can parse the value x at any point within the program arguments.                        |\n"
-           "| The program will only calculate the result for the first number, that is parsed.            |\n"
-           "| When parsing a negative number, make sure to place it after the options and use a           |\n"
-           "| double dash beforehand. Else it will be interpreted as an option.                           |\n"
-           "| If no valid number is entered, the program will calculate arsinh(0).                        |\n"
-           "|                                                                                             |\n"
-           "| You can choose between different implementations using the -V option.                       |\n"
-           "| You have the following options: (the default implementation is 0)                           |\n"
-           "| - 0: LookUp-Table: this approximates the arsinh(x) using a logarithmic lookup-table.        |\n"
-           "|      this approximation is significantly faster than the series approximation, but also more|\n"
-           "|      inaccurate, since all values in between two values in the lookup-table can only be     |\n"
-           "|      estimated linearly.                                                                    |\n"
-           "| - 1: Pure                                                                    |\n"
+const char* help_msg =
+    "Options and Use Cases:\n"
+    "The program calculates the arsinh(x) = ln(x + sqrt(x^2 + 1)) for an input value.\n"
+    "\n"
+    "Positional arguments:\n"
+    "  x   The input value for which the arsinh is calculated\n"
+    "      Can be any positive or negative double including +-inf and +-nan\n"
+    "\n"
+    "Optional arguments:\n"
+    "  -V <X:Number>    The Implementation, that should be used to approximate the arsinh(x)(default: X = 0)\n"
+    "                   Implementations corresponding to X:\n"
+    "               0: Lookuptable with linear Interpolation\n"
+    "               1: ('Pure') Taylor Series of the arsinh(x) around 0\n"
+    "                  The convergence zone of the series is [-1; 1]\n"
+    "               2: Approximation using different series depending on the input value\n"
+    "                  provides meaningful results for all possible inputs\n"
+    "               3: Approximation using the complex instructions sqrt and log\n"
+    "  -B [X:Number]    if set, program measures runtime of X iterations of the calculation (default: X = 100000000)\n"
+    "  -R               Calculates relative error of the result compared to the actual value\n"
+    "  -h/--help        Show help message (this text) and exit\n";
 
-           "| - 2: Series-Approximation: this uses two different series approximations for the intervals  |\n"
-           "|      |x|<1 and |x|>1. Both approximations use a variation of the Taylor series.             |\n"
-           "|      The number of iterations and runtime is much higher for values of x, close to 1.       |\n"
-           "| - 3: Pre-Build Functions: this approximation uses the predefined functions log and sqrt     |\n"
-           "|      from the math-library to calculate the arsinh(x).                                      |\n"
-           "|                                                                                             |\n"
-           "| You can use the Option -B to run a runtime analysis.                                        |\n"
-           "| It requires your wanted number of iterations of the function as an argument and will return |\n"
-           "| the total time, the program took for the calculation.                                       |\n"
-           "-----------------------------------------------------------------------------------------------\n");
-}
-
-double approxArsinh_series(double x);
 
 double approxArsinh_lookup(double x);
+
+double approxArsinh_series(double x);
 
 double approxArsinh_differentSeries(double x);
 
@@ -189,8 +181,11 @@ int main(int argc, char *argv[]) {
 
     long int implementation = 0;          // := choose Implementation
     long int iterations = 0;              // := if B-flag this sets numbers of iterations for runtime measurement
-    double number = 0.;                   // := input value
-    size_t relativeError = 0;
+    double newNum;
+    bool negativeNumber_Set = false;      
+    int negativeNumber_Index = 0;         // := index of possible negative number parsed
+    bool relativeError = false;
+    double number;
 
     errno = 0;
     char *endptr;
@@ -200,7 +195,7 @@ int main(int argc, char *argv[]) {
             {"help", no_argument, NULL, 'h'},
             {NULL,   0,           NULL, 0}
     };
-    while ((opt = getopt_long(argc, argv, "V:B::hR", long_options, &option_index)) != -1) {
+    while ((opt = getopt_long(argc, argv, "V:B::hR0::1::2::3::4::5::6::7::8::9::.::i::I::n::N::", long_options, &option_index)) != -1) {
         switch (opt) {
             case 'V':           //choose implementation
                 implementation = strtol(optarg, &endptr, 10);
@@ -251,35 +246,53 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case 'R'  :
-                relativeError = 1;
+                relativeError = true;
                 break;
             case 'h'  :
-                help();
+                printf("%s", help_msg);
                 return EXIT_SUCCESS;
-            case '?':
-                if (optopt == 'B'){
-                    iterations = 100000000;
-                    break;
+            case '0'  : case '1'  : case '2'  : case '3'  : case '4'  :
+            case '5'  : case '6'  : case '7'  : case '8'  : case '9'  : 
+            case '.'  : case 'i'  : case 'n'  : case 'I'  : case 'N'  :
+                //if the - is followed by one of these chars, we assume that
+                //the user might want to parse a negative number as a positional argument
+                newNum = strtod(argv[optind-1], &endptr);
+                if (endptr == argv[optind-1] || *endptr != '\0') {
+                    fprintf(stderr, "%c is not a valid Option and %s could not be converted to double\n", opt, argv[optind-1]);
+                    return EXIT_FAILURE;
+                } else if (errno == ERANGE) {
+                    fprintf(stderr, "%s over- or underflows double \n", argv[optind-1]);
+                    printf("datatype double has to be in range +/- 1.7E +/-308.\n");
+                    return EXIT_FAILURE;
                 }
-                else if (optopt == 'V')
+                if(!negativeNumber_Set){    //we only store the number, if we haven't stored a negative number already
+                    negativeNumber_Set = true;
+                    negativeNumber_Index = optind;
+                    number = newNum;
+                }
+                break;
+            case '?':
+                if (optopt == 'V')
                     fprintf(stderr, "Option -V requires an Argument\n");
                 else
-                    fprintf(stderr,
-                            "Unknown Option -%c\nWhen parsing a negative number, make sure to use a double dash beforhand. \nElse it will be interpreted as a flag.\n",
-                            optopt);
+                    fprintf(stderr, "Unknown Option -%c\n ",optopt);
                 return EXIT_FAILURE;
             default:
-                fprintf(stderr, "why tho   %c\n", optopt);
+                fprintf(stderr, "Unknown symbol %c\n", optopt);
                 return EXIT_FAILURE;
         }
     }
 
-    if (optind != argc) {  //optional argument can be parsed at any point, unless it's negative
+
+    if (optind >= argc && !negativeNumber_Set) {  //if there isn't an optional argument and no negative number was parsed
+        fprintf (stderr, "Missing positional argument -- ’x’\n");
+        printf("Input value needs to be specified.\n");
+        return EXIT_FAILURE ;
+    }
+    else if(!negativeNumber_Set || negativeNumber_Index>optind){  //optional argument is only read if a negative number wasn't parsed first
         number = strtod(argv[optind], &endptr);
         if (endptr == argv[optind] || *endptr != '\0') {
             fprintf(stderr, "%s could not be converted to double. \n", argv[optind]);
-            printf("Double may only contain the digits 0-9 and '.'.\n");
-            printf("When multiplying with a power of 10, append 'e', followed by a positive or negative whole number as the exponent\n");
             return EXIT_FAILURE;
         } else if (errno == ERANGE) {
             fprintf(stderr, "%s over- or underflows double \n", argv[optind]);
