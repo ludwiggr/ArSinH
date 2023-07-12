@@ -212,51 +212,55 @@
     \]
     linear interpoliert.
 
-    \section{Genauigkeit}
+    \begin{figure}[h]
+        \begin{subfigure}
+        \centering
+        \includegraphics[width = 12cm,height = 8cm]{pdf/Figure3.png}
+        \caption{}
+        \end{subfigure}
+        
+        \begin{subfigure}
+        \centering
+        \includegraphics[width = 7cm,height = 6cm]{pdf/Figure1.png}
+        \includegraphics[width = 7cm, height = 6cm]{pdf/Figure2.png}
+        \caption{}
+        \end{subfigure}
+        %\label{fig:enter-label}
+    \end{figure}
+
+
+    \begin{figure}
+        \caption{}
+    \end{figure}
     Als Maßstab für die Genauigkeit unserer Ergebnisse wird im Folgenden der relative Fehler der Implementierung bezüglich des tatsächlichen mathematischen Funktionswert verwendet. Die folgenden Diagramme wurden erstellt, indem mithilfe einer C-Hilfsmethode für eine große Anzahl an Eingabewerten jeweils die Funktionswerte für alle drei Implementierungen brechnet und in Arrays gespeichert wurden. Anschließend wurden diese Funktionswerte in einem Python-Programm zu den jeweilgen relativen Fehlern ausgewertet und mithilfe der Bibiliothek matplotlib als Graph dargestellt.
-
-    \includegraphics[]{Figure1.pdf}
-    \includegraphics[]{Figure2.pdf}
-    \includegraphics[]{Figure3.pdf}
-
+    
     \subsection{Reine Reihenentwicklung}
+    Wie deutlich in Abb.2.1 erkennbar ist, liefert die Reihenentwicklung außerhalb des Intervalls $0.25<|x|$ nahezu immer den exakten Funktionswert. Es gibt einige Ausnahmen mit einem verschwindend geringen relativen Fehler $\leq2^{-50}$ , welche sich durch floating-point-Rundungsfehler bei der Umrechnung der Polynomkoeffizienten erklären lassen.
+    In Abb.2.2 erkennbar, steigt der relative Fehler exponentiell an, je näher der Eingabewert an 1 liegt. Dies lässt sich anhand der Konvergenz der Reihenglieder für verschiedene Eingabewerte erklären. Wie in Kapitel 2.1.1 erläutert, ist das Ergebnis genauer, je kleiner das letzte berechnete Reihenglied ist.
+    Wir zeigen zunächst, dass bei 13 Reihengliedern die Grenze für die Entstehung von Ungenauigkeiten bei etwa 0.25 liegt. Hierzu berechnen wir jeweils das letzte Reihenglied für x=0.25:
+    \[
+    \textit{TaylorArsinh}: \frac{(2\cdot13)!0.25^{2\cdot13 + 1}}{(2\cdot13 + 1)(2^13\cdot13!)^2} \approx 2^{-59}
+    \]
+    Da des letzte Reihenglied noch unter $2^{-59}$ liegt, hat das Ergebnis noch maximale double Genauigkeit. Für x-Werte näher an 1, wird jedoch das letzte Reihenglied immer größer, wodurch der relative Fehler exponentiell ansteigt. Wie im Graph zu sehen ist, hat die Reihenentwicklung ihren maximalen relativen Fehler von circa $2^{-8} \approx 0.39\%$ am Eingabewert 1.
+    Berechnen wir nun das letzte (13.) berechnete Reihenglied für den Eingabewert 1 so erhalten wir:
+    \[
+    \textit{TaylorArsinh}: \frac{(2\cdot13)!1^{2\cdot13 + 1}}{(2\cdot13 + 1)(2^13\cdot13!)^2} \approx 0.00574 \approx 2^{-8}
+    \]
 
-    \subsection{Reihenentwicklung mit mehreren Reihen}
-    Wie deutlich im ersten Diagramm erkennbar, liefert die Reihenentwicklung außerhalb der Intervalle $0.25<x<4$ nahezu immer den exakten Funktionswert. Es gibt einige Ausnahmen mit einem verschwindend geringen relativen Fehler $\leq2^{-50}$ , welche sich durch floating-point-Rundungsfehler bei der Umrechnung der Polynomkoeffizienten erklären lassen.
-    Für einen Großteil der Eingabewerte liefert diese Funktion also tasächlich den genauest möglichen Funktionswert für den Datentyp double. Eine Ausnahme bildet jedoch das Intervall $0.25<|x|<4$.
-
-    Wie im zweiten (logarithmisch skalierten) Diagramm deutlich erkennbar, steigt der relative Fehler exponentiell an, je näher der Eingabewert an 1 liegt. Dies lässt sich anhand der Konvergenz der Reihenglieder für verschiedene Eingabewerte erklären. Wie in Kapitel 2.1.1 erläutert, ist das Ergebnis genauer, je kleiner das letzte berechnete Reihenglied ist. Da wir für \textit{TaylorLn} die maximal nötigen Reihenglieder für double-Genauigkeit berechnen, hängen die Ungenauigkeiten mit \textit{Restreihe} und \textit{TaylorArsinh} zusammen.
-    Wir belegen zunächst, dass bei 13 Reihengliedern die Grenze für die Entstehung von Ungenauigkeiten in etwa bei 0.25 und 4 liegt. Hierzu berechnen wir jeweils das letzte Reihenglied für beide Werte
-    \[
-        \textit{TaylorArsinh}: \frac{(2\cdot13)!0.25^{2\cdot13 + 1}}{(2\cdot13 + 1)(2^13\cdot13!)^2} \approx 2^{-59}
-    \]
-    \[
-        \textit{Restreihe}: \frac{(2\cdot13)!}{2\cdot13(2^{13}\cdot 13!)^2} \cdot \frac{1}{4^{2\cdot13}} \approx 2^{-59}
-    \]
-    Da des letzte Reihenglied für beide Werte noch unter $2^{-52}$ liegt, hat das Ergebnis noch maximale double Genauigkeit. Für x-Werte näher an 1, wird jedoch das letzte Reihenglied immer größer, wodurch der relative Fehler exponentiell ansteigt. Wie im Graph zu sehen ist, hat die Reihenentwicklung ihren maximalen relativen fehler von circa $2^{-8} \approx 0.39\%$ am Eingabewert 1
-    Berechnen wir jeweils das letzte (13.) berechnete Reihenglied für den Eingabewert 1 in den beiden Reihen so erhalten wir:
-    \[
-        \textit{TaylorArsinh}: \frac{(2\cdot13)!1^{2\cdot13 + 1}}{(2\cdot13 + 1)(2^13\cdot13!)^2} \approx 0.00574 \approx 2^{-8}
-    \]
-    \[
-        \textit{Restreihe}: \frac{(2\cdot13)!}{2\cdot13(2^{13}\cdot 13!)^2} \cdot \frac{1}{1^{2\cdot13}} \approx 0.00596 \approx 2^{-8}
-    \]
-    Da das letzte Reihenglied die Größenordnung $2^{-8}$ hat, liegt auch der relative Fehler etwa in dieser Größenordnung. Der Graph bestätigt somit unsere Überlegungen zur Genauigkeit der Reihenentwicklungen.
-
+    Da das letzte Reihenglied die Größenordnung $2^{-8}$ hat, liegt auch der relative Fehler etwa in dieser Größenordnung. Der Graph bestätigt somit unsere Überlegungen zur Genauigkeit der Reihenentwicklung. 
     \subsection{Lookuptabelle}
     Die Genauigkeit des Ergebnisses bei der Verwendung der Lookuptabelle hängt stark von den Eingabewerten ab. Ist der Eingabewert exakt einer der vorgespeicherten Werte in der Tabelle, so liefert die Funktion logischerweise das exakte Ergebnis. Am ungenauesten ist die Funktion für Eingabewerte, die genau zwischen zwei gespeicherten Tabellenwerten liegen. Das lässt sich deutlich an der großen vertikalen Streuung der Fehlerwerte erkennen.
-
+    
     Im ersten Diagramm ist zudem deutlich erkennbar, dass die Funktion wie auch die Reihenentwicklung deutlich ungenauere Ergebnisse für Eingabewerte nahe an 1 liefert. Dies lässt sich mithilfe des Krümmungsverhaltens der Funktion begründen. Der folgende Graph zeigt die zweite Ableitung des $arsinh''(x) = \frac{-x}{x^2\cdot \sqrt{x^2+1}+\sqrt{x^2+1}}$
 
-
+    
     \begin{tikzpicture}
-        \begin{axis}
-            [
+        \begin{axis}[
             width = 15 cm,
             height = 5 cm,
             xmin = -10, xmax = 10,
             ymin = -0.5, ymax = 0.5,
-            axis lines=middle,
+            axis lines=middle, 
             axis line style={->},
             domain= -20: 20,
             samples = 500,
@@ -272,10 +276,29 @@
     \end{tikzpicture}
 
     Wie man sieht, hat der $arsinh(x)$ eine maximale Krümmung bei circa $\pm 0.707$. Dementsprechend wird auch eine lineare Interpolation im Bereich dieser Stellen eine maximale Ungenauigkeit aufweisen.
+    
 
+
+    
+    \subsection{Reihenentwicklung mit mehreren Reihen}
+    In Abb.2.2 lässt sich wieder erkennen, wie die Reihenentwicklung außerhalb der Intervalle $0.25<x<4$ nahezu immer den exakten Funktionswert liefert, mit denselben Ausnahmen wie bei der reinen Reihe.
+    Da der Fall $1<x<0.25$ exakt äquivalent zu der reinen Reihe ist, betrachten wir hier die Ungenauigkeiten im Intervall $1<x<4$. Dazu berechnen wir das letzte Reihenglied der \textit{Restreihe}.
+    
+    \[
+    \textit{Restreihe}: \frac{(2\cdot13)!}{2\cdot13(2^{13}\cdot 13!)^2} \cdot \frac{1}{4^{2\cdot13}} \approx 2^{-59}
+    \]
+    Da des letzte Reihenglied unter $2^{-52}$ liegt, hat das Ergebnis noch maximale double Genauigkeit. Ähnlich wie bei der reinen Reihe, wächst das letzte Reihenglied für x-Werte, die näher an 1 sind und lässt so den relativen Fehler steigen.In Abb.2.1 kann man wieder erkennen wie der maximale relative Fehler bei Eingabewert 1 erreicht wird.
+    Für das letzte Reihenglied für den Eingabewert 1 erhalten wir:
+    \[
+    \textit{Restreihe}: \frac{(2\cdot13)!}{2\cdot13(2^{13}\cdot 13!)^2} \cdot \frac{1}{1^{2\cdot13}} \approx 0.00596 \approx 2^{-8}
+    \]
+    
+    Da das letzte Reihenglied die Größenordnung $2^{-8}$ hat, womit der relative Fehler hier mit der reinen Reihe übereinstimmt.
+    
+    
+    
     \subsection{Implementierung mit komplexen Instruktionen}
-    Wie im ersten Diagramm zu sehen liefert die Implementierung mit komplexen mathematischen Instruktionen der C-Math Bibliothek für den Großteil des Wertebereichs den genauest möglichen Funktionswert für den Datentyp double. Eine Ausnahme bilden sehr kleine x-Werte. Dies lässt sich mit der Absorption beziehungsweise Auslöschung von bits begründen, welche bei der Addition von doubles unterschiedlicher Größenordnung unvermeidbar auftritt. Betrachten wir nun zunächst den Term $\sqrt{x^2 + 1}$ der allgemeinen Gleichung für den $arsinh(x)$. Ab $|x|<2^{-26}$ gilt stets $x^2<2^{-52}$. $x^2$ wird damit bei der Addition mit 1 vollständig absorbiert und $\sqrt{x^2 + 1}$ evaluiert zu 1. Hierdurch entsteht ein für kleinere $x$ immer größerer relativer Fehler. Ab $|x|<2^{-52}$ wird zudem x bei Addition auf 1 immer absorbiert, wodurch $\ln{(x+\sqrt{x^2 + 1})}$ automatisch zu 0 evaluiert. Für $|x|<2^{-52}$ ist die Implementierung mit komplexen mathematischen Instruktionen demnach kaum noch anwendbar, da das Ergebnis (mit Ausnahme von 0) immer einen relativen Fehler von $100\%$ haben wird.
-
+    Wie in Abb.1 zu sehen ist, liefert die Implementierung mit komplexen mathematischen Instruktionen der C-Math Bibliothek für den Großteil des Wertebereichs den genauest möglichen Funktionswert für den Datentyp double. Die einzige Ausnahme bilden sehr kleine x-Werte. Dies lässt sich mit der Absorption beziehungsweise Auslöschung von Bits begründen, welche bei der Addition von doubles unterschiedlicher Größenordnung unvermeidbar auftritt. Betrachten wir nun zunächst den Term $\sqrt{x^2 + 1}$ der allgemeinen Gleichung für den $arsinh(x)$. Ab $|x|<2^{-26}$ gilt stets $x^2<2^{-52}$. $x^2$ wird damit bei der Addition mit 1 vollständig absorbiert und $\sqrt{x^2 + 1}$ evaluiert zu 1. Hierdurch entsteht ein für kleinere $x$ immer größerer relativer Fehler. Ab $|x|<2^{-52}$ wird zudem x bei Addition auf 1 immer absorbiert, wodurch $\ln{(x+\sqrt{x^2 + 1})}$ automatisch zu 0 evaluiert. Für $|x|<2^{-52}$ ist die Implementierung mit komplexen mathematischen Instruktionen demnach kaum noch anwendbar, da das Ergebnis (mit Ausnahme von 0) immer einen relativen Fehler von $100\%$ haben wird.
 
     \section{Performanzanalyse}
     Die Performanz der Implementierungen wird anhand der Laufzeit gemessen.
