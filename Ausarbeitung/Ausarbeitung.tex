@@ -141,14 +141,14 @@
     Da die Reihe bereits für wenige Reihenglieder genauere Ergebnisse liefert, je näher der zu berechnende Wert an Eins liegt, haben wir uns dafür entschieden, alle Werte der Mantisse, die über $1.\overline{3}$ liegen, nochmal zu halbieren und stattdessen den Exponenten um 1 zu erhöhen.
     Es gilt $M\in[0.\overline{6}, 1.\overline{3}]$.
 
-    Bei der Hauptimplementierung wird folgende Umformung genutzt:
+    Für eine reine Reihe, die ohne Bitmasken für $x\geq 1$ aussagekräftig ist, benutzen wir die Folgende Umformung:
     \[
         arsinh(x)\approx ln(2x) + error(x) = ln(2) - ln(\frac{1}{x}) + error(x)
     \]
-    Dadurch entsteht im Argument des natürlichen Logarithmus wieder ein Wert, wofür die \textbf{TaylorLn} gilt.
+    Dadurch entsteht im Argument des natürlichen Logarithmus wieder ein Wert, wofür die \textbf{TaylorLn}-Reihe gilt.
     Um die reine Reihe zu erhalten, werden die beiden Reihen zu einer vereinigt.
     Durch Ausmultiplizieren der ersten n Reihenglieder lassen sich die Koeffizienten bestimmen und eine herkömmliche Reihe der Form $\sum_{k=0}^{n} a_k x^{-k}$ erstellen.
-    Die Koeffizienten der einzelnen Reihenglieder zu berechnen ist Laufzeitintensiv, da insbesondere die Berechnung der Fakultät viel Zeit kostet.
+    Die Koeffizienten der einzelnen Reihenglieder zu berechnen ist laufzeitintensiv, da insbesondere die Berechnung der Fakultät viel Zeit kostet.
     Daher lässt sich die Berechnung optimieren, indem die Koeffizienten aller drei Reihen bereits vor Runtime berechnet werden.
     Durch Anwendung des Horner-Schemas lässt sich nun die Reihe besonders effizient berechnen.
 
