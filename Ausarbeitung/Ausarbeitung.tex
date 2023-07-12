@@ -31,7 +31,8 @@
     In den Bereichen der Control-Theory und Datenverarbeitung gibt es zahlreiche Anwendungen, in denen die Berechnung bestimmter mathematischer Funktionen von großer Bedeutung ist.~\cite{QUELLE_DANIEL}
     Eine dieser Funktionen ist der \textit{Areasinus Hyperbolicus} ($arsinh(x)$), der unter anderem die Beschreibung nichtlinearer Beziehungen und Modellierung von Sättigungsprozessen ermöglicht.
     Um die Genauigkeit und Effizienz solcher Berechnungen zu garantieren, ist es von entscheidender Bedeutung, die Berechnung des $arsinh(x)$ effizient umzusetzen.
-    \begin{tikzpicture}
+    
+    \begin{tikzpicture}[h]
         \begin{axis}
             [
             legend pos = north west,
@@ -46,6 +47,7 @@
             ]
             \addplot[] {ln(x + sqrt(x*x+1))};
             \legend{$arsinh(x) = ln(x + \sqrt{x^2 + 1})$}
+
 
         \end{axis}
     \end{tikzpicture}
