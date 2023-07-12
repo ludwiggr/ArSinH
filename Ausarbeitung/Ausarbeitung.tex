@@ -71,13 +71,13 @@
  
      Sowohl für die Implementierung mit einer Reihendarstellung, als auch für die Lookuptabelle haben wir uns die Punktsymmetrie der $arsinh$-Funktion zunutze gemacht: $arsinh(-x) = -arsinh(x)$. Die Funktionswerte für negative Eingabewerte, werden mit $-arsinh(|x|)$ berechnet. In der Folge wird daher vor allem der Fall $0\leq x$ betrachtet.
 
-     \subsection{Reine Reihendarstellung}
+     \subsection{ Reihendarstellung}
      \subsubsection{Problematik und Ansätze}
 
      Bei der Interpolation durch eine "reine" Reihe der Form $\sum_{k=0}^{\infty} a_k x^k$ bzw. $\sum_{k=0}^{\infty} a_k x^-k$ stößt man unvermeidbar auf das problem von Overflows.
      Unabhängig welche Reihe man benutzt, entweder für sehr große Werte oder sehr kleine Werte von $x$ können die Zwischenergebnisse $x^{\pm k}$ nicht als $double$ dargestellt werden, obwohl das für das Endergebnis nicht gelten muss.
      Dadurch kommen wir auf Reihendarstellungen mit begrenzten Gültigkeitsbereichen.
-     Wir versuchen also eine Reihenentwicklung zu finden, die für einen sinnvollen Konvergenzbereich möglichst genaue Ergebnisse liefert. Hierzu haben wir unter anderem die Methode der kleinsten Quadrate verwendet, um geeignet Koeffizienten für Reihenglieder mit positiven oder negativen Potenzen zu finden. Die auf diese Weise hergeleitete Reihenentwicklung liefert allerdings für Werte zwischen den verwendeten Datenpunkten sehr ungenaue Ergebnisse, da es sich bei der arsinh-Funktion nicht um ein lineares Modell handelt. Wir haben daher stattdess eine Reihenentwicklung für das Intervall $$$$ hergeleitet, die im folgenden näher erläutert werden soll.
+     Wir versuchen also eine Reihenentwicklung zu finden, die für einen sinnvollen Konvergenzbereich möglichst genaue Ergebnisse liefert. Hierzu haben wir unter anderem die Methode der kleinsten Quadrate verwendet, um geeignet Koeffizienten für Reihenglieder mit positiven oder negativen Potenzen zu finden. Die auf diese Weise hergeleitete Reihenentwicklung liefert allerdings für Werte zwischen den verwendeten Datenpunkten sehr ungenaue Ergebnisse, da es sich bei der arsinh-Funktion nicht um ein lineares Modell handelt. Wir haben daher stattdessen eine Reihenentwicklungen für verschiedene Intervalle hergeleitet, die im folgenden näher erläutert werden sollen.
      \subsubsection{Umsetzung}
      
      \[ \operatorname{arsinh}(x) =
@@ -163,19 +163,10 @@
      
      Diese Verteilung ermöglicht zudem ein besonders effizientes Mapping der Eingabewerte auf den zugehörigen Index in der Lookuptabelle durch eine Hashfunktion. Durch eine Bitmaske lassen sich Exponent und die ersten 4 Bits der Mantisse ermitteln. Diese 15 bits bilden den Index des nächstkleineren Wertes, der in der Lookuptabelle liegt. Mit diesem und dem nächsten Tabellenwert, kann das Ergebnis nun linear interpoliert werden.
      Nachdem nun die Hashfunktion einen Index $i=hash(x)$ liefert, gilt: $table[i] \leq arsinh(x) \leq table[i+1]$. 
-     Nun interpolieren wir in diesem Abschnitt linear mit $y_j = table[j]$:
+     Nun interpolieren wir in diesem Abschnitt linear. Sei $x_i$ der x-Wert zum Tabelleneintrag and der Stelle i und $y_j = table[j]$:
      \[
-         arsinh(x) \approx \frac{y_{i+1}-y_i}{\Delta x_{table}}\cdot (x-y_i) + y_i
+         arsinh(x) \approx \frac{x-x_i}{x_{i+1} - x_i}\cdot (y_{i+1}-y_i) + y_i
      \]
-     Da $\Delta x_{table}$ jedoch von $i$ abhängt, muss dieses erst bestimmt werden mit:
-     \[
-            \Delta x_{table} = x - x_i
-     \]
-     Dies geschieht durch eine Bitmaske sehr effizient.
-     
-     
- 
- 
  
      
      % Theoretischer Teil
@@ -326,7 +317,7 @@
      Der Tabellenlookup ist zwar sehr schnell, benötigt allerdings auch immer mehr Speicherplatz, je genauere Werte man erhalten möchte.
      In unserer Implementierung, die insgesamt ca. 30000 Werte in einer Lookuptabelle speichert, hat die Berechnung einen maximalen relativen Fehler von bis zu etwa 0.01 Prozent.
  
-     Die Reihenentwicklung auf der anderen Seite liefert für etwa 49.4\% aller doubles den exakten Funktionswert, wird allerdings für Eingabewerte nahe an Eins ungenau - um das exakte Ergebnis für Eins zu erhalten wäre eine unvertretbar hohe Anzahl an Reihengliedern erforderlich, die zu extremen Performanzeinbußen führen würden. Da jedoch der interessanteste Bereich über 1 hinausgeht, lässt sich schließen, dass die Nutzung einer reinen Reihe, egal ob man die für $|x|\geq1$ oder $|x|\leq1$ verwendet, für diese Aufgabe nicht geeignet ist.
+     Die reine Reihenentwicklung auf der anderen Seite liefert für etwa 49.4\% aller doubles (Intervall $[-1, 1]$) den exakten Funktionswert, wird allerdings für Eingabewerte nahe an Eins ungenau - um das exakte Ergebnis für Eins zu erhalten wäre eine unvertretbar hohe Anzahl an Reihengliedern erforderlich, die zu extremen Performanzeinbußen führen würden. Da jedoch der interessanteste Bereich über 1 hinausgeht, lässt sich schließen, dass die Nutzung einer reinen Reihe, egal ob man die für $|x|\geq1$ oder $|x|\leq1$ verwendet, für diese Aufgabe nicht geeignet ist.
      Die gemischte Reihe liefert für 99,8\% aller doubles den exakten Funktionswert.
      Auch für die 27 reihenglieder der ln-Taylorreihe und die 13 Reihenglieder der beiden anderen Reihen, für die wir uns entschieden haben, benötigt die Reihenentwicklung für $|x|>1$ bis zu 11 mal so lange für die Berechnung, benötigt dafür aber auch über 600-mal weniger Speicherplatz für eine genaue Berechnung.
  
@@ -348,11 +339,8 @@
      Dadurch verbessert sich die Genauigkeit, insbesondere für x-Werte die genau zwischen zwei Werten in der Lookup-Tabelle liegen deutlich, während sich die Laufzeit nur minimal erhöht.
      Dafür steigt allerdings der benötigte Speicherplatz, da nun für jedes Intervall ein Polynom gespeichert werden muss.
      
-     Eine mögliche weitere Verbesserung des Lookup-Tables ist eine effizientere Verteilung der Tabellenwerte. Dadurch dass wir nämlich linear zwischen den 
-     werten interepolieren entsteht umso mehr Ungenauigkeit umso stärker sich die Steigung der Funktion ändert. Diese Steigungsänderung lässt sich mit der Krümmung messen.
-     Diese ist für kleine x besonders hoch und sinkt immer weiter für betragsmäßig große Inputs. Deswegen würde man an Genauigkeit gewinnen können, ohne mehr 
-     Speicher aufzuwenden, wenn man eine Mappingfunktion finden würde, die jedem x effizient den richtigen Tabelleneintrag zuorden kann.
-      Ein weiterer Ansatz wäre, eine Kombination aus Reihenentwicklung und Lookuptabelle zu verwenden: 
+     Eine mögliche weitere Verbesserung des Lookup-Tables ist eine effizientere Verteilung der Tabellenwerte. Durch die lineare Interpolation entsteht eine höhere Ungenauigkeit, je stärker die Krümmung der arsinh Funktion ist. Verwendet man an den besonders stark gekrümmten Stellen eine höhere Dichte an Messpunkten und findet dazu eine geeignete Mappingfunktion, so würde die Lookuptabelle bei der gleichen Anzahl an vorgespeicherten Werten deutlich genauere Ergebnisse liefern.
+     Ein weiterer Ansatz wäre, eine Kombination aus Reihenentwicklung und Lookuptabelle zu verwenden: 
      Wie zuvor beobachtet liefert die Berechnung mit einer Reihenentwicklung für x-Werte, die nicht nahe an Eins liegen, besonders genaue Ergebnisse. Für |x|<0.125 brauchen wir beispielsweise nur 13 Reihenglieder, für |x|>8 brauchen wir 13 Reihenglieder der Restreihe, sowie bis zu 33 Reihenglieder der Taylorreihe für ein exaktes Ergebnis. In diesen Intervallen bietet es sich also durchaus an eine reine Reihenentwicklung zu verwenden. In dem Intervall 0.125<=|x|<=8 braucht man allerdings mehr Reihenglieder, wodurch es zu Performanzeinbußen kommt. Es wäre demnach sinnvoll in diesem Intervall eine Lookuptabelle zu verwenden. Da der Wertebereich nun deutlich kleiner ist, lassen sich bereits in kleinen Lookuptabellen, deutlich exaktere Werte speichern, wodurch der maximale relative Fehler minimal gehalten wird. Dieser Ansatz zielt besonders auf die Genauigkeit des Ergebnisses ab. Durch die Verwendung einer Lookuptabelle erhöht sich zudem die Performanz, da für die verbleibenden x-Werte weniger Reihenglieder berechnet werden müssen, um ein exaktes Ergebnis zu erhalten. 
  
      Anzumerken ist zudem, dass sich insbesondere die Reihenentwicklung durch die Verwendung von Assemblerinstruktionen noch signifikant auf Laufzeit optimieren lässt. 
