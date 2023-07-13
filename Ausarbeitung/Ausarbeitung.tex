@@ -150,9 +150,8 @@
 
     \subsubsection{Abwägung Genauigkeit und Performanz}
     Die Anzahl an benutzten Reihenglieder, entsteht aus einer Abwägung zwischen Performanz und Genauigkeit.
-    Wie viele Reihenglieder berechnet werden müssen, um ein möglichst genaues Ergebnis zu erhalten, hängt von den Eingabewerten ab.
+    Wie viele Reihenglieder berechnet werden müssen, um ein möglichst genaues Ergebnis zu erhalten, hängt von dem Eingabewert ab.
     Da die Reihenglieder aller drei Reihen immer kleiner werden, gilt: Je kleiner das letzte berechnete Reihenglied, desto genauer ist auch das Ergebnis.
-
 
     Wir betrachten zunächst \textit{TaylorArsinh}:
     Das k-te Reihenglied hat den Betrag
@@ -161,13 +160,12 @@
     \]
     Aus dieser Formel lässt sich bereits ablesen, dass ein Reihenglied kleiner ist, je kleiner x ist.
     Die Reihe liefert demnach bereits mit weniger Reihengliedern genaue Ergebnisse, je näher x an 0 liegt.
-    Werden versuchsweise bestimmte Werte von x in die Formel eingesetzt, so lässt sich feststellen, dass für x = 0.25 alle Reihenglieder ab dem etwa 13. Glied keinen Einfluss mehr auf das Endergebnis haben, da sie aufgrund der Beschränkung der Mantisse auf 52 Bit diese bei der Addition absorbiert werden.
+    Mithilfe dieser Formel lässt sich feststellen, dass für x = 0.25 alle Reihenglieder ab dem etwa 13. Glied keinen Einfluss mehr auf das Endergebnis haben, da sie aufgrund der Beschränkung der Mantisse auf 52 Bit diese bei der Addition absorbiert werden.
     Für x = 0.5 müssten 26 Reihenglieder berechnet werden.
     Für x = 0.99 sind bereits etwa 1500 Reihenglieder nötig.
     Die Anzahl der zu berechnenden Reihenglieder wird auf 13 festgelegt und damit ein exponentiell ansteigender relativer Fehler ab $|x|>0.25$ in Kauf genommen.
     
-    Für die gemischte Reihe lassen sich ähnliche Berechnungen mit \textit{TaylorLn} und \textit{Restreihe} aufstellen. Um ein sinnvolles Verhältnis aus Genauigkeit und Performanz zu erhalten wird Anzahl der zu berechnenden Reihenglieder für \textit{TaylorArsinh} und \textit{Restreihe} auf 13 festgelegt und damit ein geringer relativer Fehler in den Intervallen $0.25<|x|<4$ in Kauf genommen. Bei \textit{TaylorLn} berechnen wir 27 Reihenglieder, da damit auf dem gesamten Wertebereich ein exaktes Ergebnis erreicht wird.
-    Relativer Fehler und Performanz werden in den folgenden Kapiteln näher untersucht und belegt.
+    Für die gemischte Reihe lassen sich ähnliche Berechnungen mit \textit{TaylorLn} und \textit{Restreihe} aufstellen. Um ein sinnvolles Verhältnis von Genauigkeit und Performanz zu erhalten, wird Anzahl der zu berechnenden Reihenglieder für \textit{TaylorArsinh} und \textit{Restreihe} auf 13 festgelegt. Bei \textit{TaylorLn} berechnen wir 27 Reihenglieder, da damit auf dem gesamten Wertebereich ein exaktes Ergebnis erreicht wird.
 
     Es sei an dieser Stelle bereits erwähnt, dass ausgehend von diesen Untersuchungen eine weitere Optimierung umsetzbar wäre, die (beispielsweise mithilfe des Exponenten des Eingabewertes) die Anzahl der nötigen Reihenglieder bestimmt und nur diese berechnet.
     Durch diese Optimierung wird Overhead durch die Berechnung von für das Ergebnis irrelevanten Reihengliedern vermieden.
@@ -177,8 +175,8 @@
     \subsection{Tabellen-Lookup}
     Die Lookuptabelle speichert einige vorberechnete Werte der $arsinh$-Funktion und interpoliert für die verbleibenden Werte linear zwischen den beiden nächstgelegenen Tabellenwerten.
     Bei der Implementierung galt es zunächst zwischen Speicherplatz der Tabelle und Genauigkeit des Ergebnisses abzuwägen.
-    Im Rahmen der Ausarbeitung wurde ein Limit von 1 MB für die Lookuptabelle festgelegt.
-    Diese Größe ermöglicht das Speichern von rund 40000 Werten.
+    Im Rahmen der Ausarbeitung wurde ein Limit von 500KB für die Lookuptabelle festgelegt.
+    Diese Größe ermöglicht uns das Speichern von rund 33000 Werten.
     Ebenso wurde eine logarithmische Verteilung der Werte festgelegt, da auch die Verteilung aller möglichen Werte im Datentyp $double$ logarithmisch ist.
     Für alle positiven Eingabewerte wurde für jeden möglichen Exponenten $[-1023, +1023]$ eine feste Anzahl an Werten vorberechnet.
     Das gesetzte Speicherlimit beschränkt die Genauigkeit auf 16 Werte pro Exponent.
