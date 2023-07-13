@@ -1,39 +1,39 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <getopt.h>
 #include <stddef.h>
 #include <errno.h>
 #include <math.h>
-#include <string.h>
-#include "approxArsinh_lookup.h"
-#include "approxArsinh_series.h"
 #include <time.h>
 #include <stdbool.h>
+#include "approxArsinh_lookup.h"
+#include "approxArsinh_series.h"
+#include "approxArsinh_complexInstructions.h"
 
-static const long int numberOfImplementations = 4;     //number of possible Implementations to choose from
-static const long int maxNumberOfRepetitions = 10000000000;   //max number of repetitions of the function call to avoid timeout
-
-const char* help_msg =
-    "Options and Use Cases:\n"
-    "The program calculates the arsinh(x) = ln(x + sqrt(x^2 + 1)) for an input value.\n"
-    "\n"
-    "Positional arguments:\n"
-    "  x   The input value for which the arsinh is calculated\n"
-    "      Can be any positive or negative double including +-inf and +-nan\n"
-    "\n"
-    "Optional arguments:\n"
-    "  -V <X:Number>    The Implementation, that should be used to approximate the arsinh(x)(default: X = 0)\n"
-    "                   Implementations corresponding to X:\n"
-    "               0: Lookuptable with linear Interpolation\n"
-    "               1: ('Pure') Taylor Series of the arsinh(x) around 0\n"
-    "                  The convergence zone of the series is [-1; 1]\n"
-    "               2: Approximation using different series depending on the input value\n"
-    "                  provides meaningful results for all possible inputs\n"
-    "               3: Approximation using the complex instructions sqrt and log\n"
-    "  -B [X:Number]    if set, program measures runtime of X iterations of the calculation (default: X = 100000000)\n"
-    "  -R               Calculates relative error of the result compared to the actual value\n"
-    "  -h/--help        Show help message (this text) and exit\n";
+/* Non-changing global variables for testing */
+static const long int numberOfImplementations = 4;
+static const long int maxNumberOfRepetitions = 1000000000;
+/* A useful help message to be printed in the frame program */
+static const char *help_msg =
+        "Options and Use Cases:\n"
+        "The program calculates the arsinh(x) = ln(x + sqrt(x^2 + 1)) for an input value.\n"
+        "\n"
+        "Positional arguments:\n"
+        "  x   The input value for which the arsinh is calculated\n"
+        "      Can be any positive or negative double including +-inf and +-nan\n"
+        "\n"
+        "Optional arguments:\n"
+        "  -V <X:Number>    The Implementation, that should be used to approximate the arsinh(x)(default: X = 0)\n"
+        "                   Implementations corresponding to X:\n"
+        "               0: Lookuptable with linear Interpolation\n"
+        "               1: ('Pure') Taylor Series of the arsinh(x) around 0\n"
+        "                  The convergence zone of the series is [-1; 1]\n"
+        "               2: Approximation using different series depending on the input value\n"
+        "                  provides meaningful results for all possible inputs\n"
+        "               3: Approximation using the complex instructions sqrt and log\n"
+        "  -B [X:Number]    if set, program measures runtime of X iterations of the calculation (default: X = 100000000)\n"
+        "  -R               Calculates relative error of the result compared to the actual value\n"
+        "  -h/--help        Show help message (this text) and exit\n";
 
 
 double approxArsinh_lookup(double x);
@@ -42,14 +42,12 @@ double approxArsinh_series(double x);
 
 double approxArsinh_differentSeries(double x);
 
+double approxArsinh_complexInstructions(double x);
 
-double approxArsinh_predefined(double x) {
-    if (x > 1e16) {
-        return log(2) + log(x);
-    }
-    return log(x + sqrt(x * x + 1));
-}
-
+/* Multiplexes the Implementation to be used
+ *
+ * Returns: An Approximation of the arsinh(x) for the Argument x and the Argument implementation [0;3]
+ */
 double calculate_result(double x, int implementation) {  //just calculates the result and returns the double
     switch (implementation) {
         case 0:
@@ -59,15 +57,18 @@ double calculate_result(double x, int implementation) {  //just calculates the r
         case 2:
             return approxArsinh_differentSeries(x);
         case 3:
-            return approxArsinh_predefined(x);
+            return approxArsinh_complexInstructions(x);
         default:
             fprintf(stderr, "No such implementation.\n");
             return EXIT_FAILURE;
     }
 }
 
-double relative_error(double x,
-                      int implementation) {      //returns the relative error using the implementation of the math library as comparism
+/* Computes the relative error of a given arsinh implementation compared to the math library
+ *
+ * Returns: the relative error for arsinh(x) for the arguments x and the Argument implementation [0;3]
+ */
+double relative_error(double x, int implementation) {
     double exact = asinh(x);
     double approx;
     switch (implementation) {
@@ -81,7 +82,7 @@ double relative_error(double x,
             approx = approxArsinh_differentSeries(x);
             break;
         case 3:
-            approx = approxArsinh_predefined(x);
+            approx = approxArsinh_complexInstructions(x);
             break;
         default:
             printf("Error: Implementation not found!\n");
@@ -91,13 +92,12 @@ double relative_error(double x,
 }
 
 
-//TODO: n can't be in multiples, default value should be chosen wisely
-double performance(unsigned int n, double x, int implementation) {
-    /*
-    n = number of repetitions in multiples of 10000
-    x = input value
-    implementation =  0: lookup table ; 1: series ; 2: impl with complex functions
-    */
+/* Measures and Computes the performance of a given arsinh implementation compared to the math library
+ *
+ * Returns: the relative error for arsinh(x) for the Argument n (number of executions) the Arguments x (Argument of the function) and the Argument implementation [0;3]
+ */
+double performance(unsigned int n, double x,
+                   int implementation) {
     struct timespec start, end;
     int c1, c2;
     switch (implementation) {
@@ -152,7 +152,7 @@ double performance(unsigned int n, double x, int implementation) {
         case 3:
             c1 = clock_gettime(CLOCK_MONOTONIC, &start);
             for (unsigned int i = 0; i < n; i++) {
-                approxArsinh_predefined(x);
+                approxArsinh_complexInstructions(x);
             }
             c2 = clock_gettime(CLOCK_MONOTONIC, &end);
             if (c1 == -1) {
@@ -169,21 +169,22 @@ double performance(unsigned int n, double x, int implementation) {
             printf("Error: Implementation not found!\n");
             break;
     }
-
-
     double time = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1000000000.0;
     return time;
-
 }
 
 
+/* Frame program that parses and interprets user input
+ *
+ * Returns: One of {EXIT_SUCCESS, EXIT_FAILURE}
+ */
 int main(int argc, char *argv[]) {
 
-    long int implementation = 0;          // := choose Implementation
-    long int iterations = 0;              // := if B-flag this sets numbers of iterations for runtime measurement
+    long int implementation = 0;
+    long int iterations = 0;
     double newNum;
-    bool negativeNumber_Set = false;      
-    int negativeNumber_Index = 0;         // := index of possible negative number parsed
+    bool negativeNumber_Set = false;
+    int negativeNumber_Index = 0;
     bool relativeError = false;
     double number;
 
@@ -195,9 +196,10 @@ int main(int argc, char *argv[]) {
             {"help", no_argument, NULL, 'h'},
             {NULL,   0,           NULL, 0}
     };
-    while ((opt = getopt_long(argc, argv, "V:B::hR0::1::2::3::4::5::6::7::8::9::.::i::I::n::N::", long_options, &option_index)) != -1) {
+    while ((opt = getopt_long(argc, argv, "V:B::hR0::1::2::3::4::5::6::7::8::9::.::i::I::n::N::", long_options,
+                              &option_index)) != -1) {
         switch (opt) {
-            case 'V':           //choose implementation
+            case 'V':
                 implementation = strtol(optarg, &endptr, 10);
                 if (endptr == optarg || *endptr != '\0') {
                     fprintf(stderr, "%s could not be converted to long.\nArgument may only contain digits 0-9\n",
@@ -215,11 +217,11 @@ int main(int argc, char *argv[]) {
                     return EXIT_FAILURE;
                 }
                 break;
-            case 'B':           //choose number of iterations for runtime measurement
-                if(optarg == NULL && optind < argc && argv[optind][0] != '-'){
+            case 'B':
+                if (optarg == NULL && optind < argc && argv[optind][0] != '-') {
                     optarg = argv[optind++];
-                }           //basically checks for whitespace before optional argument
-                if(optarg!=NULL){
+                }
+                if (optarg != NULL) {
                     iterations = strtol(optarg, &endptr, 10);
                     if (endptr == optarg || *endptr != '\0') {
                         fprintf(stderr, "%s could not be converted to long.\nArgument may only contain digits 0-9.\n",
@@ -240,8 +242,7 @@ int main(int argc, char *argv[]) {
                         printf("If you wanted to parse the input value for the arsinh function, please don't parse it directly after the -B flag.\n");
                         return EXIT_FAILURE;
                     }
-                } 
-                else{
+                } else {
                     iterations = 100000000;
                 }
                 break;
@@ -251,21 +252,35 @@ int main(int argc, char *argv[]) {
             case 'h'  :
                 printf("%s", help_msg);
                 return EXIT_SUCCESS;
-            case '0'  : case '1'  : case '2'  : case '3'  : case '4'  :
-            case '5'  : case '6'  : case '7'  : case '8'  : case '9'  : 
-            case '.'  : case 'i'  : case 'n'  : case 'I'  : case 'N'  :
+
                 //if the - is followed by one of these chars, we assume that
                 //the user might want to parse a negative number as a positional argument
-                newNum = strtod(argv[optind-1], &endptr);
-                if (endptr == argv[optind-1] || *endptr != '\0') {
-                    fprintf(stderr, "%c is not a valid Option and %s could not be converted to double\n", opt, argv[optind-1]);
+            case '0'  :
+            case '1'  :
+            case '2'  :
+            case '3'  :
+            case '4'  :
+            case '5'  :
+            case '6'  :
+            case '7'  :
+            case '8'  :
+            case '9'  :
+            case '.'  :
+            case 'i'  :
+            case 'n'  :
+            case 'I'  :
+            case 'N'  :
+                newNum = strtod(argv[optind - 1], &endptr);
+                if (endptr == argv[optind - 1] || *endptr != '\0') {
+                    fprintf(stderr, "%c is not a valid Option and %s could not be converted to double\n", opt,
+                            argv[optind - 1]);
                     return EXIT_FAILURE;
                 } else if (errno == ERANGE) {
-                    fprintf(stderr, "%s over- or underflows double \n", argv[optind-1]);
+                    fprintf(stderr, "%s over- or underflows double \n", argv[optind - 1]);
                     printf("datatype double has to be in range +/- 1.7E +/-308.\n");
                     return EXIT_FAILURE;
                 }
-                if(!negativeNumber_Set){    //we only store the number, if we haven't stored a negative number already
+                if (!negativeNumber_Set) {
                     negativeNumber_Set = true;
                     negativeNumber_Index = optind;
                     number = newNum;
@@ -275,7 +290,7 @@ int main(int argc, char *argv[]) {
                 if (optopt == 'V')
                     fprintf(stderr, "Option -V requires an Argument\n");
                 else
-                    fprintf(stderr, "Unknown Option -%c\n ",optopt);
+                    fprintf(stderr, "Unknown Option -%c\n ", optopt);
                 return EXIT_FAILURE;
             default:
                 fprintf(stderr, "Unknown symbol %c\n", optopt);
@@ -283,13 +298,11 @@ int main(int argc, char *argv[]) {
         }
     }
 
-
-    if (optind >= argc && !negativeNumber_Set) {  //if there isn't an optional argument and no negative number was parsed
-        fprintf (stderr, "Missing positional argument -- ’x’\n");
+    if (optind >= argc && !negativeNumber_Set) {
+        fprintf(stderr, "Missing positional argument -- ’x’\n");
         printf("Input value needs to be specified.\n");
-        return EXIT_FAILURE ;
-    }
-    else if(!negativeNumber_Set || negativeNumber_Index>optind){  //optional argument is only read if a negative number wasn't parsed first
+        return EXIT_FAILURE;
+    } else if (!negativeNumber_Set || negativeNumber_Index > optind) {
         number = strtod(argv[optind], &endptr);
         if (endptr == argv[optind] || *endptr != '\0') {
             fprintf(stderr, "%s could not be converted to double. \n", argv[optind]);
@@ -305,7 +318,7 @@ int main(int argc, char *argv[]) {
         double result = calculate_result(number, implementation);
         printf("Calculating arsinh(%f) with implementation number %li results in %.*g.\n", number, implementation, 20,
                result);
-        if(implementation == 1 && (number<-1.||number>1.)){
+        if (implementation == 1 && (number < -1. || number > 1.)) {
             printf("WARNING: The Taylor Series of Arsinh only provides meaningful results within its convergence zone [-1; 1].\n");
             printf("For all other input values consider using the Implementation -V 2, which uses different series for the approximation.\n");
         }
@@ -319,7 +332,7 @@ int main(int argc, char *argv[]) {
         double time = performance(iterations, number, implementation);
         printf("The measured runtime of %ld iterations of implementation number %ld was %f seconds.\n", iterations,
                implementation, time);
-        if(iterations<100000000){
+        if (iterations < 100000000) {
             printf("WARNING: Using less than 10000000 iterations is not recommended. \nThe program might not run long enough to provide meaningful measurements.");
         }
         return EXIT_SUCCESS;
