@@ -33,7 +33,7 @@
     Er wird verwendet, um Küsten vor zerstörerischen Wellen zu warnen als auch um die Ausdehnung des Universums zu berechnen.
     In dieser Arbeit werden Methoden zur genauen und effizienten Berechnung dieser vielseitigen Funktion vorgestellt und analysiert.
     
-    \begin{tikzpicture}[h]
+    \begin{tikzpicture}[]
         \begin{axis}
             [
             legend pos = north west,
@@ -150,8 +150,8 @@
 
     \subsubsection{Abwägung Genauigkeit und Performanz}
     Die Anzahl an benutzten Reihenglieder, entsteht aus einer Abwägung zwischen Performanz und Genauigkeit.
-    Wie viele Reihenglieder berechnet werden müssen, um ein möglichst genaues Ergebnis zu erhalten, hängt von dem Eingabewert ab.
-    Da die Reihenglieder aller drei Reihen immer kleiner werden, gilt: Je kleiner das letzte berechnete Reihenglied, desto genauer ist auch das Ergebnis.
+    Wie viele Reihenglieder für ein möglichst genaues Ergebnis berechnet werden müssen, hängt von dem Eingabewert ab.
+    Da die Reihenglieder aller drei Reihen für Eingabewerte innerhalb des jeweiligen Konvergenzbereichs immer kleiner werden, gilt: Je kleiner das letzte berechnete Reihenglied, desto genauer ist auch das Ergebnis.
 
     Wir betrachten zunächst \textit{TaylorArsinh}:
     Das k-te Reihenglied hat den Betrag
