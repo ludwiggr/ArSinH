@@ -155,43 +155,29 @@
     Daher lässt sich die Berechnung optimieren, indem die Koeffizienten aller drei Reihen bereits vor Runtime berechnet werden.
     Durch Anwendung des Horner-Schemas lässt sich nun die Reihe besonders effizient berechnen.
 
-    \subsubsection{Abwägung Genauigkeit und Performanz}
+    \subsection{Abwägung Genauigkeit und Performanz}
     Die Anzahl an benutzten Reihenglieder, entsteht aus einer Abwägung zwischen Performanz und Genauigkeit.
     Wie viele Reihenglieder berechnet werden müssen, um ein möglichst genaues Ergebnis zu erhalten, hängt von den Eingabewerten ab.
     Da die Reihenglieder aller drei Reihen immer kleiner werden, gilt: Je kleiner das letzte berechnete Reihenglied, desto genauer ist auch das Ergebnis.
 
 
-    Wir betrachten zunächst \textit{TaylorLn}:
-    In der Implementierung liegt der Eingabewert für die Reihe im Intervall $[0.\overline{6}, 1.\overline{3}]$.
-    Aus der Formel für das k-te Reihenglied
-    \[ \frac{(x - 1)^k}{k}
-    \]
-    lässt sich errechnen, dass spätestens das 28. Reihenglied dieser Reihe für alle Eingabewerte im gegebenen Intervall $[0.\overline{6}, 1.\overline{3}]$ kleiner als $2^{-50}$ ist.
-    Somit würden alle weitere Reihenglieder bei der Addition mit dem Restterm (wegen der Limitierung durch die Mantisse auf 52 bit) nahezu vollständig ausgelöscht werden.
-    Wir setzen daher die Anzahl der zu berechnenden Reihenglieder dieser Reihe auf 27.
-
-    Betrachten wir nun \textit{TaylorArsinh}.
+    Wir betrachten zunächst \textit{TaylorArsinh}:
     Das k-te Reihenglied hat den Betrag
     \[
         \frac{(2k)!}{(2k + 1)(2^k*k!)^2}\cdot x^{2k+1}
     \]
     Aus dieser Formel lässt sich bereits ablesen, dass ein Reihenglied kleiner ist, je kleiner x ist.
-    Die Reihe liefert demnach bereits mit weniger Reihengliedern genauere Ergebnisse, je näher x an 0 liegt.
-    Werden versuchsweise bestimmte Werte von x in die Formel eingesetzt, so lässt sich feststellen, dass für x = 0.25 alle Reihenglieder ab dem etwa 13. Glied keinen Einfluss mehr auf das Endergebnis haben.
-    Für x = 0.5 müssen 26 Reihenglieder berechnet werden.
+    Die Reihe liefert demnach bereits mit weniger Reihengliedern genaue Ergebnisse, je näher x an 0 liegt.
+    Werden versuchsweise bestimmte Werte von x in die Formel eingesetzt, so lässt sich feststellen, dass für x = 0.25 alle Reihenglieder ab dem etwa 13. Glied keinen Einfluss mehr auf das Endergebnis haben, da sie aufgrund der Beschränkung der Mantisse auf 52 Bit diese bei der Addition absorbiert werden.
+    Für x = 0.5 müssten 26 Reihenglieder berechnet werden.
     Für x = 0.99 sind bereits etwa 1500 Reihenglieder nötig.
-
-    Für die \textit{Restreihe}, kann eine äquivalente Überlegung getroffen werden, die ebenfalls belegt, dass exponentiell mehr Reihenglieder benötigt werden, je näher x an 1 liegt.
-
-    %TODO: Abbildung
-
-    In der Abbildung ist zu sehen, dass für Eingabewerte nahe an 1 eine unverhältnismäßig hohe Anzahl an Reihengliedern für ein exaktes Ergebnis benötigt werden.
-    Aufgrund dieses exponentiellen Wachstums wird die Anzahl der zu berechnenden Reihenglieder für \textit{TaylorArsinh} und \textit{Restreihe} auf 13 festgelegt und damit ein geringer relativer Fehler in den Intervallen $0.25<|x|<4$ in Kauf genommen.
+    
+    Ähnliche Berechnungen lassen sich für die Reihe \textit{TaylorLn} und die \textit{Restreihe} aufstellen. Aufgrund dieses exponentiellen Wachstums wird die Anzahl der zu berechnenden Reihenglieder für \textit{TaylorArsinh} und \textit{Restreihe} auf 13 festgelegt und damit ein geringer relativer Fehler in den Intervallen $0.25<|x|<4$ in Kauf genommen. Bei \textit{TaylorLn} berechnen wir 27 Reihenglieder, da damit auf dem gesamten Wertebereich ein exaktes Ergebnis erreicht wird.
     Diese Abwägung zwischen relativem Fehler und Performanz werden in den folgenden Kapiteln näher untersucht und belegt.
 
-    Es sei an dieser Stelle erwähnt, dass ausgehend von diesen Untersuchungen eine weitere Optimierung umsetzbar wäre, die (beispielsweise mithilfe des Exponenten des Eingabewertes) jeweils die Anzahl der nötigen Reihenglieder bestimmt und dann eben diese (falls die Anzahl kleiner als 13 ist) berechnet.
-    Durch diese Optimierung wird zusätzlicher Overhead durch die Berechnung von für das Ergebnis irrelevanten Reihengliedern vermieden.
-    Da Fallunterscheidungen ausgeschlossen sind, wurde auf diese Optimierung verzichtet.
+    Es sei an dieser Stelle erwähnt, dass ausgehend von diesen Untersuchungen eine weitere Optimierung umsetzbar wäre, die (beispielsweise mithilfe des Exponenten des Eingabewertes) die Anzahl der nötigen Reihenglieder bestimmt und diese (falls die Anzahl kleiner als 13 ist) berechnet.
+    Durch diese Optimierung wird Overhead durch die Berechnung von für das Ergebnis irrelevanten Reihengliedern vermieden.
+    Da Fallunterscheidungen verboten sind, wurde auf diese Optimierung verzichtet.
 
 
     \subsection{Tabellen-Lookup}
@@ -218,7 +204,7 @@
 
     \begin{figure}[h]
         \begin{tabular}{@{}c@{}}
-        \includegraphics[width = 12cm,height = 8cm]{pdf/Figure3.png}
+        \includegraphics[width = 12cm,height = 6cm]{pdf/Figure3.png}
         \smash Abbildung 1
         \end{tabular}
         
