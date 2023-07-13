@@ -366,13 +366,13 @@
     Unter weniger strengen Rahmenbedingungen ließe sich die Implementierung allerdings sowohl in Bezug auf Laufzeit, als auch Genauigkeit noch signifikant optimieren.
 
     Ein möglicher weiterführender Ansatz ist die Verwendung von Splines in der Lookup-Tabelle:
-    Statt der bisher linearen Näherung zwischen zwei Messpunkten wäre es möglich den $arsinh(x)$ in diesem Intervall durch eine Kurve anzunähern.
+    Statt der bisher linearen Näherung zwischen zwei Messpunkten wäre es möglich den $arsinh(x)$ in diesem Intervall durch ein Polynom anzunähern.
     Hierzu werden in der Regel Polynome vom Grad drei verwendet.~\cite{????}
     Dadurch verbessert sich die Genauigkeit, insbesondere für x-Werte die genau zwischen zwei Werten in der Lookup-Tabelle liegen deutlich, während sich die Laufzeit nur minimal erhöht.
     Dafür steigt allerdings der benötigte Speicherplatz, da nun für jedes Intervall ein Polynom gespeichert werden muss.
 
     Eine mögliche weitere Verbesserung des Lookup-Tables ist eine effizientere Verteilung der Tabellenwerte.
-    Durch die lineare Interpolation entsteht eine höhere Ungenauigkeit, je stärker die Krümmung der arsinh Funktion ist.
+    Durch die lineare Interpolation entsteht eine höhere Ungenauigkeit, je stärker die Krümmung der arsinh Funktion an dieser Stelle ist.
     Wird an den besonders stark gekrümmten Stellen eine höhere Dichte an Messpunkten verwendet und eine geeignete Mappingfunktion erstellt, würde die Lookuptabelle bei der gleichen Anzahl an vorgespeicherten Werten deutlich genauere Ergebnisse liefern.
 
     Ein weiterer Ansatz wäre, eine Kombination aus Reihenentwicklung und Lookup-Tabelle zu verwenden:
@@ -381,16 +381,9 @@
     In diesen Intervallen bietet es sich an, eine reine Reihenentwicklung zu verwenden.
     In dem Intervall 0.125<=|x|<=8 werden allerdings mehr Reihenglieder benötigt, wodurch es zu Performanz einbußen kommt.
     Es wäre demnach sinnvoll in diesem Intervall eine Lookup-Tabelle zu verwenden.
+    Dieser Ansatz würde besonders auf die Genauigkeit des Ergebnisses abzielen.
 
-    Da der Wertebereich in diesem Intervall kleiner ist, lassen sich in kleinen Lookuptabellen genauere Werte speichern, wodurch der maximale relative Fehler minimal gehalten wird.
-    Dieser Ansatz zielt besonders auf die Genauigkeit des Ergebnisses ab.
-    Durch die Verwendung einer Lookuptabelle erhöht sich die Performanz, da für die verbleibenden x-Werte weniger Reihenglieder berechnet werden müssen, um ein exaktes Ergebnis zu erhalten.
-
-    Anzumerken ist zudem, dass sich insbesondere die Reihenentwicklung durch die Verwendung von Assemblerinstruktionen noch signifikant auf Laufzeit optimieren lässt.
-
-    Die Wahl des Datentyps bietet eine weitere einfache Möglichkeit zur Erhöhung der potenziellen Genauigkeit oder zur Verkleinerung des Speicherverbrauchs.
-    Gemäß IEEE 754 ~\cite{StandardforBinaryFloating} könnte auch die einfache oder vierfache Genauigkeit der Fließkommaarithmetik gewählt werden, wodurch sich die erreichbare Genauigkeit auf $23*\log10(2) \approx 6,92$ dezimale Nachkommastellen bzw. $112*\log10(2) \approx 33,72$ dezimale Nachkommastellen respektive verändern würde.
-    Der Speicherverbrauch würde sich respektive halbieren oder verdoppeln.
+    Die Wahl des Datentyps bietet eine weitere einfache Möglichkeitzur Verkleinerung des Speicherverbrauchs. Gemäß IEEE 754 ~\cite{StandardforBinaryFloating} könnte auch die einfache Genauigkeit der Fließkommaarithmetik gewählt werden, wodurch sich der Speicherverbrauch halbieren würde.
 
     % TODO: Fuegen Sie Ihre Quellen der Datei Ausarbeitung.bib hinzu
     % Referenzieren Sie diese dann mit \cite{}.
