@@ -6,7 +6,7 @@ CC = gcc
 LIBRARYS = -lm
 
 # The resulting executable files to be created
-output = approxArsinh_lookup.o  approxArsinh_series.o Implementierung.o
+output = approxArsinh_lookup.o approxArsinh_series.o approxArsinh_complexInstructions.o Implementierung.o test_performance.o
 
 # The command 'make' will execute the first target entry (this) in the file
 Implementierung: $(output)

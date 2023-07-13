@@ -18,3 +18,4 @@ double approxArsinh_lookup(double x) {
     double result = ylow + relation * (yhigh - ylow);
     return x >= 0 ? result : -result;
 }
+

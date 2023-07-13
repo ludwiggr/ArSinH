@@ -1,4 +1,5 @@
 #include <string.h>
+#include <math.h>
 
 double approxArsinh_series(double x);
 
@@ -57,3 +58,6 @@ static double const coeffs_rest[] = {0.25, -0.09375, 0.052083333333333336, -0.03
                                      -0.0009017334820383588, 0.0008731588583431641, -0.0008460621316194071,
                                      0.0008203384599791669, -0.0007958923738717878, 0.0007726367720208628};
 //stores precalculated coefficients of the asymptotic expansion rest series
+
+
+

@@ -1,4 +1,5 @@
-#include <sting.h>
+#include <string.h>
+#include <math.h>
 
 
 double approxArsinh_lookup(double x);
