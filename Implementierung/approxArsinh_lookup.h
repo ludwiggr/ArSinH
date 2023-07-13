@@ -1,6 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include <sting.h>
+
+
+double approxArsinh_lookup(double x);
+
 // precalculated values of the arsinh-function
 // stores 16 evenly distributed results for each exponent of the datatype double
 static double const table[] = {1.1125369292536007e-308 , 1.1820704873319507e-308 , 1.251604045410301e-308 , 1.321137603488651e-308 ,
@@ -8193,4 +8195,5 @@ static double const table[] = {1.1125369292536007e-308 , 1.1820704873319507e-308
 710.3423286813194 , 710.3774200011306 , 710.4113215528063 , 710.4441113756293 ,
 710.475860073944};
 
-double approxArsinh_lookup(double x);
+
+
