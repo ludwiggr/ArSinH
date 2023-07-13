@@ -134,15 +134,12 @@
 
     
     
-    In der Vergleichsimplementierung ohne die Beschränkung auf eine reine Reihendarstellung, kann das $double$ Datenformat genutzt werden, um die Berechnung signifikant auf Genauigkeit zu optimieren. Die Implementierung mit verschiedenen Reihen verwendet eine Bitmaske um effizient Exponent und Mantisse von $x$ ermitteln.
-    Mit Exponent und Mantisse lässt sich nun folgende Umformung treffen:
+    In der Vergleichsimplementierung ohne die Beschränkung auf eine reine Reihendarstellung, kann das $double$ Datenformat genutzt werden, um die Berechnung signifikant auf Genauigkeit zu optimieren. Die Implementierung mit verschiedenen Reihen verwendet Exponent und Mantisse von $x$ um folgende Umformung zu treffen:
     \begin{gather*}
         x = M\cdot2^E \,\,\, mit \,\,\, M = implizierte Mantisse \,\,\, E = implizierter Exponent\\
         arsinh(x) \approx \ln(2x) = \ln(2) + \ln(x) = \ln(2) + \ln(M\cdot2^E) = \ln(2) + E\cdot\ln(2) + \ln(M)\\
     \end{gather*}
     Da $M\in[1, 2[$ liegt, kann nun \textit{TaylorLn} für die Berechnung von $\ln(M)$ verwendet werden.
-    Da die Reihe bereits für wenige Reihenglieder genauere Ergebnisse liefert, je näher der zu berechnende Wert an Eins liegt, haben wir uns dafür entschieden, alle Werte der Mantisse, die über $1.\overline{3}$ liegen, nochmal zu halbieren und stattdessen den Exponenten um 1 zu erhöhen.
-    Es gilt $M\in[0.\overline{6}, 1.\overline{3}]$.
 
     
     Die Koeffizienten der einzelnen Reihenglieder zu berechnen ist laufzeitintensiv, da insbesondere die Berechnung der Fakultät viel Zeit kostet.
