@@ -85,30 +85,22 @@
     Sowohl für die Implementierung mit einer Reihendarstellung, als auch für die Lookuptabelle haben wir uns die Punktsymmetrie der $arsinh$-Funktion zunutze gemacht: $arsinh(-x) = -arsinh(x)$.
     Die Funktionswerte für negative Eingabewerte werden per Fallunterscheidung mit $-arsinh(|x|)$ berechnet.
 
+
     \subsection{ Reihendarstellung}
 
     \subsubsection{Problematik und Ansätze}
 
-    Bei der Interpolation durch eine reine Reihe der Form $\sum_{k=0}^{\infty} a_k x^k$ bzw. $\sum_{k=0}^{\infty} a_k x^-k$ werden Overflows zum Problem.
-    Unabhängig welche Reihe genutzt wird, können die Zwischenergebnisse $x^{\pm k}$ entweder für sehr große Werte oder sehr kleine Werte von $x$ nicht als $double$ dargestellt werden, obwohl das für das Endergebnis nicht gelten muss.
-    Deshalb haben Reihendarstellungen stets begrenzten Gültigkeitsbereiche.
+    Bei der Interpolation durch eine reine Reihe der Form $\sum_{k=0}^{\pm\infty} a_k x^k$ werden Overflows zum Problem.
+    Unabhängig welche Reihe genutzt wird, können die Zwischenergebnisse $x^{\pm k}$ entweder für sehr große Werte oder sehr kleine Werte von $x$ nicht als $double$ dargestellt werden und entwerten damit das Endergebnis.
+    Daher haben Reihendarstellungen stets begrenzten Gültigkeitsbereiche.
     Es wird versucht, eine Reihenentwicklung zu finden, die für einen sinnvollen Konvergenzbereich möglichst genaue Ergebnisse liefert.
     Hierzu haben wir unter anderem die Methode der kleinsten Quadrate verwendet, um geeignet Koeffizienten für Reihenglieder mit positiven oder negativen Potenzen zu finden.
     Die auf diese Weise hergeleitete Reihenentwicklung liefert allerdings für Werte zwischen den verwendeten Datenpunkten sehr ungenaue Ergebnisse, da es sich bei der arsinh-Funktion nicht um ein lineares Modell handelt.
-    Wir haben daher stattdessen eine Reihenentwicklung für verschiedene Intervalle hergeleitet, die im Folgenden näher erläutert werden sollen.
-
-    \subsubsection{Umsetzung}
-
-    \[ \operatorname{arsinh}(x) =
-    \begin{cases}
-        \textit{TaylorArsinh}     & \text{ falls } |x| < 1 \\
-        \ln(2x) + error(x)  & \text{ falls } |x| >1 \\
-        x     & \text{ falls } x \in \{\pm\inf, \pm Nan\}\\
-    \end{cases}\]
+    Wir haben daher stattdessen Reihenentwicklungen für verschiedene Intervalle hergeleitet, die im Folgenden näher erläutert werden sollen.
     Für bessere Verständlichkeit werden die drei Reihen mit \textit{TaylorArsinh}, \textit{TaylorLn} und \textit{Restreihe} bezeichnet.
     Die Berechnungen werden im Folgenden näher erläutert:
 
-    \subsection{Reihendarstellung für $|x|\leq 1$}
+    \subsubsection{Reihendarstellung für $|x|\leq 1$}
     Für $|x| \leq 1$ wird die Taylor-Reihe des $arsinh(x)$ um den Entwicklungspunkt 0 verwendet:
 
     \[
@@ -118,7 +110,7 @@
 
     Durch das Auflösen der Doppelfakultäten entsteht eine leichter implementierbare Formel.
 
-    \subsection{Reihendarstellung für $|x|\geq 1$}
+    \subsubsection{Reihendarstellung für $|x|\geq 1$}
     Die Berechnung für $|x| > 1$ folgt aus folgender Näherung:
     \[
         arsinh(x) = \ln(x + \sqrt{x^2 + 1}) = \ln(2x) + error(x)
@@ -133,8 +125,16 @@
     \[
         \textbf{\textit{TaylorLn}}\coloneqq\ln(x) = \sum_{k = 1}^{\infty} \frac{(-1)^{k + 1}}{k}(x - 1)^k
     \]
-    Aufgrund der begrenzten Gültigkeit der Reihe wird bei der gemischten Implementierung das $double$ Datenformat genutzt, um die Berechnung zu optimieren.
-    Durch eine Bitmaske lassen sich effizient Exponent und Mantisse von $x$ ermitteln.
+    Um diese beiden Reihen zu einer reinen Reihe zu vereinigen, verwenden wir die Folgende Umformung:
+    \[
+        arsinh(x)\approx ln(2x) + error(x) = ln(2) - ln(\frac{1}{x}) + error(x)
+    \]
+    Da $|x|>1$ gilt, steht im Argument des natürlichen Logarithmus nun ein Wert $\in ]0, 1]$, für den die \textbf{TaylorLn}-Reihe konvergiert.
+    Um die reine Reihe zu erhalten, können durch Ausmultiplizieren der ersten n Reihenglieder die ersten n Koeffizienten $a_k$ der neuen Reihe bestimmt werden, wodurch sich eine reine Reihendarstellung der Form $\sum_{k=0}^{n} a_k x^{-k}$ ergibt.
+
+    
+    
+    In der Vergleichsimplementierung ohne die Beschränkung auf eine reine Reihendarstellung, kann das $double$ Datenformat genutzt werden, um die Berechnung signifikant auf Genauigkeit zu optimieren. Die Implementierung mit verschiedenen Reihen verwendet eine Bitmaske um effizient Exponent und Mantisse von $x$ ermitteln.
     Mit Exponent und Mantisse lässt sich nun folgende Umformung treffen:
     \begin{gather*}
         x = M\cdot2^E \,\,\, mit \,\,\, M = implizierte Mantisse \,\,\, E = implizierter Exponent\\
@@ -144,18 +144,23 @@
     Da die Reihe bereits für wenige Reihenglieder genauere Ergebnisse liefert, je näher der zu berechnende Wert an Eins liegt, haben wir uns dafür entschieden, alle Werte der Mantisse, die über $1.\overline{3}$ liegen, nochmal zu halbieren und stattdessen den Exponenten um 1 zu erhöhen.
     Es gilt $M\in[0.\overline{6}, 1.\overline{3}]$.
 
-    Für eine reine Reihe, die ohne Bitmasken für $x\geq 1$ aussagekräftig ist, benutzen wir die Folgende Umformung:
-    \[
-        arsinh(x)\approx ln(2x) + error(x) = ln(2) - ln(\frac{1}{x}) + error(x)
-    \]
-    Dadurch entsteht im Argument des natürlichen Logarithmus wieder ein Wert, wofür die \textbf{TaylorLn}-Reihe gilt.
-    Um die reine Reihe zu erhalten, werden die beiden Reihen zu einer vereinigt.
-    Durch Ausmultiplizieren der ersten n Reihenglieder lassen sich die Koeffizienten bestimmen und eine herkömmliche Reihe der Form $\sum_{k=0}^{n} a_k x^{-k}$ erstellen.
+    
     Die Koeffizienten der einzelnen Reihenglieder zu berechnen ist laufzeitintensiv, da insbesondere die Berechnung der Fakultät viel Zeit kostet.
     Daher lässt sich die Berechnung optimieren, indem die Koeffizienten aller drei Reihen bereits vor Runtime berechnet werden.
     Durch Anwendung des Horner-Schemas lässt sich nun die Reihe besonders effizient berechnen.
 
-    \subsection{Abwägung Genauigkeit und Performanz}
+    \subsubsection{Umsetzung}
+    In der Implementierung mit einer reinen Reihenentwicklung wird die \textit{TaylorArsinh} verwendet. Diese Entscheidung entsteht primär aus einer Abwägung aus Genauigkeit und Konvergenzbereich. Da im Datentyp double für $|x|<1$ gleich viele Werte existieren wie für $|x|\geq1$, beinhaltet der Konvergenzbereich der Reihen für die beiden Intervalle gleich viele mögliche double-Eingabewerte. Durch Genauigkeitsmessungen hat sich jedoch ergeben, dass die TaylorArsinh(x) für den Großteil der Eingabewerte unter 1 mit wenigen Reihengliedern bereits ein exaktes Ergebnis liefern kann, während das Ergebnis der Näherung $ arsinh(x)\approx ln(2x) + error(x) = ln(2) - ln(\frac{1}{x}) + error(x)$ ungenauer wird, je größer $|x|$ ist. 
+
+    Für die gemischte Reihenentwicklung können wir zudem eine Fallunterscheidung nach den Eingabewerten treffen, um für alle Eingabewerte eine möglichst genaue Näherung zu treffen:
+    \[ \operatorname{arsinh}(x) =
+    \begin{cases}
+        \textit{TaylorArsinh}     & \text{ falls } |x| < 1 \\
+        \ln(2x) + error(x)  & \text{ falls } |x| >1 \\
+        x     & \text{ falls } x \in \{\pm\inf, \pm Nan\}\\
+    \end{cases}\]
+
+    \subsubsection{Abwägung Genauigkeit und Performanz}
     Die Anzahl an benutzten Reihenglieder, entsteht aus einer Abwägung zwischen Performanz und Genauigkeit.
     Wie viele Reihenglieder berechnet werden müssen, um ein möglichst genaues Ergebnis zu erhalten, hängt von den Eingabewerten ab.
     Da die Reihenglieder aller drei Reihen immer kleiner werden, gilt: Je kleiner das letzte berechnete Reihenglied, desto genauer ist auch das Ergebnis.
@@ -171,13 +176,14 @@
     Werden versuchsweise bestimmte Werte von x in die Formel eingesetzt, so lässt sich feststellen, dass für x = 0.25 alle Reihenglieder ab dem etwa 13. Glied keinen Einfluss mehr auf das Endergebnis haben, da sie aufgrund der Beschränkung der Mantisse auf 52 Bit diese bei der Addition absorbiert werden.
     Für x = 0.5 müssten 26 Reihenglieder berechnet werden.
     Für x = 0.99 sind bereits etwa 1500 Reihenglieder nötig.
+    Die Anzahl der zu berechnenden Reihenglieder wird auf 13 festgelegt und damit ein exponentiell ansteigender relativer Fehler ab $|x|>0.25$ in Kauf genommen.
     
-    Ähnliche Berechnungen lassen sich für die Reihe \textit{TaylorLn} und die \textit{Restreihe} aufstellen. Aufgrund dieses exponentiellen Wachstums wird die Anzahl der zu berechnenden Reihenglieder für \textit{TaylorArsinh} und \textit{Restreihe} auf 13 festgelegt und damit ein geringer relativer Fehler in den Intervallen $0.25<|x|<4$ in Kauf genommen. Bei \textit{TaylorLn} berechnen wir 27 Reihenglieder, da damit auf dem gesamten Wertebereich ein exaktes Ergebnis erreicht wird.
-    Diese Abwägung zwischen relativem Fehler und Performanz werden in den folgenden Kapiteln näher untersucht und belegt.
+    Für die gemischte Reihe lassen sich ähnliche Berechnungen mit \textit{TaylorLn} und \textit{Restreihe} aufstellen. Um ein sinnvolles Verhältnis aus Genauigkeit und Performanz zu erhalten wird Anzahl der zu berechnenden Reihenglieder für \textit{TaylorArsinh} und \textit{Restreihe} auf 13 festgelegt und damit ein geringer relativer Fehler in den Intervallen $0.25<|x|<4$ in Kauf genommen. Bei \textit{TaylorLn} berechnen wir 27 Reihenglieder, da damit auf dem gesamten Wertebereich ein exaktes Ergebnis erreicht wird.
+    Relativer Fehler und Performanz werden in den folgenden Kapiteln näher untersucht und belegt.
 
-    Es sei an dieser Stelle erwähnt, dass ausgehend von diesen Untersuchungen eine weitere Optimierung umsetzbar wäre, die (beispielsweise mithilfe des Exponenten des Eingabewertes) die Anzahl der nötigen Reihenglieder bestimmt und diese (falls die Anzahl kleiner als 13 ist) berechnet.
+    Es sei an dieser Stelle bereits erwähnt, dass ausgehend von diesen Untersuchungen eine weitere Optimierung umsetzbar wäre, die (beispielsweise mithilfe des Exponenten des Eingabewertes) die Anzahl der nötigen Reihenglieder bestimmt und nur diese berechnet.
     Durch diese Optimierung wird Overhead durch die Berechnung von für das Ergebnis irrelevanten Reihengliedern vermieden.
-    Da Fallunterscheidungen verboten sind, wurde auf diese Optimierung verzichtet.
+    Da Fallunterscheidungen grundsätzlich vermieden werden sollten sind, wurde auf diese Optimierung verzichtet.
 
 
     \subsection{Tabellen-Lookup}
