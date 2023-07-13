@@ -48,6 +48,7 @@
             ]
             \addplot[] {ln(x + sqrt(x*x+1))};
             \legend{$arsinh(x) = ln(x + \sqrt{x^2 + 1})$}
+            \caption{}
 
 
         \end{axis}
@@ -55,29 +56,19 @@
 
     \subsection{Analyse und Spezifikation der Aufgabenstellung}
     Die Aufgabe A316 ist eben diesen $arsinh(x)$ im C17 Standard von C zu approximieren.
-    Spezifischer verlangt die Aufgabenstellung explizit zwei Implementierungen, die nur auf einfachen arithmetischen Ausdrücken basiert sowie eine Vergleichsimplementierung, die komplexe Instruktionen benutzen darf.
+    Spezifischer verlangt die Aufgabenstellung explizit zwei Implementierungen, die nur auf einfachen arithmetischen Ausdrücken basieren sowie eine Vergleichsimplementierung, die komplexe Instruktionen benutzen darf.
     Eine dieser Implementierungen soll dabei eine reine Reihe sein, während die andere einen Tabellen-Lookup benutzen soll.
 
     Für unsere Implementierung wurden folgende Annahmen getroffen:
-
-
-    Mit der \textbf{"reinen"} \textbf{Reihenentwicklung} ist die Implementierung bezeichnet, welche mit exakt einer Reihendarstellung die Funktionswerte berechnet.
-    Fallunterscheidungen nach Intervallen von $x$ dürfen in dieser Implementierung also grundsätzlich nicht gemacht werden.
+    Eine \textbf{"reinen"} \textbf{Reihenentwicklung} soll hierbei eine Berechnung der Form $\sum_{k=0}^{\pm\infty} a_k x^k$ oder $\sum_{k=0}^{\pm\infty} a_k x^{-k}$ sein und bis auf einzelne Inputs keine weiteren Fallunterscheidungen machen.
     Hierbei sollte also eine Reihe gewählt werden, deren Konvergenzbereich am ehesten für ein mögliches Anwendungsgebiet geeignet ist.
-
-    Da die reine Reihenentwicklung nicht für alle Eingabewerte konvergiert wurde eine weitere Implementierung erstellt, die \textbf{mehrere Reihenentwicklungen für verschiedene Intervalle} der Eingabe verwendet.
-    Die Anzahl der Fallunterscheidungen soll hierbei minimal gehalten werden, indem möglichst wenige verschiedene Reihenentwicklungen und eine feste Anzahl an berechneten Reihengliedern verwendet werden.
-
-    Für die Implementierung der \textbf{Lookuptabelle} war der Speicherplatz Abwägungskriterium, da für die meisten Anwendungen Speichereffizienz wichtig ist.
-    Eine Abwägung zwischen Speicherplatz und Genauigkeit findet sich in Kapitel 2.2.
-    Wir haben uns zudem für eine Lookuptabelle mit linearer Interpolation entschieden.
-
-    Als \textbf{Vergleichsimplementierung} verwenden wir die arsinh(x) Funktion der C math Bibiliothek.
+    Eine \textbf{Reihenentwicklung mit mehreren Reihen} soll hier eine einzige Fallunterscheidung für $x\leq1$ machen, um die Anzahl an Fallunterscheidungen gering zu halten.
+    Für die \textbf{Lookuptabelle} war der Speicherplatz von zentraler Bedeutung, da für die meisten Anwendungen Speichereffizienz wichtig ist.
+    Wir haben uns zudem für eine lineare Interpolation zwischen den gespeicherten Werten entschieden.
+    Als \textbf{Vergleichsimplementierung} verwenden wir Funktionen der C math Bibiliothek.
     Diese wird in erster Linie für die Bewertung der Genauigkeit herangezogen.
-    Es sei an dieser Stelle bereits erwähnt, dass Funktionen der C-Mathematikbibliothek auf Maschinenebene implementiert sind und bestimmte Hardwarefunktionen nutzen können.
-    Daher wird diese Implementierung an Performanz kaum zu übertreffen sein.
 
-    Diese vier Implementierungen werden in Kapitel 3 und 4 auf Performanz und Genauigkeit untersucht, verglichen und anhand der Ergebnisse bewertet.
+    Diese vier Implementierungen werden in der Folge erklärt und auf Performanz und Genauigkeit untersucht, verglichen und anhand der Ergebnisse bewertet.
 
 
     \section{Lösungsansatz}
