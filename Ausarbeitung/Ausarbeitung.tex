@@ -33,7 +33,7 @@
     Er wird verwendet, um Küsten vor zerstörerischen Wellen zu warnen als auch um die Ausdehnung des Universums zu berechnen.
     In dieser Arbeit werden Methoden zur genauen und effizienten Berechnung dieser vielseitigen Funktion vorgestellt und analysiert.
     
-    \begin{tikzpicture}[h]
+    \begin{tikzpicture}[]
         \begin{axis}
             [
             legend pos = north west,
@@ -48,6 +48,7 @@
             ]
             \addplot[] {ln(x + sqrt(x*x+1))};
             \legend{$arsinh(x) = ln(x + \sqrt{x^2 + 1})$}
+            \caption{}
 
 
         \end{axis}
@@ -55,29 +56,19 @@
 
     \subsection{Analyse und Spezifikation der Aufgabenstellung}
     Die Aufgabe A316 ist eben diesen $arsinh(x)$ im C17 Standard von C zu approximieren.
-    Spezifischer verlangt die Aufgabenstellung explizit zwei Implementierungen, die nur auf einfachen arithmetischen Ausdrücken basiert sowie eine Vergleichsimplementierung, die komplexe Instruktionen benutzen darf.
+    Spezifischer verlangt die Aufgabenstellung explizit zwei Implementierungen, die nur auf einfachen arithmetischen Ausdrücken basieren sowie eine Vergleichsimplementierung, die komplexe Instruktionen benutzen darf.
     Eine dieser Implementierungen soll dabei eine reine Reihe sein, während die andere einen Tabellen-Lookup benutzen soll.
 
     Für unsere Implementierung wurden folgende Annahmen getroffen:
-
-
-    Mit der \textbf{"reinen"} \textbf{Reihenentwicklung} ist die Implementierung bezeichnet, welche mit exakt einer Reihendarstellung die Funktionswerte berechnet.
-    Fallunterscheidungen nach Intervallen von $x$ dürfen in dieser Implementierung also grundsätzlich nicht gemacht werden.
+    Eine \textbf{"reinen"} \textbf{Reihenentwicklung} soll hierbei eine Berechnung der Form $\sum_{k=0}^{\pm\infty} a_k x^k$ oder $\sum_{k=0}^{\pm\infty} a_k x^{-k}$ sein und bis auf einzelne Inputs keine weiteren Fallunterscheidungen machen.
     Hierbei sollte also eine Reihe gewählt werden, deren Konvergenzbereich am ehesten für ein mögliches Anwendungsgebiet geeignet ist.
-
-    Da die reine Reihenentwicklung nicht für alle Eingabewerte konvergiert wurde eine weitere Implementierung erstellt, die \textbf{mehrere Reihenentwicklungen für verschiedene Intervalle} der Eingabe verwendet.
-    Die Anzahl der Fallunterscheidungen soll hierbei minimal gehalten werden, indem möglichst wenige verschiedene Reihenentwicklungen und eine feste Anzahl an berechneten Reihengliedern verwendet werden.
-
-    Für die Implementierung der \textbf{Lookuptabelle} war der Speicherplatz Abwägungskriterium, da für die meisten Anwendungen Speichereffizienz wichtig ist.
-    Eine Abwägung zwischen Speicherplatz und Genauigkeit findet sich in Kapitel 2.2.
-    Wir haben uns zudem für eine Lookuptabelle mit linearer Interpolation entschieden.
-
-    Als \textbf{Vergleichsimplementierung} verwenden wir die arsinh(x) Funktion der C math Bibiliothek.
+    Eine \textbf{Reihenentwicklung mit mehreren Reihen} soll hier eine einzige Fallunterscheidung für $x\leq1$ machen, um die Anzahl an Fallunterscheidungen gering zu halten.
+    Für die \textbf{Lookuptabelle} war der Speicherplatz von zentraler Bedeutung, da für die meisten Anwendungen Speichereffizienz wichtig ist.
+    Wir haben uns zudem für eine lineare Interpolation zwischen den gespeicherten Werten entschieden.
+    Als \textbf{Vergleichsimplementierung} verwenden wir Funktionen der C math Bibiliothek.
     Diese wird in erster Linie für die Bewertung der Genauigkeit herangezogen.
-    Es sei an dieser Stelle bereits erwähnt, dass Funktionen der C-Mathematikbibliothek auf Maschinenebene implementiert sind und bestimmte Hardwarefunktionen nutzen können.
-    Daher wird diese Implementierung an Performanz kaum zu übertreffen sein.
 
-    Diese vier Implementierungen werden in Kapitel 3 und 4 auf Performanz und Genauigkeit untersucht, verglichen und anhand der Ergebnisse bewertet.
+    Diese vier Implementierungen werden in der Folge erklärt und auf Performanz und Genauigkeit untersucht, verglichen und anhand der Ergebnisse bewertet.
 
 
     \section{Lösungsansatz}
@@ -91,11 +82,11 @@
     \subsubsection{Problematik und Ansätze}
 
     Bei der Interpolation durch eine reine Reihe der Form $\sum_{k=0}^{\pm\infty} a_k x^k$ werden Overflows zum Problem.
-    Unabhängig welche Reihe genutzt wird, können die Zwischenergebnisse $x^{\pm k}$ entweder für sehr große Werte oder sehr kleine Werte von $x$ nicht als $double$ dargestellt werden und entwerten damit das Endergebnis.
-    Daher haben Reihendarstellungen stets begrenzten Gültigkeitsbereiche.
+    Unabhängig welche Reihe genutzt wird, können die Zwischenergebnisse $x^{\pm k}$ entweder für sehr große Werte oder sehr kleine Werte von $x$ nicht als $double$ dargestellt werden, was zu einem falschen Endergebnis führt.
+    Daher haben Reihendarstellungen stets begrenzte Gültigkeitsbereiche.
     Es wird versucht, eine Reihenentwicklung zu finden, die für einen sinnvollen Konvergenzbereich möglichst genaue Ergebnisse liefert.
     Hierzu haben wir unter anderem die Methode der kleinsten Quadrate verwendet, um geeignet Koeffizienten für Reihenglieder mit positiven oder negativen Potenzen zu finden.
-    Die auf diese Weise hergeleitete Reihenentwicklung liefert allerdings für Werte zwischen den verwendeten Datenpunkten sehr ungenaue Ergebnisse, da es sich bei der arsinh-Funktion nicht um ein lineares Modell handelt.
+    Die auf diese Weise hergeleitete Reihenentwicklung liefert allerdings für Werte zwischen den verwendeten Datenpunkten zu ungenaue Ergebnisse, da die $arsinh$-Funktion nicht um ein lineares.
     Wir haben daher stattdessen Reihenentwicklungen für verschiedene Intervalle hergeleitet, die im Folgenden näher erläutert werden sollen.
     Für bessere Verständlichkeit werden die drei Reihen mit \textit{TaylorArsinh}, \textit{TaylorLn} und \textit{Restreihe} bezeichnet.
     Die Berechnungen werden im Folgenden näher erläutert:
@@ -159,9 +150,8 @@
 
     \subsubsection{Abwägung Genauigkeit und Performanz}
     Die Anzahl an benutzten Reihenglieder, entsteht aus einer Abwägung zwischen Performanz und Genauigkeit.
-    Wie viele Reihenglieder berechnet werden müssen, um ein möglichst genaues Ergebnis zu erhalten, hängt von den Eingabewerten ab.
-    Da die Reihenglieder aller drei Reihen immer kleiner werden, gilt: Je kleiner das letzte berechnete Reihenglied, desto genauer ist auch das Ergebnis.
-
+    Wie viele Reihenglieder für ein möglichst genaues Ergebnis berechnet werden müssen, hängt von dem Eingabewert ab.
+    Da die Reihenglieder aller drei Reihen für Eingabewerte innerhalb des jeweiligen Konvergenzbereichs immer kleiner werden, gilt: Je kleiner das letzte berechnete Reihenglied, desto genauer ist auch das Ergebnis.
 
     Wir betrachten zunächst \textit{TaylorArsinh}:
     Das k-te Reihenglied hat den Betrag
@@ -170,13 +160,12 @@
     \]
     Aus dieser Formel lässt sich bereits ablesen, dass ein Reihenglied kleiner ist, je kleiner x ist.
     Die Reihe liefert demnach bereits mit weniger Reihengliedern genaue Ergebnisse, je näher x an 0 liegt.
-    Werden versuchsweise bestimmte Werte von x in die Formel eingesetzt, so lässt sich feststellen, dass für x = 0.25 alle Reihenglieder ab dem etwa 13. Glied keinen Einfluss mehr auf das Endergebnis haben, da sie aufgrund der Beschränkung der Mantisse auf 52 Bit diese bei der Addition absorbiert werden.
+    Mithilfe dieser Formel lässt sich feststellen, dass für x = 0.25 alle Reihenglieder ab dem etwa 13. Glied keinen Einfluss mehr auf das Endergebnis haben, da sie aufgrund der Beschränkung der Mantisse auf 52 Bit diese bei der Addition absorbiert werden.
     Für x = 0.5 müssten 26 Reihenglieder berechnet werden.
     Für x = 0.99 sind bereits etwa 1500 Reihenglieder nötig.
     Die Anzahl der zu berechnenden Reihenglieder wird auf 13 festgelegt und damit ein exponentiell ansteigender relativer Fehler ab $|x|>0.25$ in Kauf genommen.
     
-    Für die gemischte Reihe lassen sich ähnliche Berechnungen mit \textit{TaylorLn} und \textit{Restreihe} aufstellen. Um ein sinnvolles Verhältnis aus Genauigkeit und Performanz zu erhalten wird Anzahl der zu berechnenden Reihenglieder für \textit{TaylorArsinh} und \textit{Restreihe} auf 13 festgelegt und damit ein geringer relativer Fehler in den Intervallen $0.25<|x|<4$ in Kauf genommen. Bei \textit{TaylorLn} berechnen wir 27 Reihenglieder, da damit auf dem gesamten Wertebereich ein exaktes Ergebnis erreicht wird.
-    Relativer Fehler und Performanz werden in den folgenden Kapiteln näher untersucht und belegt.
+    Für die gemischte Reihe lassen sich ähnliche Berechnungen mit \textit{TaylorLn} und \textit{Restreihe} aufstellen. Um ein sinnvolles Verhältnis von Genauigkeit und Performanz zu erhalten, wird Anzahl der zu berechnenden Reihenglieder für \textit{TaylorArsinh} und \textit{Restreihe} auf 13 festgelegt. Bei \textit{TaylorLn} berechnen wir 27 Reihenglieder, da damit auf dem gesamten Wertebereich ein exaktes Ergebnis erreicht wird.
 
     Es sei an dieser Stelle bereits erwähnt, dass ausgehend von diesen Untersuchungen eine weitere Optimierung umsetzbar wäre, die (beispielsweise mithilfe des Exponenten des Eingabewertes) die Anzahl der nötigen Reihenglieder bestimmt und nur diese berechnet.
     Durch diese Optimierung wird Overhead durch die Berechnung von für das Ergebnis irrelevanten Reihengliedern vermieden.
@@ -186,8 +175,8 @@
     \subsection{Tabellen-Lookup}
     Die Lookuptabelle speichert einige vorberechnete Werte der $arsinh$-Funktion und interpoliert für die verbleibenden Werte linear zwischen den beiden nächstgelegenen Tabellenwerten.
     Bei der Implementierung galt es zunächst zwischen Speicherplatz der Tabelle und Genauigkeit des Ergebnisses abzuwägen.
-    Im Rahmen der Ausarbeitung wurde ein Limit von 1 MB für die Lookuptabelle festgelegt.
-    Diese Größe ermöglicht das Speichern von rund 40000 Werten.
+    Im Rahmen der Ausarbeitung wurde ein Limit von 500KB für die Lookuptabelle festgelegt.
+    Diese Größe ermöglicht uns das Speichern von rund 33000 Werten.
     Ebenso wurde eine logarithmische Verteilung der Werte festgelegt, da auch die Verteilung aller möglichen Werte im Datentyp $double$ logarithmisch ist.
     Für alle positiven Eingabewerte wurde für jeden möglichen Exponenten $[-1023, +1023]$ eine feste Anzahl an Werten vorberechnet.
     Das gesetzte Speicherlimit beschränkt die Genauigkeit auf 16 Werte pro Exponent.
@@ -203,7 +192,7 @@
         arsinh(x) \approx \frac{x-x_i}{x_{i+1} - x_i}\cdot (y_{i+1}-y_i) + y_i
     \]
     linear interpoliert.
-    \section{Genauigkeit}
+        \section{Genauigkeit}
 
     \begin{figure}[h]
         \begin{tabular}{@{}c@{}}
@@ -220,25 +209,39 @@
     \end{figure}
 
 
-    \begin{figure}
-        \caption{}
-    \end{figure}
-    Als Maßstab für die Genauigkeit unserer Ergebnisse wird im Folgenden der relative Fehler der Implementierung bezüglich des tatsächlichen mathematischen Funktionswert verwendet. Die Diagramme wurden erstellt, indem mithilfe einer C-Hilfsmethode für eine große Anzahl an Eingabewerten jeweils die Funktionswerte für alle drei Implementierungen berechnet und in Arrays gespeichert wurden. Anschließend wurden diese Funktionswerte in einem Python-Programm zu den jeweilgen relativen Fehlern ausgewertet und mithilfe der Bibiliothek matplotlib als Graph dargestellt.
+    Als Maßstab für die Genauigkeit unserer Ergebnisse wird im Folgenden der relative Fehler der Implementierung bezüglich des tatsächlichen mathematischen Funktionswert verwendet. Die Diagramme wurden erstellt, indem für rund 40000 logarithmisch verteilte Eingabewerte der relative Fehler für alle vier Implementierungen errechnet und mittels matplotlib aus Python dargestellt wurde.
     
     \subsection{Reine Reihenentwicklung}
-    Wie deutlich in Abb.2.1 und Abb.2.2 erkennbar ist, liefert die Reihenentwicklung außerhalb des Intervalls $0.25<|x|$ nahezu immer den exakten Funktionswert. Es gibt einige Ausnahmen mit einem verschwindend geringen relativen Fehler $\leq2^{-50}$ , welche sich durch floating-point-Rundungsfehler bei der Umrechnung der Polynomkoeffizienten erklären lassen.
-    In Abb.2.2 ist erkennbar, der relative Fehler steigt exponentiell an, je näher der Eingabewert an 1 liegt. Dies lässt sich anhand der Konvergenz der Reihenglieder für verschiedene Eingabewerte erklären. Wie in Kapitel 2.1.1 erläutert, ist das Ergebnis genauer, je kleiner das letzte berechnete Reihenglied ist.
+    Wie deutlich in Abb.2.1 und Abb.2.2 erkennbar ist, liefert die Reihenentwicklung für $|x|<0.25$ nahezu immer den exakten Funktionswert.
+    Wie in Abb.2.2 erkennbar, steigt der relative Fehler ab etwa $|x| = 0.25$ exponentiell zum Eingabewert an. Dies lässt sich anhand der Konvergenz der Reihenglieder für verschiedene Eingabewerte erklären. Wie in Kapitel 2.1.1 erläutert, ist das Ergebnis genauer, je kleiner das letzte berechnete Reihenglied ist.
     Wir zeigen zunächst, dass bei 13 Reihengliedern die Grenze für die Entstehung von Ungenauigkeiten bei etwa 0.25 liegt. Hierzu berechnen wir jeweils das letzte Reihenglied für x=0.25:
     \[
     \textit{TaylorArsinh}: \frac{(2\cdot13)!0.25^{2\cdot13 + 1}}{(2\cdot13 + 1)(2^13\cdot13!)^2} \approx 2^{-59}
     \]
-    Da des letzte Reihenglied noch unter $2^{-59}$ liegt, hat das Ergebnis noch maximale double Genauigkeit. Für x-Werte näher an 1, wird jedoch das letzte Reihenglied immer größer, wodurch der relative Fehler exponentiell ansteigt. Wie im Graph zu sehen ist, hat die Reihenentwicklung ihren maximalen relativen Fehler im Intervall $|x|\leq1$ von circa $2^{-8} \approx 0.39\%$ am Eingabewert 1.
+    Da des letzte Reihenglied noch unter $2^{-52}\cdot asinh(0.25)$ liegt und die die Mantisse von doubles nur 52 bit beinhaltet, hat das Ergebnis noch maximale double Genauigkeit. Für größer werdende x-Werte, wird jedoch das letzte Reihenglied immer größer, wodurch der relative Fehler exponentiell ansteigt.  Daher hat die reine Reihenentwicklung innerhalb ihres Konvergenzbereichs $|x|\leq1$ ihren maximalen relativen Fehler von circa $2^{-8} \approx 0.39\%$ am Eingabewert 1.
     Berechnen wir nun das letzte (13.) berechnete Reihenglied für den Eingabewert 1 so erhalten wir:
     \[
     \textit{TaylorArsinh}: \frac{(2\cdot13)!1^{2\cdot13 + 1}}{(2\cdot13 + 1)(2^13\cdot13!)^2} \approx 0.00574 \approx 2^{-8}
     \]
 
-    Da das letzte Reihenglied die Größenordnung $2^{-8}$ hat, liegt auch der relative Fehler etwa in dieser Größenordnung. Die Rechnung bestätigt somit, was wir im Graph beobachten.
+    Da das letzte Reihenglied die Größenordnung $2^{-8}$ hat, liegt auch der relative Fehler etwa in dieser Größenordnung. Innerhalb ihres Konvergenzbereiches hat die reine Reihenentwicklung also einen maximalen Fehler von $2^{-8}$
+    Außerhalb des Konvergenzbereichs $|x|\leq1$ konvergieren die einzelnen Reihenglieder nicht gegen 0, wodurch die Reihe nicht mehr anwendbar ist. Da das letzte Reihenglied weiter exponentiell ansteigt, steigt auch der relative Fehler exponentiell an, wie auch in Abbildung 2.1 deutlich erkennbar.
+
+    \subsection{Reihenentwicklung mit mehreren Reihen}
+    In Abb.1 und Abb.2.2 lässt sich ähnlich zur reinen Reihenentwicklung erkennen, dass die Reihenentwicklung außerhalb der Intervalle $0.25<|x|<4$ nahezu immer den exakten Funktionswert liefert. Es gibt einige Ausnahmen mit einem verschwindend geringen relativen Fehler $\leq2^{-50}$ , welche sich durch floating-point-Rundungsfehler bei der Umrechnung der Polynomkoeffizienten erklären lassen.
+    Da der Fall $1<x<0.25$ exakt äquivalent zu der reinen Reihe ist, betrachten wir hier die Ungenauigkeiten im Intervall $1<x<4$. Dazu berechnen wir das letzte Reihenglied der \textit{Restreihe} für $|x|=4$.
+
+    \[
+    \textit{Restreihe}: \frac{(2\cdot13)!}{2\cdot13(2^{13}\cdot 13!)^2} \cdot \frac{1}{4^{2\cdot13}} \approx 2^{-59}
+    \]
+    Da des letzte Reihenglied unter $2^{-52}$ liegt, hat das Ergebnis noch maximale double Genauigkeit. Ähnlich wie bei der reinen Reihe, wächst das letzte Reihenglied für x-Werte, die näher an 1 liegen exponentiell, was zu einem exponentiellen Anstieg des relativen Fehler führt.
+    Für das letzte Reihenglied für den Eingabewert 1 erhalten wir:
+    \[
+    \textit{Restreihe}: \frac{(2\cdot13)!}{2\cdot13(2^{13}\cdot 13!)^2} \cdot \frac{1}{1^{2\cdot13}} \approx 0.00596 \approx 2^{-8}
+    \]
+
+    Da das letzte Reihenglied die Größenordnung $2^{-8}$ hat, stimmt der relative Fehler hier mit der reinen Reihe auch von der anderen Seite aus überein.
+
     \subsection{Lookuptabelle}
     Die Genauigkeit des Ergebnisses bei der Verwendung der Lookuptabelle hängt stark von den Eingabewerten ab. Ist der Eingabewert exakt einer der vorgespeicherten Werte in der Tabelle, so liefert die Funktion logischerweise das exakte Ergebnis. Am ungenauesten ist die Funktion für Eingabewerte, die genau zwischen zwei gespeicherten Tabellenwerten liegen. Das lässt sich deutlich an der großen vertikalen Streuung der Fehlerwerte erkennen.
     
@@ -267,29 +270,10 @@
     \end{tikzpicture}
 
     Wie man sieht, hat der $arsinh(x)$ eine maximale Krümmung bei circa $\pm 0.707$. Dementsprechend wird auch eine lineare Interpolation im Bereich dieser Stellen eine maximale Ungenauigkeit aufweisen.
-    
 
-
-    
-    \subsection{Reihenentwicklung mit mehreren Reihen}
-    In Abb.1 und Abb.2.2 lässt sich wieder erkennen, wie die Reihenentwicklung außerhalb der Intervalle $0.25<x<4$ nahezu immer den exakten Funktionswert liefert, mit denselben Ausnahmen wie bei der reinen Reihe für kleine x.
-    Da der Fall $1<x<0.25$ exakt äquivalent zu der reinen Reihe ist, betrachten wir hier die Ungenauigkeiten im Intervall $1<x<4$. Dazu berechnen wir das letzte Reihenglied der \textit{Restreihe}.
-    
-    \[
-    \textit{Restreihe}: \frac{(2\cdot13)!}{2\cdot13(2^{13}\cdot 13!)^2} \cdot \frac{1}{4^{2\cdot13}} \approx 2^{-59}
-    \]
-    Da des letzte Reihenglied unter $2^{-52}$ liegt, hat das Ergebnis noch maximale double Genauigkeit. Ähnlich wie bei der reinen Reihe, wächst das letzte Reihenglied für x-Werte, die näher an 1 sind und lässt so den relativen Fehler steigen.In Abb.2.1 kann man wieder erkennen wie der maximale relative Fehler bei Eingabewert 1 erreicht wird, bevor er wieder sinkt.
-    Für das letzte Reihenglied für den Eingabewert 1 erhalten wir:
-    \[
-    \textit{Restreihe}: \frac{(2\cdot13)!}{2\cdot13(2^{13}\cdot 13!)^2} \cdot \frac{1}{1^{2\cdot13}} \approx 0.00596 \approx 2^{-8}
-    \]
-    
-    Da das letzte Reihenglied die Größenordnung $2^{-8}$ hat, stimmt der relative Fehler hier mit der reinen Reihe auch von der anderen Seite aus überein.
-    
-    
-    
     \subsection{Implementierung mit komplexen Instruktionen}
     Wie in Abb.1 zu sehen ist, liefert die Implementierung mit komplexen mathematischen Instruktionen der C-Math Bibliothek für den Großteil des Wertebereichs den genauest möglichen Funktionswert für den Datentyp double. Die einzige Ausnahme bilden sehr kleine x-Werte. Dies lässt sich mit der Absorption beziehungsweise Auslöschung von Bits begründen, welche bei der Addition von doubles unterschiedlicher Größenordnung unvermeidbar auftritt. Betrachten wir nun zunächst den Term $\sqrt{x^2 + 1}$ der allgemeinen Gleichung für den $arsinh(x)$. Ab $|x|<2^{-26}$ gilt stets $x^2<2^{-52}$. $x^2$ wird damit bei der Addition mit 1 vollständig absorbiert und $\sqrt{x^2 + 1}$ evaluiert zu 1. Hierdurch entsteht ein für kleinere $x$ immer größerer relativer Fehler. Ab $|x|<2^{-52}$ wird zudem x bei Addition auf 1 immer absorbiert, wodurch $\ln{(x+\sqrt{x^2 + 1})}$ automatisch zu 0 evaluiert. Für $|x|<2^{-52}$ ist die Implementierung mit komplexen mathematischen Instruktionen demnach kaum noch anwendbar, da das Ergebnis (mit Ausnahme von 0) immer einen relativen Fehler von $100\%$ haben wird.
+
 
     \section{Performanzanalyse}
     Die Performanz der Implementierungen wird anhand der Laufzeit gemessen.
@@ -334,8 +318,8 @@
      \subsection{Bewertung, Einordnung und Erklärung der Ergebnisse}
      %Folgerungen
 
-     Wie in der Abbildung zu sehen gibt es starke Performanzunterschiede zwischen den verschiedenen Implementierungen. Wir betrachten zunächst die Implementierung mit komplexen Instruktionen. Wie zuvor erwähnt, arbeiten Funktionen der C-Mathematikbibliothek mit Hardwareoptimierungen. Damit ist die Funktion im Vergleich zu den anderen Implementierungen deutlich schneller. Es offenbart sich hierbei auch innerhalb der Funktion eine signifikante Diskrepanz zwischen den Eingabewerten unterhalb von $10^{16}$ und jenen oberhalb von $10^{16}$. 
-     Ab dem gewählten Grenzwert von $10^{16}$ wird die Näherung $arsinh(x) = ln(2x)$ für die Berechnung verwendet. Diese Berechnung wird bei Optimierungsstufe O3 so stark optimiert, dass sogar bei $10^{12}$ Iterationen des Funktionsausfrufs eine kaum noch messbare Laufzeit zustande kommt. Für den Großteil der Werte deren Betrag kleiner ist als $10^{16}$ sind allerdings neben der Logarithmusberechnung zudem Multiplikation, Addition und Wurzelberechnung für die exakte Berechnung erforderlich, wodurch die Funktion in diesem Intervall eine durchschnittliche Laufzeit von etwa 1.648 ns hat. 
+     Wie in den Abbildungen zu sehen ist, gibt es starke Performanzunterschiede zwischen den verschiedenen Implementierungen. Wir betrachten zunächst die Implementierung mit komplexen Instruktionen. Diese ist hierbei im Vergleich zu den anderen Implementierungen deutlich schneller. Es offenbart sich auch innerhalb der Funktion eine signifikante Diskrepanz zwischen den Eingabewerten unterhalb von $10^{16}$ und jenen oberhalb von $10^{16}$.
+     Ab dem gewählten Grenzwert von $10^{16}$ wird die Näherung $arsinh(x) = ln(2x)$ für die Berechnung verwendet. Diese Berechnung wird bei Optimierungsstufe O3 so stark optimiert, dass sogar bei $10^{12}$ Iterationen eine kaum noch messbare Laufzeit aufweist. Für den Großteil der Werte deren Betrag kleiner ist als $10^{16}$ sind allerdings neben der Logarithmusberechnung zudem Multiplikation, Addition und Wurzelberechnung für die exakte Berechnung erforderlich, wodurch die Funktion in diesem Intervall eine durchschnittliche Laufzeit von etwa 1.648 ns hat.
 
      Die Lookuptabelle hat für alle reellen Eingabewerte etwa die gleiche Laufzeit von 2.613 ns, da die Berechnung unabhängig von der Höhe des Eingabewerts ist. Durch die effiziente Hashfunktion mittels Bitmaske, die für das Mapping der Eingabewerte auf den jeweiligen Tabellenwert verwendet wird, ist diese Implementierung nur etwa 1.5 mal so langsam wie die worst-case Laufzeit der Implementierung mit komplexen Instruktionen. Neben der Hashfunktion werden nur wenige einfache Instruktionen für die lineare Interpolation benötigt, was ebenfalls zu der hohen Performanz dieser Implementierung beiträgt.
 
@@ -347,21 +331,20 @@
 
     \subsection{Zusammenfassung}
     Der Trade-off zwischen Performance, Genauigkeit und Speicherverbrauch ist für die beiden Implementierungen mit einem Tabellenlookup beziehungsweise einer Reihenentwicklung sehr unterschiedlich.
-    Der Tabellenlookup ist schnell, benötigt allerdings mehr Speicherplatz, je genauere Werte zu erzielen sind.
+    Der Tabellenlookup ist schnell, benötigt allerdings mehr Speicherplatz, um genauere Werte zu erzielen.
     In der Tabellenlookup Implementierung mit insgesamt etwa 30000 zu speichernden Werten in einer Lookup-Tabelle, hat die Berechnung einen maximalen relativen Fehler von 0.02\%.
 
-    Die reine Reihenentwicklung auf der anderen Seite liefert für etwa 49.4\% aller doubles im Intervall $[-1, 1]$ den exakten Funktionswert, wird aber für Eingabewerte nahe an Eins ungenau.
-    Um das exakte Ergebnis für Eins zu erhalten wäre eine unvertretbar hohe Anzahl an Reihengliedern erforderlich, die zu hohen Performanz einbußen führen würden.
-    Da jedoch der interessanteste Bereich über 1 hinausgeht, lässt sich schließen, dass die Nutzung einer reinen Reihe, egal ob für $|x|\geq1$ oder $|x|\leq1$ verwendet, für gegebene Problemstellung nicht geeignet ist.
+    Die reine Reihenentwicklung auf der anderen Seite liefert mit 13 gespeicherten Werten für etwa 49.4\% aller doubles im Intervall $[-1, 1]$ den exakten Funktionswert, wird aber für Eingabewerte nahe an Eins ungenau.
+    Da jedoch der interessanteste Bereich über 1 hinausgeht, lässt sich schließen, dass die Nutzung einer reinen Reihe, egal ob $|x|\geq1$ oder $|x|\leq1$ verwendet, für die gegebene Problemstellung nicht geeignet ist.
     Die gemischte Reihe liefert für 99,8\% aller doubles den exakten Funktionswert.
-    Auch für die 27 reihenglieder der ln-Taylorreihe und die 13 Reihenglieder der beiden anderen Reihen, benötigt die Reihenentwicklung verglichen mit dem Lookup für $|x|>1$ die bis zu 11-fache Zeit für die Berechnung.
-    Andererseits benötigt diese über 600-mal weniger Speicherplatz für eine genaue Berechnung.
+    Jedoch benötigt die Reihenentwicklung verglichen mit dem Lookup für $|x|>1$ die bis zu 11-fache Zeit für die Berechnung.
+    Andererseits verbraucht diese über 600-mal weniger Speicherplatz für eine genaue Berechnung.
 
     \subsection{Anwendung}
-    Welche Implementierung verwendet werden sollte, hängt von den Rahmenbedingungen ab.
+    Welche Implementierung verwendet werden sollte, hängt also von den genauen Rahmenbedingungen ab.
     Der Areasinus Hyperbolicus findet in erster Linie Anwendung in verschiedensten Bereichen der Physik und Ingenierswissenschaften~\cite{????}.
-    Für die Auswertung großer Messreihen eignet sich die Lookuptabelle besser, da Messungen in der echten Welt kleine Fehler aufweisen und die Lookuptabelle für viele Werte aufgrund der besseren Performanz schneller Ergebnisse liefert.
-    Hat jedoch die exakte Genauigkeit der Ergebnisse eine höhere Priorität, so eignet sich die Reihenentwicklung mit einer geeigneten Menge an Reihengliedern deutlich besser.
+    Für die Verwendung in Echtzeitsystemen eignet sich somit die Lookuptabelle besser, da Messungen in der stets kleine Fehler aufweisen und die Lookuptabelle für viele Werte aufgrund der höheren Performanz schneller Ergebnisse liefert.
+    Steht jedoch Genauigkeit im Vordergrund, so eignet sich die Reihenentwicklung mit einer geeigneten Menge an Reihengliedern deutlich besser.
 
     \subsection{Ausblick}
 
@@ -375,16 +358,16 @@
     Dafür steigt allerdings der benötigte Speicherplatz, da nun für jedes Intervall ein Polynom gespeichert werden muss.
 
     Eine mögliche weitere Verbesserung des Lookup-Tables ist eine effizientere Verteilung der Tabellenwerte.
-    Durch die lineare Interpolation entsteht eine höhere Ungenauigkeit, je stärker die Krümmung der arsinh Funktion an dieser Stelle ist.
-    Wird an den besonders stark gekrümmten Stellen eine höhere Dichte an Messpunkten verwendet und eine geeignete Mappingfunktion erstellt, würde die Lookuptabelle bei der gleichen Anzahl an vorgespeicherten Werten deutlich genauere Ergebnisse liefern.
+    Durch lineare Interpolation entsteht eine höhere Ungenauigkeit, je stärker die Krümmung der arsinh Funktion an dieser Stelle ist.
+    Würde also an stark gekrümmten Stellen eine höhere Dichte an Messpunkten verwendet und eine geeignete Mappingfunktion erstellt, würde die Lookuptabelle bei der gleichen Anzahl an vorgespeicherten Werten deutlich genauere Ergebnisse liefern.
 
     Ein weiterer Ansatz wäre, eine Kombination aus Reihenentwicklung und Lookup-Tabelle zu verwenden:
     Wie bereits beobachtet, liefert die Berechnung mit einer Reihenentwicklung für x-Werte, die nicht nahe an Eins liegen, besonders genaue Ergebnisse.
     Für |x|<0.125 brauchen werden beispielsweise 13 Reihenglieder benötigt, für |x|>8 werden 13 Reihenglieder der Restreihe, sowie bis zu 33 Reihenglieder der Taylorreihe für ein exaktes Ergebnis benötigt.
-    In diesen Intervallen bietet es sich an, eine reine Reihenentwicklung zu verwenden.
-    In dem Intervall 0.125<=|x|<=8 werden allerdings mehr Reihenglieder benötigt, wodurch es zu Performanz einbußen kommt.
+    Außerhalb dieser Intervallen bietet es sich an, eine reine Reihenentwicklung zu verwenden.
+    In dem Intervall 0.125<=|x|<=8 werden allerdings mehr Reihenglieder benötigt, wodurch es zu starken Performanzeinbußen kommt.
     Es wäre demnach sinnvoll in diesem Intervall eine Lookup-Tabelle zu verwenden.
-    Dieser Ansatz würde besonders auf die Genauigkeit des Ergebnisses abzielen.
+    Dieser Ansatz würde ein besonders genaues Ergebnisses erzielen.
 
     Die Wahl des Datentyps bietet eine weitere einfache Möglichkeitzur Verkleinerung des Speicherverbrauchs. Gemäß IEEE 754 ~\cite{StandardforBinaryFloating} könnte auch die einfache Genauigkeit der Fließkommaarithmetik gewählt werden, wodurch sich der Speicherverbrauch halbieren würde.
 
