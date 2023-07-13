@@ -82,11 +82,11 @@
     \subsubsection{Problematik und Ansätze}
 
     Bei der Interpolation durch eine reine Reihe der Form $\sum_{k=0}^{\pm\infty} a_k x^k$ werden Overflows zum Problem.
-    Unabhängig welche Reihe genutzt wird, können die Zwischenergebnisse $x^{\pm k}$ entweder für sehr große Werte oder sehr kleine Werte von $x$ nicht als $double$ dargestellt werden und entwerten damit das Endergebnis.
-    Daher haben Reihendarstellungen stets begrenzten Gültigkeitsbereiche.
+    Unabhängig welche Reihe genutzt wird, können die Zwischenergebnisse $x^{\pm k}$ entweder für sehr große Werte oder sehr kleine Werte von $x$ nicht als $double$ dargestellt werden, was zu einem falschen Endergebnis führt.
+    Daher haben Reihendarstellungen stets begrenzte Gültigkeitsbereiche.
     Es wird versucht, eine Reihenentwicklung zu finden, die für einen sinnvollen Konvergenzbereich möglichst genaue Ergebnisse liefert.
     Hierzu haben wir unter anderem die Methode der kleinsten Quadrate verwendet, um geeignet Koeffizienten für Reihenglieder mit positiven oder negativen Potenzen zu finden.
-    Die auf diese Weise hergeleitete Reihenentwicklung liefert allerdings für Werte zwischen den verwendeten Datenpunkten sehr ungenaue Ergebnisse, da es sich bei der arsinh-Funktion nicht um ein lineares Modell handelt.
+    Die auf diese Weise hergeleitete Reihenentwicklung liefert allerdings für Werte zwischen den verwendeten Datenpunkten zu ungenaue Ergebnisse, da die $arsinh$-Funktion nicht um ein lineares.
     Wir haben daher stattdessen Reihenentwicklungen für verschiedene Intervalle hergeleitet, die im Folgenden näher erläutert werden sollen.
     Für bessere Verständlichkeit werden die drei Reihen mit \textit{TaylorArsinh}, \textit{TaylorLn} und \textit{Restreihe} bezeichnet.
     Die Berechnungen werden im Folgenden näher erläutert:
