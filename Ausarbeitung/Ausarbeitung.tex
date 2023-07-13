@@ -208,10 +208,6 @@
         %\label{fig:enter-label}
     \end{figure}
 
-
-    \begin{figure}
-        \caption{}
-    \end{figure}
     Als Maßstab für die Genauigkeit unserer Ergebnisse wird im Folgenden der relative Fehler der Implementierung bezüglich des tatsächlichen mathematischen Funktionswert verwendet. Die Diagramme wurden erstellt, indem mithilfe einer C-Hilfsmethode für eine große Anzahl an Eingabewerten jeweils die Funktionswerte für alle drei Implementierungen berechnet und in Arrays gespeichert wurden. Anschließend wurden diese Funktionswerte in einem Python-Programm zu den jeweilgen relativen Fehlern ausgewertet und mithilfe der Bibiliothek matplotlib als Graph dargestellt.
     
     \subsection{Reine Reihenentwicklung}
@@ -336,21 +332,20 @@
 
     \subsection{Zusammenfassung}
     Der Trade-off zwischen Performance, Genauigkeit und Speicherverbrauch ist für die beiden Implementierungen mit einem Tabellenlookup beziehungsweise einer Reihenentwicklung sehr unterschiedlich.
-    Der Tabellenlookup ist schnell, benötigt allerdings mehr Speicherplatz, je genauere Werte zu erzielen sind.
+    Der Tabellenlookup ist schnell, benötigt allerdings mehr Speicherplatz, um genauere Werte zu erzielen.
     In der Tabellenlookup Implementierung mit insgesamt etwa 30000 zu speichernden Werten in einer Lookup-Tabelle, hat die Berechnung einen maximalen relativen Fehler von 0.02\%.
 
-    Die reine Reihenentwicklung auf der anderen Seite liefert für etwa 49.4\% aller doubles im Intervall $[-1, 1]$ den exakten Funktionswert, wird aber für Eingabewerte nahe an Eins ungenau.
-    Um das exakte Ergebnis für Eins zu erhalten wäre eine unvertretbar hohe Anzahl an Reihengliedern erforderlich, die zu hohen Performanz einbußen führen würden.
-    Da jedoch der interessanteste Bereich über 1 hinausgeht, lässt sich schließen, dass die Nutzung einer reinen Reihe, egal ob für $|x|\geq1$ oder $|x|\leq1$ verwendet, für gegebene Problemstellung nicht geeignet ist.
+    Die reine Reihenentwicklung auf der anderen Seite liefert mit 13 gespeicherten Werten für etwa 49.4\% aller doubles im Intervall $[-1, 1]$ den exakten Funktionswert, wird aber für Eingabewerte nahe an Eins ungenau.
+    Da jedoch der interessanteste Bereich über 1 hinausgeht, lässt sich schließen, dass die Nutzung einer reinen Reihe, egal ob $|x|\geq1$ oder $|x|\leq1$ verwendet, für die gegebene Problemstellung nicht geeignet ist.
     Die gemischte Reihe liefert für 99,8\% aller doubles den exakten Funktionswert.
-    Auch für die 27 reihenglieder der ln-Taylorreihe und die 13 Reihenglieder der beiden anderen Reihen, benötigt die Reihenentwicklung verglichen mit dem Lookup für $|x|>1$ die bis zu 11-fache Zeit für die Berechnung.
-    Andererseits benötigt diese über 600-mal weniger Speicherplatz für eine genaue Berechnung.
+    Jedoch benötigt die Reihenentwicklung verglichen mit dem Lookup für $|x|>1$ die bis zu 11-fache Zeit für die Berechnung.
+    Andererseits verbraucht diese über 600-mal weniger Speicherplatz für eine genaue Berechnung.
 
     \subsection{Anwendung}
-    Welche Implementierung verwendet werden sollte, hängt von den Rahmenbedingungen ab.
+    Welche Implementierung verwendet werden sollte, hängt also von den genauen Rahmenbedingungen ab.
     Der Areasinus Hyperbolicus findet in erster Linie Anwendung in verschiedensten Bereichen der Physik und Ingenierswissenschaften~\cite{????}.
-    Für die Auswertung großer Messreihen eignet sich die Lookuptabelle besser, da Messungen in der echten Welt kleine Fehler aufweisen und die Lookuptabelle für viele Werte aufgrund der besseren Performanz schneller Ergebnisse liefert.
-    Hat jedoch die exakte Genauigkeit der Ergebnisse eine höhere Priorität, so eignet sich die Reihenentwicklung mit einer geeigneten Menge an Reihengliedern deutlich besser.
+    Für die Verwendung in Echtzeitsystemen eignet sich somit die Lookuptabelle besser, da Messungen in der stets kleine Fehler aufweisen und die Lookuptabelle für viele Werte aufgrund der höheren Performanz schneller Ergebnisse liefert.
+    Steht jedoch Genauigkeit im Vordergrund, so eignet sich die Reihenentwicklung mit einer geeigneten Menge an Reihengliedern deutlich besser.
 
     \subsection{Ausblick}
 
@@ -364,16 +359,16 @@
     Dafür steigt allerdings der benötigte Speicherplatz, da nun für jedes Intervall ein Polynom gespeichert werden muss.
 
     Eine mögliche weitere Verbesserung des Lookup-Tables ist eine effizientere Verteilung der Tabellenwerte.
-    Durch die lineare Interpolation entsteht eine höhere Ungenauigkeit, je stärker die Krümmung der arsinh Funktion an dieser Stelle ist.
-    Wird an den besonders stark gekrümmten Stellen eine höhere Dichte an Messpunkten verwendet und eine geeignete Mappingfunktion erstellt, würde die Lookuptabelle bei der gleichen Anzahl an vorgespeicherten Werten deutlich genauere Ergebnisse liefern.
+    Durch lineare Interpolation entsteht eine höhere Ungenauigkeit, je stärker die Krümmung der arsinh Funktion an dieser Stelle ist.
+    Würde also an stark gekrümmten Stellen eine höhere Dichte an Messpunkten verwendet und eine geeignete Mappingfunktion erstellt, würde die Lookuptabelle bei der gleichen Anzahl an vorgespeicherten Werten deutlich genauere Ergebnisse liefern.
 
     Ein weiterer Ansatz wäre, eine Kombination aus Reihenentwicklung und Lookup-Tabelle zu verwenden:
     Wie bereits beobachtet, liefert die Berechnung mit einer Reihenentwicklung für x-Werte, die nicht nahe an Eins liegen, besonders genaue Ergebnisse.
     Für |x|<0.125 brauchen werden beispielsweise 13 Reihenglieder benötigt, für |x|>8 werden 13 Reihenglieder der Restreihe, sowie bis zu 33 Reihenglieder der Taylorreihe für ein exaktes Ergebnis benötigt.
-    In diesen Intervallen bietet es sich an, eine reine Reihenentwicklung zu verwenden.
-    In dem Intervall 0.125<=|x|<=8 werden allerdings mehr Reihenglieder benötigt, wodurch es zu Performanz einbußen kommt.
+    Außerhalb dieser Intervallen bietet es sich an, eine reine Reihenentwicklung zu verwenden.
+    In dem Intervall 0.125<=|x|<=8 werden allerdings mehr Reihenglieder benötigt, wodurch es zu starken Performanzeinbußen kommt.
     Es wäre demnach sinnvoll in diesem Intervall eine Lookup-Tabelle zu verwenden.
-    Dieser Ansatz würde besonders auf die Genauigkeit des Ergebnisses abzielen.
+    Dieser Ansatz würde ein besonders genaues Ergebnisses erzielen.
 
     Die Wahl des Datentyps bietet eine weitere einfache Möglichkeitzur Verkleinerung des Speicherverbrauchs. Gemäß IEEE 754 ~\cite{StandardforBinaryFloating} könnte auch die einfache Genauigkeit der Fließkommaarithmetik gewählt werden, wodurch sich der Speicherverbrauch halbieren würde.
 
