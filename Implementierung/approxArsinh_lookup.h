@@ -4,8 +4,9 @@
 
 double approxArsinh_lookup(double x);
 
-// precalculated values of the arsinh-function
-// stores 16 evenly distributed results for each exponent of the datatype double
+/* Precalculated values of the arsinh-function
+ * stores 16 evenly distributed results for each exponent of the datatype double
+ */
 static double const table[] = {1.1125369292536007e-308 , 1.1820704873319507e-308 , 1.251604045410301e-308 , 1.321137603488651e-308 ,
 1.390671161567001e-308 , 1.460204719645351e-308 , 1.529738277723701e-308 , 1.599271835802051e-308 ,
 1.668805393880401e-308 , 1.738338951958751e-308 , 1.807872510037101e-308 , 1.877406068115451e-308 ,
