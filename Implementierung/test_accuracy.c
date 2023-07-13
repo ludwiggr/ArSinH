@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <math.h>
 #include "approxArsinh_lookup.h"
 #include "approxArsinh_series.h"
 #include "approxArsinh_complexInstructions.h"
