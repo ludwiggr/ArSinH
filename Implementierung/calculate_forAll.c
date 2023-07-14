@@ -3,8 +3,9 @@
 #include "approxArsinh_series.h"
 #include "approxArsinh_complexInstructions.h"
 
-/* calculates arsinh(x) for ca. 40000 values and writes results into files
- * later on used to compare relative errors
+/*
+ * Calculates arsinh(x) for ca. 40000 values and writes results into files
+ * used to compare relative errors
  */
 int main() {
 
