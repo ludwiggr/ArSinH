@@ -1,6 +1,7 @@
 #include "performance.h"
 
-/* Measures and Computes the runtime of a given arsinh implementation for a specified number of iterations
+/*
+ * Measures and Computes the runtime of a given arsinh implementation for a specified number of iterations
  *
  * Arguments: n (number of executions), x (Argument of the function), implementation [0;3]
  *
