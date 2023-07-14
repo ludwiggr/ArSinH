@@ -2,6 +2,10 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
+##originally used to calculate entries of the lookuptable
+
+
+
 n = 1023
 x_arr = np.geomspace(1, math.pow(2, n), n)
 y_arr = np.array([math.asinh(x) for x in x_arr])

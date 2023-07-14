@@ -3,9 +3,8 @@
 #include "approxArsinh_series.h"
 #include "approxArsinh_complexInstructions.h"
 
-/* Calls the Accuracy Tests and returns the measured Values
- *
- * Returns: The accuracy test results
+/* calculates arsinh(x) for ca. 40000 values and writes results into files
+ * later on used to compare relative errors
  */
 int main() {
 
