@@ -24,7 +24,6 @@ static double const coeffs_taylor[] = {1.0, -0.5, 0.3333333333333333, -0.25, 0.2
                                        -0.03333333333333333, 0.03225806451612903, -0.03125};
 
 
-
 /* Stores precalculated coefficients of the asymptotic expansion rest series */
 static double const coeffs_rest[] = {0.25, -0.09375, 0.052083333333333336, -0.0341796875, 0.024609375, -0.018798828125,
                                      0.014962332589285714, -0.012273788452148438, 0.010303921169704862,

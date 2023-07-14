@@ -1,8 +1,6 @@
 import math
 
-##calculates first couple of coefficients for all three series
-
-
+# calculates first coefficients for all three series
 
 # coefficients for ln approx series
 c_ln = []

@@ -2,9 +2,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
-##originally used to calculate entries of the lookuptable
-
-
+# used to calculate entries of the lookup-table
 
 n = 1023
 x_arr = np.geomspace(1, math.pow(2, n), n)
@@ -23,9 +21,9 @@ print(y_arr)
 # exit()
 
 def approx(x):
-    if (x < 0):
+    if x < 0:
         return -approx(-x)
-    if (x == 0):
+    if x == 0:
         return 0
     app = math.floor(math.log2(x))
     m1 = (y_arr[app + 1] - y_arr[app])
