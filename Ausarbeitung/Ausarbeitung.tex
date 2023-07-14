@@ -50,8 +50,8 @@
             ]
             \addplot[] {ln(x + sqrt(x*x+1))};
             \legend{$arsinh(x) = ln(x + \sqrt{x^2 + 1})$}
-            \caption{}
-
+            \caption{Abbildung 1}
+            \label{Abbildung 1}
 
         \end{axis}
     \end{tikzpicture}
@@ -115,14 +115,11 @@
         \textbf{\textit{TaylorLn}}\coloneqq\ln(x) = \sum_{k = 1}^{\infty} \frac{(-1)^{k + 1}}{k}(x - 1)^k
     \]
 
-    %TODO geeignete Überschrift
     \subsubsection{Optimierungen: Genauigkeit und Performanz}
-
     
     Die Koeffizienten einzelner Reihenglieder zu berechnen ist laufzeitintensiv, da insbesondere die Berechnung der Fakultät viel Zeit kostet.
     Daher lässt sich die Berechnung optimieren, indem die Koeffizienten aller drei Reihen bereits vor Runtime berechnet werden.
     Durch Anwendung des Horner-Schemas lassen sich die Reihen besonders effizient berechnen.
-
     
     Die Anzahl an benutzten Reihenglieder, entsteht aus einer Abwägung zwischen Performanz und Genauigkeit.
     Wie viele Reihenglieder für ein möglichst genaues Ergebnis berechnet werden müssen, hängt von dem Eingabewert ab.
@@ -134,7 +131,7 @@
     \[
         \frac{(2k)!}{(2k + 1)(2^k*k!)^2}\cdot x^{2k+1}
     \]
-    Aus dieser Formel lässt sich bereits ablesen, dass ein Reihenglied kleiner ist, je kleiner x ist. %TODO: Ein Reihengleid? nicht das reihengleid, auf das sich oben bezogen wird?
+    Aus dieser Formel lässt sich bereits ablesen, dass der Betrag des k-ten Reihengliedes kleiner ist, je kleiner $|x|$ ist.
     Die Reihe liefert demnach bereits mit weniger Reihengliedern genaue Ergebnisse, je näher x an 0 liegt.
     Mithilfe dieser Formel lässt sich feststellen, dass für x = 0.25 alle Reihenglieder ab dem 13. Glied keinen Einfluss mehr auf das Endergebnis haben, da sie aufgrund der Beschränkung der Mantisse auf 52 Bit diese bei der Addition absorbiert werden.
     Für x = 0.5 müssten 26 Reihenglieder berechnet werden.
@@ -142,11 +139,7 @@
     Die Anzahl der zu berechnenden Reihenglieder wird auf 13 festgelegt und damit ein exponentiell ansteigender relativer Fehler ab $|x|>0.25$ in Kauf genommen.
     Ähnliche Abwägungen lassen sich für die \textit{Restreihe} aufstellen, weshalb für diese Reihe ebenfalls 13 Reihenglieder verwendet werden.
 
-    %TODO: nicht hier!
-
-
-
-    \subsection{Reine Reihendarstellung}
+    \subsection{Reine Reihendarstellung}\label{subsec:reine-reihendarstellung}
 
     Es stellt sich die Frage, ob die Reihenentwicklung für $|x|\geq1$ oder $|x|\leq1$ verwendet werden sollte. 
     
@@ -163,7 +156,7 @@
     Durch an dieser Stelle nicht weiter definerte Genauigkeits-Messungen hat sich ergeben, dass die TaylorArsinh(x) für den Großteil der Eingabewerte unter 1 mit wenigen Reihengliedern bereits ein exaktes Ergebnis liefern kann.
     Das Ergebnis der Näherung $ arsinh(x)\approx ln(2x) + error(x) = ln(2) - ln(\frac{1}{x}) + error(x)$ wird wird hingegen ungenauer, je größer $|x|$ ist. 
 
-    \subsection{Reihendarstellung mit Fallunterscheidung}
+    \subsection{Reihendarstellung mit Fallunterscheidung}\label{subsec:reihendarstellung-mit-fallunterscheidung}
 
     Für die gemischte Reihenentwicklung wird zudem eine Fallunterscheidung nach den Eingabewerten getroffen, um für alle Eingabewerte eine möglichst genaue Näherung zu finden:
     \[ \operatorname{arsinh}(x) =
@@ -179,7 +172,8 @@
         x = M\cdot2^E \,\,\, mit \,\,\, M = implizierte Mantisse \,\,\, E = implizierter Exponent\\
         \ln(2x) = \ln(2) + \ln(x) = \ln(2) + \ln(M\cdot2^E) = \ln(2) + E\cdot\ln(2) + \ln(M)\\
     \end{gather*}
-    Da $M\in[1, 2[$ liegt, kann \textit{TaylorLn} für die Berechnung von $\ln(M)$ verwendet werden. Für die so gegebenen Eingabewerte der Taylorreihe werden analog zu den Überlegungen in Kapitel 2.1.3 27 Reihenglieder für ein exaktes Ergebnis benötigt.
+    Da $M\in[1, 2[$ liegt, kann \textit{TaylorLn} für die Berechnung von $\ln(M)$ verwendet werden.
+    Für die so gegebenen Eingabewerte der Taylorreihe werden analog zu den Überlegungen in Kapitel 2.1.3 27 Reihenglieder für ein exaktes Ergebnis benötigt.
 
     
 
@@ -209,17 +203,27 @@
     \section{Genauigkeit}\label{sec:genauigkeit}
 
     \begin{figure}[h]
-        \begin{tabular}{@{}c@{}}
-        \includegraphics[width = 12cm,height = 6cm]{images/Figure3}
-        \smash Abbildung 1
-        \end{tabular}
-        
-        \begin{tabular}{@{}c@{}}
-        \includegraphics[width = 7cm,height = 6cm]{images/Figure1}
-        \includegraphics[width = 7cm, height = 6cm]{images/Figure2}
-        \small Abbildung 2
-        \end{tabular}
-        \label{fig:Abbildung 1-3}
+        \centering
+        \includegraphics[width=12cm,height=6cm]{images/Figure3}
+        \caption{Abbildung 2}
+        \label{fig:abb2}
+    \end{figure}
+
+    \begin{figure}[htbp]
+        \centering
+        \begin{minipage}[b]{0.45\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{images/Figure1}
+            \caption{Abbildung 3}
+            \label{fig:abb3}
+        \end{minipage}
+        \hfill
+        \begin{minipage}[b]{0.45\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{images/Figure2}
+            \caption{Abbildung 4}
+            \label{fig:abb4}
+        \end{minipage}
     \end{figure}
 
 
@@ -422,8 +426,7 @@
     Durch lineare Interpolation entsteht eine höhere Ungenauigkeit, je stärker die Krümmung der $arsinh$ Funktion an dieser Stelle ist.
     Würde an stark gekrümmten Stellen eine höhere Dichte an Messpunkten verwendet und eine geeignete Mappingfunktion erstellt, würde die Lookup-Tabelle bei der gleichen Anzahl an vorgespeicherten Werten deutlich genauere Ergebnisse liefern.
 
-    %TODO: umformulieren, in Kontext einbinden
-    Es sei an dieser Stelle bereits erwähnt, dass ausgehend von diesen Untersuchungen eine weitere Optimierung umsetzbar wäre, die (beispielsweise mithilfe des Exponenten des Eingabewertes) die Anzahl der nötigen Reihenglieder bestimmt und diese berechnet.
+    Eine weitere Optimierung für die reine Reihenentwicklung, bestimmt mithilfe des Exponenten des Eingabewertes die Anzahl der nötigen Reihenglieder.
     Durch diese Optimierung wird Overhead durch die Berechnung von für das Ergebnis irrelevanten Reihengliedern vermieden, auf Kosten eines geringen, festen Laufzeitanteils.
 
     Ein weiterer Ansatz wäre, eine Kombination aus Reihenentwicklung und Lookup-Tabelle zu verwenden:
@@ -437,7 +440,7 @@
     Die Wahl des Datentyps bietet eine weitere einfache Möglichkeit zur Verkleinerung des Speicherverbrauchs.
     Gemäß IEEE 754 ~\cite{StandardforBinaryFloating} könnte die einfache Genauigkeit der Fließkommaarithmetik gewählt werden, wodurch sich der Speicherverbrauch halbieren würde.
 
-    Diese und gegebenenfalls weitere Optimierungen könnten die Implementierung des $arsinh(x)$ noch weiter verbessern, bleiben hier aus Gründen der Übersichtlichkeit sowie der gegebenen Beschränkungen allerdings unberücksichtigt.
+    Diese und gegebenenfalls weitere Optimierungen könnten die Implementierung des $arsinh(x)$ noch weiter verbessern, blieben aus Gründen der gegebenen Beschränkungen allerdings unberücksichtigt.
 
     % TODO: Fuegen Sie Ihre Quellen der Datei Ausarbeitung.bib hinzu
     % Referenzieren Sie diese dann mit \cite{}.
