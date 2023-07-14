@@ -5,8 +5,7 @@
 #include <errno.h>
 #include <math.h>
 #include <stdbool.h>
-#include "approxArsinh_complexInstructions.h"
-#include "test_performance.h"
+#include "performance.h"
 
 /* Non-changing global variables for testing */
 static const long int numberOfImplementations = 4;
@@ -48,9 +47,12 @@ double approxArsinh_complexInstructions(double x);
 
 double performance(unsigned int n, double x, int implementation);
 
-/* Multiplexes the Implementation to be used
- *
- * Returns: An Approximation of the arsinh(x) for the input value x and the Argument implementation [0;3]
+
+/* Multiplexes the Implementation to be used and calculates the arsinh(x)
+ * 
+ * Arguments: x (Argument of the function), implementation [0;3]
+ * 
+ * Returns: An Approximation of the arsinh(x) using the specified implementation
  */
 double calculate_result(double x, int implementation) {
     switch (implementation) {
@@ -68,9 +70,13 @@ double calculate_result(double x, int implementation) {
     }
 }
 
+
+
 /* Computes the relative error of a given arsinh implementation compared to the math library
  *
- * Returns: the relative error for arsinh(x) for the input value x and the argument implementation [0;3]
+ * Arguments: x (Argument of the function), implementation [0;3]
+ *
+ * Returns: the relative error for arsinh(x)
  */
 double relative_error(double x, int implementation) {
     double exact = asinh(x);
@@ -95,12 +101,13 @@ double relative_error(double x, int implementation) {
     return fabs((approx - exact) / exact);
 }
 
+
 /* Frame program that parses and interprets user input
  *
  * returns EXIT_FAILURE or EXIT_SUCCESS
  */
 int main(int argc, char *argv[]) {
-    //local variables to store options
+    /*local variables to store options*/
     long int implementation = 0;
     long int iterations = 0;
     double newNum;
@@ -113,14 +120,15 @@ int main(int argc, char *argv[]) {
     char *endptr;
     int opt;
     int option_index = 0;
-    struct option long_options[] = {      //converts --help to -h
+    /*converts --help to -h*/
+    struct option long_options[] = {  
             {"help", no_argument, NULL, 'h'},
             {NULL,   0,           NULL, 0}
     };
     while ((opt = getopt_long(argc, argv, "V:B::hR0::1::2::3::4::5::6::7::8::9::.::i::I::n::N::", long_options,
                               &option_index)) != -1) {
         switch (opt) {
-            //choose Implementation
+            /*choose Implementation*/
             case 'V':
                 implementation = strtol(optarg, &endptr, 10);
                 if (endptr == optarg || *endptr != '\0') {
@@ -140,9 +148,9 @@ int main(int argc, char *argv[]) {
                 }
                 break;
 
-            //enable runtime measurement for given iterations
+            /*enable runtime measurement for given iterations*/
             case 'B':
-                //checks for possible ' ' before optional argument of B flag
+                /*checks for possible ' ' before optional argument of B flag*/
                 if (optarg == NULL && optind < argc && argv[optind][0] != '-') {
                     optarg = argv[optind++];
                 }
@@ -168,24 +176,24 @@ int main(int argc, char *argv[]) {
                         return EXIT_FAILURE;
                     }
                 } 
-                //set default iterations, to ensure runtime is long enough for accurate results
+                /*set default iterations, to ensure runtime is long enough for accurate results*/
                 else {
                     iterations = 100000000;
                 }
                 break;
 
-            //enable calculation of relative error
+            /*enable calculation of relative error*/
             case 'R'  :
                 relativeError = true;
                 break;
 
-            //help
+            /*help*/
             case 'h'  :
                 printf("%s", help_msg);
                 return EXIT_SUCCESS;
 
-            //if the - is followed by one of these chars, we assume that
-            //the user might want to parse a negative number as a positional argument
+            /*if the - is followed by one of these chars, we assume that
+            the user might want to parse a negative number as a positional argument*/
             case '0'  :
             case '1'  :
             case '2'  :
@@ -201,7 +209,7 @@ int main(int argc, char *argv[]) {
             case 'n'  :
             case 'I'  :
             case 'N'  :
-                //tries to convert argument at current position 
+                /*tries to convert argument at current position*/ 
                 newNum = strtod(argv[optind - 1], &endptr);
                 if (endptr == argv[optind - 1] || *endptr != '\0') {
                     fprintf(stderr, "%c is not a valid Option and %s could not be converted to double\n", opt,
@@ -212,7 +220,7 @@ int main(int argc, char *argv[]) {
                     printf("datatype double has to be in range +/- 1.7E +/-308.\n");
                     return EXIT_FAILURE;
                 }
-                //only sets the new parsed number, if no negative number has been parsed yet
+                /*only sets the new parsed number, if no negative number has been parsed yet*/
                 if (!negativeNumber_Set) {
                     negativeNumber_Set = true;
                     negativeNumber_Index = optind;
@@ -231,14 +239,14 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    //parse positional argument
+    /*parse positional argument*/
 
-    //no negative number parsed and no positional argument -> failure
+    /*no negative number parsed and no positional argument -> failure*/
     if (optind >= argc && !negativeNumber_Set) {
         fprintf(stderr, "Missing positional argument -- ’x’\n");
         printf("Input value needs to be specified.\n");
         return EXIT_FAILURE;
-    //only converts the positional argument, if a negative number hasn't been parsed beforehand
+    /*only converts the positional argument, if a negative number hasn't been parsed beforehand*/
     } else if (!negativeNumber_Set || negativeNumber_Index > optind) {
         number = strtod(argv[optind], &endptr);
         if (endptr == argv[optind] || *endptr != '\0') {
@@ -251,9 +259,9 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    //output Strings for all valid inputs
+    /*Output Strings for all valid inputs*/
     
-    //regular calculation of the function with specified Implementation
+    /*regular calculation of the function with specified Implementation*/
     if (!relativeError && iterations == 0) {
         double result = calculate_result(number, implementation);
         printf("Calculating arsinh(%f) with implementation number %li results in %.*g.\n", number, implementation, 20,
@@ -264,20 +272,20 @@ int main(int argc, char *argv[]) {
         }
         return EXIT_SUCCESS;
     } 
-    //calculation of relative error for specified implementation
+    /*calculation of relative error for specified implementation*/
     else if (relativeError) {
         double error = relative_error(number, implementation);
         printf("The relative error when calculating arsinh(%f) with implementation number %ld was %.*f\n", number,
                implementation, 15, error);
         return EXIT_SUCCESS;
     } 
-    //runtime measurement for specified iterations and implementation
+    /*runtime measurement for specified iterations and implementation*/
     else {
         double time = performance(iterations, number, implementation);
         printf("The measured runtime of %ld iterations of implementation number %ld was %f seconds.\n", iterations,
                implementation, time);
-        if (iterations < 10000000) {
-            printf("WARNING: Using less than 10000000 iterations is not recommended. \nThe program might not run long enough to provide meaningful measurements.");
+        if (iterations < 100000000) {
+            printf("WARNING: Using less than 100000000 iterations is not recommended. \nThe program might not run long enough to provide meaningful measurements.");
         }
         return EXIT_SUCCESS;
     }

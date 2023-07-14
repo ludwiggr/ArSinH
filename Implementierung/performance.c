@@ -1,8 +1,10 @@
-#include "test_performance.h"
+#include "performance.h"
 
-/* Measures and Computes the performance of a given arsinh implementation compared to the math library
+/* Measures and Computes the runtime of a given arsinh implementation for a specified number of iterations
  *
- * Returns: the relative error for arsinh(x) for the Argument n (number of executions) the Arguments x (Argument of the function) and the Argument implementation [0;3]
+ * Arguments: n (number of executions), x (Argument of the function), implementation [0;3]
+ *
+ * Returns: the runtime in seconds for arsinh(x)
  */
 double performance(unsigned int n, double x, int implementation) {
     struct timespec start, end;

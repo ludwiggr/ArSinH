@@ -3,8 +3,6 @@
 /* Non-changing global variable for log_2 */
 static const double LOG_TWO = 0.69314718055994530941;
 
-// 
-
 
 /* Series Approximation of arsinh for [-1; +1]
  * using the Taylorseries around 0
@@ -98,8 +96,11 @@ double approxLn(double x) {
     signed long long xLowerTwo = (xToBit & 0xBFFFFFFFFFFFFFFF) | 0x3FF0000000000000;
     double mantissa;
     memcpy(&mantissa, &xLowerTwo, 8);
-    if (mantissa > 1.3333333333333333) { //ensures input is as close to one as possible
-        mantissa /= 2;                   //so Taylor series returns more accurate results
+    /*ensures input is as close to one as possible
+     *so Taylor series returns more accurate results
+     */
+    if (mantissa > 1.3333333333333333) { 
+        mantissa /= 2;                   
         exp++;
     }
     return approxLnTaylor(mantissa) + exp * LOG_TWO;
