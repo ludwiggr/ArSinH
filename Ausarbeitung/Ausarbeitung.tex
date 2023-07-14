@@ -34,7 +34,7 @@
     Ebenso wird die Funktion verwendet, um Küsten vor zerstörerischen Wellen zu warnen als auch um die Ausdehnung des Universums zu berechnen.~\cite{universum1,universum2}
     In diesen Anwendungsgebieten ist es wichtig, die Funktion schnell und genau zu berechnen.
     Deshalb werden im Folgenden Methoden zur genauen und effizienten Berechnung dieser vielseitigen Funktion vorgestellt und analysiert.
-    
+    \begin{figure}[h]
     \begin{tikzpicture}[]
         \begin{axis}
             [
@@ -50,11 +50,12 @@
             ]
             \addplot[] {ln(x + sqrt(x*x+1))};
             \legend{$arsinh(x) = ln(x + \sqrt{x^2 + 1})$}
-            \caption{Abbildung 1}
             \label{Abbildung 1}
 
         \end{axis}
     \end{tikzpicture}
+    \caption{$arsinh(x)$-Funktionsplot}
+    \end{figure}
 
     \subsection{Analyse und Spezifikation der Aufgabenstellung}\label{subsec:analyse-und-spezifikation-der-aufgabenstellung}
 
@@ -204,31 +205,31 @@
 
     \begin{figure}[h]
         \centering
-        \includegraphics[width=12cm,height=6cm]{images/Figure3}
-        \caption{Abbildung 2}
+        \includegraphics[width=12cm,height=5.5cm]{images/Figure3}
+        \caption{rel. Fehler über positiven Wertebereich}
         \label{fig:abb2}
     \end{figure}
+
+
+    Als Maßstab für die Genauigkeit der Ergebnisse wird im Folgenden der relative Fehler der Implementierung bezüglich des tatsächlichen mathematischen Funktionswerts verwendet.
+    Die Diagramme wurden erstellt, indem für rund 40000 logarithmisch verteilte Eingabewerte der relative Fehler für alle vier Implementierungen errechnet und mittels $matplotlib$ aus $Python$ dargestellt wurde.
 
     \begin{figure}[htbp]
         \centering
         \begin{minipage}[b]{0.45\textwidth}
             \centering
             \includegraphics[width=\textwidth]{images/Figure1}
-            \caption{Abbildung 3}
+            \caption{rel. Fehler um 1}
             \label{fig:abb3}
         \end{minipage}
         \hfill
         \begin{minipage}[b]{0.45\textwidth}
             \centering
             \includegraphics[width=\textwidth]{images/Figure2}
-            \caption{Abbildung 4}
+            \caption{rel. Fehler kleine x}
             \label{fig:abb4}
         \end{minipage}
     \end{figure}
-
-
-    Als Maßstab für die Genauigkeit der Ergebnisse wird im Folgenden der relative Fehler der Implementierung bezüglich des tatsächlichen mathematischen Funktionswerts verwendet.
-    Die Diagramme wurden erstellt, indem für rund 40000 logarithmisch verteilte Eingabewerte der relative Fehler für alle vier Implementierungen errechnet und mittels $matplotlib$ aus $Python$ dargestellt wurde.
     
     \subsection{Reine Reihenentwicklung}\label{subsec:reine-reihenentwicklung}
     %TODO: Abbildungen nicht so benannt, wie im Text referneziert
@@ -288,7 +289,7 @@
     Im ersten Diagramm ist zudem deutlich erkennbar, dass die Funktion, wie die Reihenentwicklung, deutlich ungenauere Ergebnisse für Eingabewerte nahe an 1 liefert.
     Dies lässt sich mithilfe des Krümmungsverhaltens der Funktion begründen. 
     Der folgende Graph zeigt die zweite Ableitung des $arsinh''(x) = \frac{-x}{x^2\cdot \sqrt{x^2+1}+\sqrt{x^2+1}}$
-    
+    \begin{figure}
     \begin{tikzpicture}
         \begin{axis}[
             width = 15 cm,
@@ -309,6 +310,8 @@
             };
         \end{axis}
     \end{tikzpicture}
+    \caption{$arsinh''(x)$}
+    \end{figure}
     
 
     Der $arsinh(x)$ hat die maximale Krümmung bei circa $\pm 0.707$.
@@ -317,7 +320,7 @@
     \subsection{Implementierung mit komplexen Instruktionen}\label{subsec:implementierung-mit-komplexen-instruktionen}
 
     %TODO: Abbildung nicht so benannt
-    Wie in Abb.1 zu sehen ist, liefert die Implementierung mit komplexen mathematischen Instruktionen der C-Math Bibliothek für den Großteil des Wertebereichs den genauest möglichen Funktionswert für den Datentyp double.
+    Wie in Abb.2 zu sehen ist, liefert die Implementierung mit komplexen mathematischen Instruktionen der C-Math Bibliothek für den Großteil des Wertebereichs den genauest möglichen Funktionswert für den Datentyp double.
     Die einzige Ausnahme bilden sehr kleine x-Werte.
     Dies lässt sich mit der Absorption beziehungsweise Auslöschung von Bits begründen, welche bei der Addition von doubles unterschiedlicher Größenordnung unvermeidbar auftritt.
 
