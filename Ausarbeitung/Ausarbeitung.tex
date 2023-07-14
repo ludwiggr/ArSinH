@@ -11,7 +11,6 @@
 \pgfplotsset{compat=1.16}
 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% TODO: Ersetzen Sie in den folgenden Zeilen die entsprechenden -Texte-
 %% mit den richtigen Werten.
@@ -35,26 +34,24 @@
     In diesen Anwendungsgebieten ist es wichtig, die Funktion schnell und genau zu berechnen.
     Deshalb werden im Folgenden Methoden zur genauen und effizienten Berechnung dieser vielseitigen Funktion vorgestellt und analysiert.
     \begin{figure}[h]
-    \begin{tikzpicture}[]
-        \begin{axis}
-            [
-            legend pos = north west,
-            width = 15 cm,
-            height = 5 cm,
-            xmin = -12, xmax = 12,
-            ymin = -4, ymax = 4,
-            axis lines=middle,
-            axis line style={->},
-            domain= -20: 20,
-            samples = 500
-            ]
-            \addplot[] {ln(x + sqrt(x*x+1))};
-            \legend{$arsinh(x) = ln(x + \sqrt{x^2 + 1})$}
-            \label{Abbildung 1}
-
-        \end{axis}
-    \end{tikzpicture}
-    \caption{$arsinh(x)$-Funktionsplot}
+        \begin{tikzpicture}[]
+            \begin{axis}
+                [
+                legend pos = north west,
+                width = 15 cm,
+                height = 5 cm,
+                xmin = -12, xmax = 12,
+                ymin = -4, ymax = 4,
+                axis lines=middle,
+                axis line style={->},
+                domain= -20: 20,
+                samples = 500
+                ]
+                \addplot[] {ln(x + sqrt(x*x+1))};
+                \legend{$arsinh(x) = ln(x + \sqrt{x^2 + 1})$}
+            \end{axis}
+        \end{tikzpicture}
+        \caption{$arsinh(x)$-Funktionsplot}
     \end{figure}
 
     \subsection{Analyse und Spezifikation der Aufgabenstellung}\label{subsec:analyse-und-spezifikation-der-aufgabenstellung}
@@ -76,6 +73,7 @@
 
 
     \section{Lösungsansatz}\label{sec:losungsansatz}
+
     \subsection{Reihendarstellungen}\label{subsec:reihendarstellung}
 
     Bei der Approximation durch eine reine Reihe der Form $\sum_{k=0}^{\pm\infty} a_k x^k$ werden Overflows zum Problem.
@@ -117,11 +115,11 @@
     \]
 
     \subsubsection{Optimierungen: Genauigkeit und Performanz}
-    
+
     Die Koeffizienten einzelner Reihenglieder zu berechnen ist laufzeitintensiv, da insbesondere die Berechnung der Fakultät viel Zeit kostet.
     Daher lässt sich die Berechnung optimieren, indem die Koeffizienten aller drei Reihen bereits vor Runtime berechnet werden.
     Durch Anwendung des Horner-Schemas lassen sich die Reihen besonders effizient berechnen.
-    
+
     Die Anzahl an benutzten Reihenglieder, entsteht aus einer Abwägung zwischen Performanz und Genauigkeit.
     Wie viele Reihenglieder für ein möglichst genaues Ergebnis berechnet werden müssen, hängt von dem Eingabewert ab.
     Da die Reihenglieder aller drei Reihen für Eingabewerte innerhalb des jeweiligen Konvergenzbereichs immer kleiner werden, gilt:
@@ -142,8 +140,8 @@
 
     \subsection{Reine Reihendarstellung}\label{subsec:reine-reihendarstellung}
 
-    Es stellt sich die Frage, ob die Reihenentwicklung für $|x|\geq1$ oder $|x|\leq1$ verwendet werden sollte. 
-    
+    Es stellt sich die Frage, ob die Reihenentwicklung für $|x|\geq1$ oder $|x|\leq1$ verwendet werden sollte.
+
     Da es sich bei der Reihenentwicklung für $|x|\geq1$ nicht um eine reine Reihe handelt, gilt es zunächst, die beiden verwendeten Reihen zu einer reinen Reihe zu vereinigen:
     \[
         arsinh(x)\approx ln(2x) + error(x) = ln(2) - ln(\frac{1}{x}) + error(x)
@@ -155,7 +153,7 @@
     Diese Entscheidung entsteht primär aus einer Abwägung aus Genauigkeit und Konvergenzbereich.
     Da im Datentyp double für $|x|<1$ gleich viele Werte existieren wie für $|x|\geq1$, beinhaltet der Konvergenzbereich der Reihen für die beiden Intervalle gleich viele mögliche double-Eingabewerte.
     Durch an dieser Stelle nicht weiter definerte Genauigkeits-Messungen hat sich ergeben, dass die TaylorArsinh(x) für den Großteil der Eingabewerte unter 1 mit wenigen Reihengliedern bereits ein exaktes Ergebnis liefern kann.
-    Das Ergebnis der Näherung $ arsinh(x)\approx ln(2x) + error(x) = ln(2) - ln(\frac{1}{x}) + error(x)$ wird hingegen ungenauer, je größer $|x|$ ist. 
+    Das Ergebnis der Näherung $ arsinh(x)\approx ln(2x) + error(x) = ln(2) - ln(\frac{1}{x}) + error(x)$ wird hingegen ungenauer, je größer $|x|$ ist.
 
     \subsection{Reihendarstellung mit Fallunterscheidung}\label{subsec:reihendarstellung-mit-fallunterscheidung}
 
@@ -166,7 +164,7 @@
         \ln(2x) + error(x)  & \text{ falls } |x| >1 \\
         x     & \text{ falls } x \in \{\pm\inf, \pm Nan\}\\
     \end{cases}\]
-    
+
     Für $|x|\geq1$ kann das $double$ Datenformat genutzt werden, um die Genauigkeit der Berechnung zu optimieren.
     Die Implementierung verwendet Exponent und Mantisse von $x$ um folgende Umformung zu treffen:
     \begin{gather*}
@@ -175,8 +173,6 @@
     \end{gather*}
     Da $M\in[1, 2[$ liegt, kann \textit{TaylorLn} für die Berechnung von $\ln(M)$ verwendet werden.
     Für die so gegebenen Eingabewerte der Taylorreihe werden analog zu den Überlegungen in Kapitel 2.1.3 27 Reihenglieder für ein exaktes Ergebnis benötigt.
-
-    
 
     \subsection{Tabellen-Lookup}
     Die Lookup-Tabelle speichert einige vorberechnete Werte der $arsinh$-Funktion und interpoliert für die verbleibenden Werte linear zwischen den beiden nächstgelegenen Tabellenwerten.
@@ -201,13 +197,13 @@
     Für negative Werte wird die Punktsymmetrie der $arsinh$-Funktion: $arsinh(-x) = -arsinh(x)$ genutzt.
     Die Funktionswerte für negative Eingabewerte können per Fallunterscheidung mit $-arsinh(|x|)$ berechnet werden, wodurch weniger Werte gespeichert werden müssen.
 
+
     \section{Genauigkeit}\label{sec:genauigkeit}
 
     \begin{figure}[h]
         \centering
         \includegraphics[width=12cm,height=5.5cm]{images/Figure3}
         \caption{rel. Fehler über positiven Wertebereich}
-        \label{fig:abb2}
     \end{figure}
 
 
@@ -220,28 +216,25 @@
             \centering
             \includegraphics[width=\textwidth]{images/Figure1}
             \caption{rel. Fehler um 1}
-            \label{fig:abb3}
         \end{minipage}
         \hfill
         \begin{minipage}[b]{0.45\textwidth}
             \centering
             \includegraphics[width=\textwidth]{images/Figure2}
             \caption{rel. Fehler kleine x}
-            \label{fig:abb4}
         \end{minipage}
     \end{figure}
-    
+
     \subsection{Reine Reihenentwicklung}\label{subsec:reine-reihenentwicklung}
-    %TODO: Abbildungen nicht so benannt, wie im Text referneziert
-    Wie deutlich in Abb.2.1 und Abb.2.2 erkennbar ist, liefert die Reihenentwicklung für $|x|<0.25$ nahezu immer den exakten Funktionswert.
-    Wie in Abb.2.2 erkennbar, steigt der relative Fehler ab $|x| = 0.25$ exponentiell zum Eingabewert an.
+    Wie deutlich in Abb. 3 und 4 erkennbar ist, liefert die Reihenentwicklung für $|x|<0.25$ nahezu immer den exakten Funktionswert.
+    Wie in Abb. 4 erkennbar, steigt der relative Fehler ab $|x| = 0.25$ exponentiell zum Eingabewert an.
     Dies lässt sich anhand der Konvergenz der Reihenglieder für verschiedene Eingabewerte erklären.
-    Wie in Kapitel 2.1.1 erläutert, ist das Ergebnis genauer, je kleiner das letzte berechnete Reihenglied ist.
+    Wie im Kapitel Optimierung erläutert, ist das Ergebnis genauer, je kleiner das letzte berechnete Reihenglied ist.
     Es wird gezeigt, dass bei 13 Reihengliedern die Grenze für die Entstehung von Ungenauigkeiten bei rund 0.25 liegt.
     Hierzu wird jeweils das letzte Reihenglied für x=0.25 berechnet:
 
     \[
-    \textit{TaylorArsinh}: \frac{(2\cdot13)!0.25^{2\cdot13 + 1}}{(2\cdot13 + 1)(2^13\cdot13!)^2} \approx 2^{-59}
+        \textit{TaylorArsinh}: \frac{(2\cdot13)!0.25^{2\cdot13 + 1}}{(2\cdot13 + 1)(2^13\cdot13!)^2} \approx 2^{-59}
     \]
 
     Da das letzte Reihenglied noch unter $2^{-52}\cdot asinh(0.25)$ liegt und die Mantisse von doubles 52 bit beinhaltet, hat das Ergebnis noch maximale double Genauigkeit.
@@ -250,77 +243,77 @@
     Für das letzte (13.) berechnete Reihenglied für den Eingabewert 1 ergibt sich:
 
     \[
-    \textit{TaylorArsinh}: \frac{(2\cdot13)!1^{2\cdot13 + 1}}{(2\cdot13 + 1)(2^13\cdot13!)^2} \approx 0.00574 \approx 2^{-8}
+        \textit{TaylorArsinh}: \frac{(2\cdot13)!1^{2\cdot13 + 1}}{(2\cdot13 + 1)(2^13\cdot13!)^2} \approx 0.00574 \approx 2^{-8}
     \]
 
     Da das letzte Reihenglied die Größenordnung $2^{-8}$ hat, liegt der relative Fehler in dieser Größenordnung.
     Innerhalb ihres Konvergenzbereichs hat die reine Reihenentwicklung einen maximalen Fehler von $2^{-8}$.
-    Außerhalb des Konvergenzbereichs $|x|\leq1$ konvergieren die einzelnen Reihenglieder nicht gegen 0, wodurch die Reihe nicht mehr anwendbar ist. 
-    Da das letzte Reihenglied weiter exponentiell ansteigt, steigt der relative Fehler exponentiell an, wie in Abbildung 2.1 deutlich erkennbar.
+    Außerhalb des Konvergenzbereichs $|x|\leq1$ konvergieren die einzelnen Reihenglieder nicht gegen 0, wodurch die Reihe nicht mehr anwendbar ist.
+    Da das letzte Reihenglied weiter exponentiell ansteigt, steigt der relative Fehler exponentiell an, wie in Abb. 3 deutlich erkennbar.
 
     \subsection{Reihenentwicklung mit mehreren Reihen}\label{subsec:reihenentwicklung-mit-mehreren-reihen}
-    %TODO: Abbildungen nicht so benannt, wie im Text referneziert
-    In Abb.1 und Abb.2.2 lässt sich vergleichbar zur reinen Reihenentwicklung erkennen, dass die Reihenentwicklung außerhalb der Intervalle $0.25<|x|<4$ nahezu immer den exakten Funktionswert liefert.
+
+    In Abb. 2 und 4 lässt sich vergleichbar zur reinen Reihenentwicklung erkennen, dass die Reihenentwicklung außerhalb der Intervalle $0.25<|x|<4$ nahezu immer den exakten Funktionswert liefert.
     Es gibt einige Ausnahmen mit einem verschwindend geringen relativen Fehler $\leq2^{-50}$, welche sich durch floating-point-Rundungsfehler bei der Umrechnung der Polynomkoeffizienten erklären lassen.
     Da der Fall $1<x<0.25$ exakt äquivalent zu der reinen Reihe ist, wird die Ungenauigkeiten im Intervall $1<x<4$ betrachtet.
     Wird das letzte Reihenglied der \textit{Restreihe} für $|x|=4$ berechnet.
 
     \[
-    \textit{Restreihe}: \frac{(2\cdot13)!}{2\cdot13(2^{13}\cdot 13!)^2} \cdot \frac{1}{4^{2\cdot13}} \approx 2^{-59}
+        \textit{Restreihe}: \frac{(2\cdot13)!}{2\cdot13(2^{13}\cdot 13!)^2} \cdot \frac{1}{4^{2\cdot13}} \approx 2^{-59}
     \]
-    
-    Da das letzte Reihenglied unter $2^{-52}$ liegt, hat das Ergebnis noch maximale double Genauigkeit. 
+
+    Da das letzte Reihenglied unter $2^{-52}$ liegt, hat das Ergebnis noch maximale double Genauigkeit.
     Wie bei der reinen Reihe, wächst das letzte Reihenglied für x-Werte, die näher an 1 liegen exponentiell, was zu einem exponentiellen Anstieg des relativen Fehlers führt.
     Für das letzte Reihenglied für den Eingabewert 1 folgt:
-    
+
     \[
-    \textit{Restreihe}: \frac{(2\cdot13)!}{2\cdot13(2^{13}\cdot 13!)^2} \cdot \frac{1}{1^{2\cdot13}} \approx 0.00596 \approx 2^{-8}
+        \textit{Restreihe}: \frac{(2\cdot13)!}{2\cdot13(2^{13}\cdot 13!)^2} \cdot \frac{1}{1^{2\cdot13}} \approx 0.00596 \approx 2^{-8}
     \]
 
     Da das letzte Reihenglied die Größenordnung $2^{-8}$ hat, stimmt der relative Fehler hier mit der reinen Reihe von der anderen Seite aus überein.
 
     \subsection{Lookup-Tabelle}\label{subsec:lookup-tabelle}
 
-    Die Genauigkeit des Ergebnisses bei der Verwendung der Lookup-Tabelle hängt stark von den Eingabewerten ab. 
-    Ist der Eingabewert exakt einer der vorgespeicherten Werte in der Tabelle, so liefert die Funktion das exakte Ergebnis. 
+    Die Genauigkeit des Ergebnisses bei der Verwendung der Lookup-Tabelle hängt stark von den Eingabewerten ab.
+    Ist der Eingabewert exakt einer der vorgespeicherten Werte in der Tabelle, so liefert die Funktion das exakte Ergebnis.
     Am ungenauesten ist die Funktion für Eingabewerte, die zwischen zwei gespeicherten Tabellenwerten liegen.
     Das lässt sich deutlich an der großen vertikalen Streuung der Fehlerwerte erkennen.
-    %TODO: Welches erste Diagramm?
-    Im ersten Diagramm ist zudem deutlich erkennbar, dass die Funktion, wie die Reihenentwicklung, deutlich ungenauere Ergebnisse für Eingabewerte nahe an 1 liefert.
-    Dies lässt sich mithilfe des Krümmungsverhaltens der Funktion begründen. 
+
+    Im Abb. 3 ist zudem deutlich erkennbar, dass die Funktion, wie die Reihenentwicklung, deutlich ungenauere Ergebnisse für Eingabewerte nahe an 1 liefert.
+    Dies lässt sich mithilfe des Krümmungsverhaltens der Funktion begründen.
     Der folgende Graph zeigt die zweite Ableitung des $arsinh''(x) = \frac{-x}{x^2\cdot \sqrt{x^2+1}+\sqrt{x^2+1}}$
     \begin{figure}
-    \begin{tikzpicture}
-        \begin{axis}[
-            width = 15 cm,
-            height = 5 cm,
-            xmin = -10, xmax = 10,
-            ymin = -0.5, ymax = 0.5,
-            axis lines=middle, 
-            axis line style={->},
-            domain= -20: 20,
-            samples = 500,
-            ]
-            \addplot[] {-x/((x*x)* sqrt((x*x)+1) + sqrt((x*x)+1))};
-            \addplot [color=blue, mark = *] coordinates {
-                (-0.707106781093, 0.3849001794598)
-            };
-            \addplot [color=blue, mark = *] coordinates {
-                (0.707106781093, -0.3849001794598)
-            };
-        \end{axis}
-    \end{tikzpicture}
-    \caption{$arsinh''(x)$}
+        \begin{tikzpicture}
+            \begin{axis}
+                [
+                width = 15 cm,
+                height = 5 cm,
+                xmin = -10, xmax = 10,
+                ymin = -0.5, ymax = 0.5,
+                axis lines=middle,
+                axis line style={->},
+                domain= -20: 20,
+                samples = 500,
+                ]
+                \addplot[] {-x/((x*x)* sqrt((x*x)+1) + sqrt((x*x)+1))};
+                \addplot [color=blue, mark = *] coordinates {
+                    (-0.707106781093, 0.3849001794598)
+                };
+                \addplot [color=blue, mark = *] coordinates {
+                    (0.707106781093, -0.3849001794598)
+                };
+            \end{axis}
+        \end{tikzpicture}
+        \caption{$arsinh''(x)$}
     \end{figure}
-    
+
 
     Der $arsinh(x)$ hat die maximale Krümmung bei circa $\pm 0.707$.
     Dementsprechend wird eine lineare Interpolation im Bereich dieser Stellen eine maximale Ungenauigkeit aufweisen.
 
     \subsection{Implementierung mit komplexen Instruktionen}\label{subsec:implementierung-mit-komplexen-instruktionen}
 
-    %TODO: Abbildung nicht so benannt
-    Wie in Abb.2 zu sehen ist, liefert die Implementierung mit komplexen mathematischen Instruktionen der C-Math Bibliothek für den Großteil des Wertebereichs den genauest möglichen Funktionswert für den Datentyp double.
+    Wie in Abb. 2 zu sehen ist, liefert die Implementierung mit komplexen mathematischen Instruktionen der C-Math Bibliothek für den Großteil des Wertebereichs den genauest möglichen Funktionswert für den Datentyp double.
     Die einzige Ausnahme bilden sehr kleine x-Werte.
     Dies lässt sich mit der Absorption beziehungsweise Auslöschung von Bits begründen, welche bei der Addition von doubles unterschiedlicher Größenordnung unvermeidbar auftritt.
 
@@ -333,12 +326,12 @@
 
 
     \section{Performanzanalyse}\label{sec:performanzanalyse}
-    
+
     Die Performanz der Implementierungen wird anhand der Laufzeit gemessen.
     Diese wird im Folgenden mit der Bibliothek $time.h$ gemessen.
 
     \subsection{Methodik und Annahmen}\label{subsec:methodik-und-annahmen}
-    
+
     Gemessen wurde auf einem System mit Intel i5-10210U Prozessor, 1.60 GHz, 8 GiB Arbeitsspeicher, Ubuntu 22.04.2 LTS, 64 Bit, 5.19.0-46-generic Linux-Kernel.
     Kompiliert wurde mit GCC 11.3.0 mit der Option -O3. Um eine optimale Vergleichbarkeit der Ergebnisse zu garantieren, wurden alle nicht für das Betriebssystem nötigen Prozesse beendet.
 
@@ -348,56 +341,58 @@
 
     \subsubsection{Zeitmessung der Implementierungen}
 
-    Der folgende Graph zeigt die durchschnittliche Laufzeit eines Funktionsaufrufs der drei Implementierungen mit Reihenentwicklung, Tabellen-Lookup und der Implementierung mithilfe komplexer Instruktionen der C-math-library in Nanosekunden:
-    
-     \begin{tikzpicture}
-         \begin{axis}[
-             width = 11 cm,
-             height = 6 cm,
-             ybar,
-             enlargelimits = 0.12,
-             symbolic x coords = {gemischte Reihe, reine Reihe,  Lookup-Tabelle,  komplex},
-             xtick={gemischte Reihe, reine Reihe, Lookup-Tabelle, komplex},
-             ylabel={Zeit in ns},
-             xlabel={Implementierung},
-             legend style={at={(0.6, 0.9)},
-               anchor=north,legend columns=-1},
-                            ]
+    Abb. 6 zeigt die durchschnittliche Laufzeit eines Funktionsaufrufs der drei Implementierungen mit Reihenentwicklung, Tabellen-Lookup und der Implementierung mithilfe komplexer Instruktionen der C-math-library in Nanosekunden:
 
-             \addplot coordinates {(gemischte Reihe, 6.569) (reine Reihe,6.369) (Lookup-Tabelle, 2.613) (komplex, 1.648)};
-             \addplot coordinates {(gemischte Reihe, 29.212) (reine Reihe, 6.369) (Lookup-Tabelle, 2.613) (komplex, 1.648)};
-             \addplot coordinates {(gemischte Reihe, 29.212) (reine Reihe,6.369) (Lookup-Tabelle, 2.613) (komplex, 0.0)};
-             \legend{$|x|<1$, $1\leq |x| \leq 10^{16}$, $|x|>10^{16}$};
-         \end{axis}
-     \end{tikzpicture}
- 
-     \subsection{Bewertung, Einordnung und Erklärung der Ergebnisse}\label{subsec:bewertung-einordnung-und-erklarung-der-ergebnisse}
+    \begin{figure}
+        \begin{tikzpicture}
+            \begin{axis}[
+                width = 14 cm,
+                height = 6 cm,
+                ybar,
+                enlargelimits = 0.12,
+                symbolic x coords = {gemischte Reihe, reine Reihe,  Lookup-Tabelle,  math-library},
+                xtick={gemischte Reihe, reine Reihe, Lookup-Tabelle, math-library},
+                ylabel={Zeit in ns},
+                legend style={at={(0.6, 0.9)},
+                anchor=north,legend columns=-1},
+            ]
 
-    %TODO: Abbildungen konkret referenzieren, nicht in den abbildungen
-     Wie in den Abbildungen zu sehen ist, gibt es starke Performanz-Unterschiede zwischen den verschiedenen Implementierungen. 
-     Es wird zunächst die Implementierung mit komplexen Instruktionen betrachtet.
-     Diese ist hierbei im Vergleich zu den anderen Implementierungen deutlich schneller. 
-     Es offenbart sich innerhalb der Funktion eine signifikante Diskrepanz zwischen den Eingabewerten unterhalb von $10^{16}$ und jenen oberhalb von $10^{16}$.
-    Ab dem gewählten Grenzwert von $10^{16}$ wird die Näherung $arsinh(x) = ln(2x)$ für die Berechnung verwendet. 
+                \addplot coordinates {(gemischte Reihe, 6.569) (reine Reihe,6.369) (Lookup-Tabelle, 2.613) (math-library, 1.648)};
+                \addplot coordinates {(gemischte Reihe, 29.212) (reine Reihe, 6.369) (Lookup-Tabelle, 2.613) (math-library, 1.648)};
+                \addplot coordinates {(gemischte Reihe, 29.212) (reine Reihe,6.369) (Lookup-Tabelle, 2.613) (math-library, 0.0)};
+                \legend{$|x|<1$, $1\leq |x| \leq 10^{16}$, $|x|>10^{16}$};
+            \end{axis}
+        \end{tikzpicture}
+        \caption{Laufzeit der Implementierungen}
+    \end{figure}
+
+    \subsection{Bewertung, Einordnung und Erklärung der Ergebnisse}\label{subsec:bewertung-einordnung-und-erklarung-der-ergebnisse}
+
+    Wie in Abb. 6 zu sehen ist, gibt es starke Performanz-Unterschiede zwischen den verschiedenen Implementierungen.
+    Es wird zunächst die Implementierung mit komplexen Instruktionen betrachtet.
+    Diese ist hierbei im Vergleich zu den anderen Implementierungen deutlich schneller.
+    Es offenbart sich innerhalb der Funktion eine signifikante Diskrepanz zwischen den Eingabewerten unterhalb von $10^{16}$ und jenen oberhalb von $10^{16}$.
+    Ab dem gewählten Grenzwert von $10^{16}$ wird die Näherung $arsinh(x) = ln(2x)$ für die Berechnung verwendet.
     Diese Berechnung wird bei Optimierungsstufe $-O3$ so stark optimiert, dass sie sogar bei $10^{12}$ Iterationen eine Laufzeit nahe Null aufweist.
     Für den Großteil der Werte deren Betrag kleiner ist als $10^{16}$ sind allerdings neben der Logarithmus berechnung zudem Multiplikation, Addition und Wurzelberechnung für die exakte Berechnung erforderlich, wodurch die Funktion in diesem Intervall eine durchschnittliche Laufzeit von rund 1.648 ns hat.
 
-     Die Lookup-Tabelle hat für alle reellen Eingabewerte deine ähnliche Laufzeit von 2.613 ns, da die Berechnung unabhängig von der Höhe des Eingabewerts ist.
+    Die Lookup-Tabelle hat für alle reellen Eingabewerte deine ähnliche Laufzeit von 2.613 ns, da die Berechnung unabhängig von der Höhe des Eingabewerts ist.
     Durch die effiziente Hashfunktion mittels Bitmaske, die für das Mapping der Eingabewerte auf den jeweiligen Tabellenwert verwendet wird, ist diese Implementierung lediglich um den Faktor 1,5 langsamer, als der worst-case Laufzeit der Implementierung mit komplexen Instruktionen.
     Neben der Hashfunktion werden wenige einfache Instruktionen für die lineare Interpolation benötigt, was ebenfalls zu der hohen Performanz dieser Implementierung beiträgt.
 
-     Im Vergleich zu der Lookup-Tabelle, braucht die reine Reihenentwicklung für die definierte Anzahl berechneter Reihenglieder mit 6.369 ns 2.5-mal so lange wie die Lookup-Tabelle.
+    Im Vergleich zu der Lookup-Tabelle, braucht die reine Reihenentwicklung für die definierte Anzahl berechneter Reihenglieder mit 6.369 ns 2.5-mal so lange wie die Lookup-Tabelle.
     Dies ist damit zu begründen, dass die Reihenentwicklung deutlich mehr Multiplikationen und Summen über mehrere Reihenglieder verwendet, wodurch die Berechnung länger dauert.
 
-     Die Reihendarstellung mit verschiedenen Reihen benötigt für $|x|<1$ ähnlich gleich viel Zeit wie die reine Reihenentwicklung, da derselbe Algorithmus wiederverwendet wird.
+    Die Reihendarstellung mit verschiedenen Reihen benötigt für $|x|<1$ ähnlich gleich viel Zeit wie die reine Reihenentwicklung, da derselbe Algorithmus wiederverwendet wird.
     Für die Approximation der Eingabewerte $|x|\geq1$ werden allerdings zwei verschiedene Reihen (TaylorLn und Restreihe) sowie einige komplexere Bitoperationen verwendet.
     Hierdurch benötigt diese Implementierung für $|x|\geq1$ rund 29.212 ns und damit 12-mal so lange wie die Lookup-Tabelle.
     Um eine vergleichbare Genauigkeit mit den Eingabewerten $|x|<1$ zu erhalten, sind diese Operationen allerdings notwendig.
 
+
     \section{Zusammenfassung und Ausblick}\label{sec:zusammenfassung-und-ausblick}
 
     \subsection{Zusammenfassung und Einordnung}\label{subsec:zusammenfassung}
-    
+
     Der Trade-off zwischen Performance, Genauigkeit und Speicherverbrauch ist für die Implementierungen mit einer Lookup-Tabelle beziehungsweise einer Reihenentwicklung sehr unterschiedlich.
     Die Lookup-Tabelle ist schnell, benötigt allerdings mehr Speicherplatz, um genauere Werte zu erzielen.
     In der Lookup-Tabellen Implementierung mit insgesamt circa 30000 zu speichernden Werten, hat die Berechnung einen maximalen relativen Fehler von 0.02\%.
