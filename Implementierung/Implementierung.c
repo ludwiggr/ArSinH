@@ -7,10 +7,11 @@
 #include <stdbool.h>
 #include "performance.h"
 
-/* Non-changing global variables for testing */
+// Non-changing global variables for testing
 static const long int numberOfImplementations = 4;
 static const long int maxNumberOfIterations = 1000000000;
-/* A useful help message to be printed in the frame program */
+
+// A useful help message to be printed in the frame program
 static const char *help_msg =
         "Options and Use Cases:\n"
         "The program calculates the arsinh(x) = ln(x + sqrt(x^2 + 1)) for an input value.\n"
@@ -33,7 +34,7 @@ static const char *help_msg =
         "  -h/--help        Show help message (this text) and exit\n";
 
 
-//declaration of the different implementations that can be used
+// declaration of the different implementations that can be used
 
 double approxArsinh_lookup(double x);
 
@@ -44,11 +45,11 @@ double approxArsinh_differentSeries(double x);
 double approxArsinh_complexInstructions(double x);
 
 
-
 double performance(unsigned int n, double x, int implementation);
 
 
-/* Multiplexes the Implementation to be used and calculates the arsinh(x)
+/*
+ * Multiplexes the Implementation to be used and calculates the arsinh(x)
  * 
  * Arguments: x (Argument of the function), implementation [0;3]
  * 
@@ -71,8 +72,8 @@ double calculate_result(double x, int implementation) {
 }
 
 
-
-/* Computes the relative error of a given arsinh implementation compared to the math library
+/*
+ * Computes the relative error of a given arsinh implementation compared to the math library
  *
  * Arguments: x (Argument of the function), implementation [0;3]
  *
@@ -102,9 +103,10 @@ double relative_error(double x, int implementation) {
 }
 
 
-/* Frame program that parses and interprets user input
+/*
+ * Frame program that parses and interprets user input
  *
- * returns EXIT_FAILURE or EXIT_SUCCESS
+ * Returns: EXIT_FAILURE or EXIT_SUCCESS
  */
 int main(int argc, char *argv[]) {
     /*local variables to store options*/
@@ -121,14 +123,14 @@ int main(int argc, char *argv[]) {
     int opt;
     int option_index = 0;
     /*converts --help to -h*/
-    struct option long_options[] = {  
+    struct option long_options[] = {
             {"help", no_argument, NULL, 'h'},
             {NULL,   0,           NULL, 0}
     };
     while ((opt = getopt_long(argc, argv, "V:B::hR0::1::2::3::4::5::6::7::8::9::.::i::I::n::N::", long_options,
                               &option_index)) != -1) {
         switch (opt) {
-            /*choose Implementation*/
+            /*choose implementation*/
             case 'V':
                 implementation = strtol(optarg, &endptr, 10);
                 if (endptr == optarg || *endptr != '\0') {
@@ -148,7 +150,7 @@ int main(int argc, char *argv[]) {
                 }
                 break;
 
-            /*enable runtime measurement for given iterations*/
+                /*enable runtime measurement for given iterations*/
             case 'B':
                 /*checks for possible ' ' before optional argument of B flag*/
                 if (optarg == NULL && optind < argc && argv[optind][0] != '-') {
@@ -175,25 +177,25 @@ int main(int argc, char *argv[]) {
                         printf("If you wanted to parse the input value for the arsinh function, please don't parse it directly after the -B flag.\n");
                         return EXIT_FAILURE;
                     }
-                } 
-                /*set default iterations, to ensure runtime is long enough for accurate results*/
+                }
+                    /*set default iterations, to ensure runtime is long enough for accurate results*/
                 else {
                     iterations = 100000000;
                 }
                 break;
 
-            /*enable calculation of relative error*/
+                /*enable calculation of relative error*/
             case 'R'  :
                 relativeError = true;
                 break;
 
-            /*help*/
+                /*help*/
             case 'h'  :
                 printf("%s", help_msg);
                 return EXIT_SUCCESS;
 
-            /*if the - is followed by one of these chars, we assume that
-            the user might want to parse a negative number as a positional argument*/
+                /*if the - is followed by one of these chars, we assume that
+                the user might want to parse a negative number as a positional argument*/
             case '0'  :
             case '1'  :
             case '2'  :
@@ -209,7 +211,7 @@ int main(int argc, char *argv[]) {
             case 'n'  :
             case 'I'  :
             case 'N'  :
-                /*tries to convert argument at current position*/ 
+                /*tries to convert argument at current position*/
                 newNum = strtod(argv[optind - 1], &endptr);
                 if (endptr == argv[optind - 1] || *endptr != '\0') {
                     fprintf(stderr, "%c is not a valid Option and %s could not be converted to double\n", opt,
@@ -246,7 +248,7 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Missing positional argument -- ’x’\n");
         printf("Input value needs to be specified.\n");
         return EXIT_FAILURE;
-    /*only converts the positional argument, if a negative number hasn't been parsed beforehand*/
+        /*only converts the positional argument, if a negative number hasn't been parsed beforehand*/
     } else if (!negativeNumber_Set || negativeNumber_Index > optind) {
         number = strtod(argv[optind], &endptr);
         if (endptr == argv[optind] || *endptr != '\0') {
@@ -259,8 +261,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    /*Output Strings for all valid inputs*/
-    
+    /*output strings for all valid inputs*/
+
     /*regular calculation of the function with specified Implementation*/
     if (!relativeError && iterations == 0) {
         double result = calculate_result(number, implementation);
@@ -271,15 +273,15 @@ int main(int argc, char *argv[]) {
             printf("For all other input values consider using the Implementation -V 2, which uses different series for the approximation.\n");
         }
         return EXIT_SUCCESS;
-    } 
-    /*calculation of relative error for specified implementation*/
+    }
+        /*calculation of relative error for specified implementation*/
     else if (relativeError) {
         double error = relative_error(number, implementation);
         printf("The relative error when calculating arsinh(%f) with implementation number %ld was %.*f\n", number,
                implementation, 15, error);
         return EXIT_SUCCESS;
-    } 
-    /*runtime measurement for specified iterations and implementation*/
+    }
+        /*runtime measurement for specified iterations and implementation*/
     else {
         double time = performance(iterations, number, implementation);
         printf("The measured runtime of %ld iterations of implementation number %ld was %f seconds.\n", iterations,
