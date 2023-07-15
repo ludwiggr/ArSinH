@@ -138,6 +138,9 @@
     Die Anzahl der zu berechnenden Reihenglieder wird auf 13 festgelegt und damit ein exponentiell ansteigender relativer Fehler ab $|x|>0.25$ in Kauf genommen.
     Ähnliche Abwägungen lassen sich für die \textit{Restreihe} aufstellen, weshalb für diese Reihe ebenfalls 13 Reihenglieder verwendet werden.
 
+    Es sei hier bereits erwähnt, dass ausgehend von diesen Untersuchungen eine weitere Optimierung umsetzbar wäre, die (beispielsweise mithilfe des Exponenten des Eingabewertes) die Anzahl der nötigen Reihenglieder bestimmt und nur diese berechnet.
+    Durch diese Optimierung wird Overhead durch die Berechnung von für das Ergebnis irrelevanten Reihengliedern vermieden, auf Kosten eines geringen, festen Laufzeitanteils.
+
     \subsection{Reine Reihendarstellung}\label{subsec:reine-reihendarstellung}
 
     Es stellt sich die Frage, ob die Reihenentwicklung für $|x|\geq1$ oder $|x|\leq1$ verwendet werden sollte.
@@ -391,54 +394,44 @@
 
     \section{Zusammenfassung und Ausblick}\label{sec:zusammenfassung-und-ausblick}
 
-    \subsection{Zusammenfassung und Einordnung}\label{subsec:zusammenfassung}
+    \subsection{Zusammenfassung}\label{subsec:zusammenfassung}
 
     Der Trade-off zwischen Performance, Genauigkeit und Speicherverbrauch ist für die Implementierungen mit einer Lookup-Tabelle beziehungsweise einer Reihenentwicklung sehr unterschiedlich.
     Die Lookup-Tabelle ist schnell, benötigt allerdings mehr Speicherplatz, um genauere Werte zu erzielen.
-    In der Lookup-Tabellen Implementierung mit insgesamt circa 30000 zu speichernden Werten, hat die Berechnung einen maximalen relativen Fehler von 0.02\%.
+    Eine Implementierung mit rund 30000 gespeicherten Werten, hat einen maximalen relativen Fehler von 0.02\%.
 
-    Die reine Reihenentwicklung auf der anderen Seite liefert mit 13 gespeicherten Werten für circa 49.4\% aller doubles im Intervall $[-1, 1]$ den exakten Funktionswert, wird für Eingabewerte nahe an Eins ungenau.
-    Da der interessanteste Bereich über 1 hinausgeht, lässt sich schließen, dass die Nutzung einer reinen Reihe, egal ob $|x|\geq1$ oder $|x|\leq1$ verwendet, für die gegebene Problemstellung nicht geeignet ist.
+    Die reine Reihenentwicklung auf der anderen Seite liefert mit 13 brechneten Reihengliedern für den Großteil der Eingabewerte im Intervall $[-1, 1]$ den exakten Funktionswert und wird für Eingabewerte nahe an Eins ungenau.
+    Da die Berechnungen in der Regel nicht auf ein bestimmtes Eingabeintervall beschränkt sind, ist von der Verwendung einer reinen Reihendarstellung abzuraten.
+    
 
     Die gemischte Reihe liefert für 99,8\% aller doubles den exakten Funktionswert.
-    Die Reihenentwicklung verglichen mit dem Lookup benötigt für $|x|>1$ die bis zu 11-fache Zeit für die Berechnung.
-    Andererseits verbraucht diese über 600-mal weniger Speicherplatz für eine genaue Berechnung.
+    Die Reihenentwicklung verglichen mit dem Lookup benötigt für $|x|>1$ die bis zu 11-fache Zeit für die Berechnung, andererseits verbraucht diese über 600-mal weniger Speicherplatz für eine genauere Berechnung.
 
-    Welche Implementierung verwendet werden sollte, hängt von den genauen Rahmenbedingungen ab.
-    Der $Areasinus Hyperbolicus$ findet in erster Linie Anwendung in verschiedensten Bereichen der Physik und Ingenierswissenschaften.~\cite{????}.
-    Für die Verwendung in Echtzeitsystemen eignet sich somit die Lookup-Tabelle besser, da Messungen in der stets kleine Fehler aufweisen und die Lookup-Tabelle für viele Werte aufgrund der höheren Performanz schneller Ergebnisse liefert.
-    Steht Genauigkeit im Vordergrund, so eignet sich die Reihenentwicklung mit einer geeigneten Menge an Reihengliedern deutlich besser.
 
     \subsection{Ausblick}\label{subsec:ausblick}
 
     Die Implementierung des $arsinh(x)$ war auf eine reine Reihenentwicklung und eine einfache Lookup-Tabelle mit linearer Näherung beschränkt.
     Unter weniger strengen Rahmenbedingungen ließe sich die Implementierung allerdings sowohl in Bezug auf Laufzeit, als auch Genauigkeit noch signifikant optimieren.
 
-    Ein möglicher weiterführender Ansatz ist die Verwendung von Splines in der Lookup-Tabelle:
-    Statt der bisher linearen Näherung zwischen zwei Messpunkten wäre es möglich den $arsinh(x)$ in diesem Intervall durch ein Polynom anzunähern.
+    Insgesamt kann die Reihendarstellung für solche Werte verwendet werden, für die nur wenige Reihenglieder berechnet werden müssen, um Speicherplatz für Lookuptabellenwerte zu sparen. 
+    Für die übrigen Werte ist die Lookuptabelle allerdings in Bezug auf Laufzeit die bessere Wahl. 
+    
+    Für eine genauere Interpolation zwischen den gespeicherten Werten bietet sich die Verwendung von Splines in der Lookuptabelle an:
+    Statt der bisher linearen Näherung zwischen zwei Messpunkten würde der $arsinh(x)$ in diesem Intervall durch ein Polynom angenähert.
     Hierzu werden in der Regel Polynome vom Grad drei verwendet.~\cite{????}
-    Durch dieses Vorgehen verbessert sich die Genauigkeit, insbesondere für x-Werte die zwischen zwei Werten in der Lookup-Tabelle liegen deutlich, während sich die Laufzeit lediglich minimal erhöht.
-    Dafür steigt allerdings der benötigte Speicherplatz, da für jedes Intervall ein Polynom gespeichert werden muss.
 
-    Eine mögliche weitere Verbesserung des Lookup-Tables ist eine effizientere Verteilung der Tabellenwerte.
-    Durch lineare Interpolation entsteht eine höhere Ungenauigkeit, je stärker die Krümmung der $arsinh$ Funktion an dieser Stelle ist.
-    Würde an stark gekrümmten Stellen eine höhere Dichte an Messpunkten verwendet und eine geeignete Mappingfunktion erstellt, würde die Lookup-Tabelle bei der gleichen Anzahl an vorgespeicherten Werten deutlich genauere Ergebnisse liefern.
+    Des Weiteren ist eine effizientere Verteilung der Tabellenwerte möglich.
+    Stärkere Krümmung der $arsinh$-Funktion führt zu ungenaueren Ergebnissen der Interpolation.
+    Durch eine höhere Dichte an Messpunkten an stark gekrümmten Stellen und eine geeignete Mappingfunktion, würde die Lookup-Tabelle bei der gleichen Anzahl an vorgespeicherten Werten deutlich genauere Ergebnisse liefern.
 
-    Eine weitere Optimierung für die reine Reihenentwicklung, bestimmt mithilfe des Exponenten des Eingabewertes die Anzahl der nötigen Reihenglieder.
-    Durch diese Optimierung wird Overhead durch die Berechnung von für das Ergebnis irrelevanten Reihengliedern vermieden, auf Kosten eines geringen, festen Laufzeitanteils.
-
-    Ein weiterer Ansatz wäre, eine Kombination aus Reihenentwicklung und Lookup-Tabelle zu verwenden:
-    Wie bereits beobachtet, liefert die Berechnung mit einer Reihenentwicklung für x-Werte, die nicht nahe an Eins liegen, besonders genaue Ergebnisse.
-    Für |x|<0.125 brauchen werden beispielsweise 13 Reihenglieder benötigt, für |x|>8 werden 13 Reihenglieder der Restreihe, sowie bis zu 33 Reihenglieder der Taylorreihe für ein exaktes Ergebnis benötigt.
-    Außerhalb dieser Intervalle bietet es sich an, eine reine Reihenentwicklung zu verwenden.
-    In dem Intervall 0.125<=|x|<=8 mit der stärksten Krümmung werden allerdings mehr Reihenglieder benötigt, wodurch es zu starken Performanzeinbußen kommt.
-    Es wäre demnach sinnvoll in diesem Intervall eine Lookup-Tabelle zu verwenden.
-    Dieser Ansatz würde ein besonders genaues Ergebnis erzielen.
-
-    Die Wahl des Datentyps bietet eine weitere einfache Möglichkeit zur Verkleinerung des Speicherverbrauchs.
-    Gemäß IEEE 754 ~\cite{StandardforBinaryFloating} könnte die einfache Genauigkeit der Fließkommaarithmetik gewählt werden, wodurch sich der Speicherverbrauch halbieren würde.
-
-    Diese und gegebenenfalls weitere Optimierungen könnten die Implementierung des $arsinh(x)$ noch weiter verbessern, blieben aus Gründen der gegebenen Beschränkungen allerdings unberücksichtigt.
+    Durch dieses Verfahren verbessert sich die Genauigkeit, während sich die Laufzeit minimal erhöht.
+    Zwar müssen für jedes Intervall mehrere Koeffizienten gespeichert werden, durch die effizientere Verteilung kann allerdings die Anzahl der Intervalle reduziert werden. 
+    \newline
+    \newline
+    Zusammenfassend lässt sich feststellen, dass die Wahl der geeigneten Implementierung von den genauen Rahmenbedingungen abhängt.
+    Die $arsinh$-Funktion findet in erster Linie Anwendung in verschiedensten Bereichen der Physik und Ingenierswissenschaften.~\cite{????}.
+    Für die Verwendung in Echtzeitsystemen eignet sich somit die Lookup-Tabelle besser, da Messungen in der Regel kleine Fehler aufweisen und die Lookup-Tabelle für viele Werte aufgrund der höheren Performanz schneller Ergebnisse liefert.
+    Steht Genauigkeit im Vordergrund, so eignet sich eine Reihenentwicklung mit einer geeigneten Menge an Reihengliedern besser.
 
     % TODO: Fuegen Sie Ihre Quellen der Datei Ausarbeitung.bib hinzu
     % Referenzieren Sie diese dann mit \cite{}.
