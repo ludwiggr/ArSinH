@@ -23,7 +23,7 @@ int main() {
             double lookup = approxArsinh_lookup(x);
             double series = approxArsinh_series(x);
             double predefined = approxArsinh_complexInstructions(x);
-            double diff = approxArsinh_differentSeries(x);
+            double diff = approxArsinh_series_V2(x);
             fprintf(fp1, "%.15g, ", lookup);
             fprintf(fp2, "%.15g, ", series);
             fprintf(fp3, "%.15g, ", x);

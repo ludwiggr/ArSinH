@@ -139,7 +139,7 @@ double approxXAboveOne(double x) {
  * exact results outside the interval 0.25<|x|<4
  * exponentially less accurate results for |x| closer to 1
  */
-double approxArsinh_differentSeries(double x) {
+double approxArsinh_series_V2(double x) {
     if (x == -INFINITY || x == INFINITY || x == NAN || x == -NAN) {
         return x;
     } else if (x >= 1 || x <= -1) {

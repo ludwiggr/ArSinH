@@ -45,7 +45,7 @@ double performance(unsigned int n, double x, int implementation) {
         case 2:
             c1 = clock_gettime(CLOCK_MONOTONIC, &start);
             for (unsigned int i = 0; i < n; i++) {
-                approxArsinh_differentSeries(x);
+                approxArsinh_series_V2(x);
             }
             c2 = clock_gettime(CLOCK_MONOTONIC, &end);
 

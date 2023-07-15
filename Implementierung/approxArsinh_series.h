@@ -3,7 +3,7 @@
 
 double approxArsinh_series(double x);
 
-double approxArsinh_differentSeries(double x);
+double approxArsinh_series_V2(double x);
 
 
 /* Stores precalculated coefficients for the Taylor series of arsinh around 0*/
