@@ -32,7 +32,7 @@
     In den Bereichen der speziellen Relativitätstheorie~\cite{relativity}, Kosmologie~\cite{universum1,universum2} und allgemein bei der Berechnung von Wellen~\cite{linear_waves} gibt es zahlreiche Anwendungen, in denen die Berechnung des \textit{Areasinus Hyperbolicus oder} $arsinh(x)$ von großer Bedeutung ist.
     Ebenso wird die Funktion verwendet, um Küsten vor zerstörerischen Wellen zu warnen als auch um die Ausdehnung des Universums zu berechnen.~\cite{universum1,universum2}
     In diesen Anwendungsgebieten ist es wichtig, die Funktion schnell und genau zu berechnen.
-    Deshalb werden im Folgenden Methoden zur genauen und effizienten Berechnung dieser vielseitigen Funktion vorgestellt und analysiert.
+    Im Folgenden werden Methoden zur genauen und effizienten Berechnung dieser vielseitigen Funktion vorgestellt und analysiert.
     \begin{figure}[h]
         \begin{tikzpicture}[]
             \begin{axis}
@@ -61,15 +61,15 @@
     Eine der einfachen Implementierungen soll eine reine Reihe sein, während die andere einen Tabellen-Lookup benutzen soll.
 
     Für die Implementierungen wurden folgende Annahmen getroffen:
-    Die \textbf{reine Reihenentwicklung} soll hierbei eine Berechnung der Form $\sum_{k=0}^{\pm\infty} a_k x^k$ oder $\sum_{k=0}^{\pm\infty} a_k x^{-k}$ sein und bis auf einzelne Inputs keine weiteren Fallunterscheidungen machen.
+    Die \textbf{reine Reihenentwicklung} soll hierbei eine Berechnung der Form $\sum_{k=0}^{\pm\infty} a_k x^k$ sein und bis auf einzelne Inputs keine weiteren Fallunterscheidungen machen.
     Hierbei sollte eine Reihe gewählt werden, deren Konvergenzbereich am ehesten für ein mögliches Anwendungsgebiet geeignet ist.
-    Eine \textbf{Reihenentwicklung mit Fallunterscheidung} verwendet in Abhängigkeit vom Eingabewert verschiedene Reihen.
-    Für die \textbf{Lookup-Tabelle} war der Speicherplatz zentraler Abwägung, da für die meisten Anwendungen Speichereffizienz wichtig ist.
-    Zwischen den gespeicherten Werten wird eine lineare Interpolation durchgeführt.
-    Als \textbf{Vergleichsimplementierung} verwenden werden Funktionen der C math Bibliothek verwendet.
+    Als weitere Implementierung, die für alle Eingabewerte gültige Näherungen liefert, verwendet eine \textbf{Reihenentwicklung mit Fallunterscheidung} verschiedene Reihen in Abhängigkeit vom Eingabewert.
+    Für die \textbf{Lookup-Tabelle} war der Speicherplatz Teil der zentralen Abwägung, da für die meisten Anwendungen Speichereffizienz wichtig ist.
+    Zwischen den gespeicherten Werten soll linear interpoliert werden.
+    Als \textbf{Vergleichsimplementierung} werden Funktionen der C math Bibliothek verwendet.
     Diese wird insbesondere für die Bewertung der Genauigkeit herangezogen.
 
-    Diese vier Implementierungen werden in der Folge erklärt und auf Performanz und Genauigkeit untersucht, verglichen und anhand der Ergebnisse bewertet.
+    Diese vier Implementierungen werden in der Folge erklärt, auf Performanz und Genauigkeit untersucht, verglichen und anhand der Ergebnisse bewertet.
 
 
     \section{Lösungsansatz}\label{sec:losungsansatz}
@@ -82,7 +82,7 @@
     Es wird versucht, eine Reihenentwicklung zu finden, die für einen sinnvollen Konvergenzbereich möglichst genaue Ergebnisse liefert.
 
     Unter anderem kann die Methode der kleinsten Quadrate verwendet werden, um geeignet Koeffizienten für Reihenglieder mit positiven oder negativen Potenzen zu finden.
-    Die auf diese Weise hergeleitete Reihenentwicklung liefert allerdings für Werte zwischen den verwendeten Datenpunkten zu ungenaue Ergebnisse, da die $arsinh$-Funktion kein lineares Modell ist.
+    Die auf diese Weise hergeleitete Reihenentwicklung liefert allerdings für Werte zwischen den verwendeten Datenpunkten zu ungenaue Ergebnisse.
 
     Daher wurden Reihenentwicklungen für verschiedene Intervalle hergeleitet, die im Folgenden näher erläutert werden sollen.
     Für bessere Verständlichkeit werden die drei Reihen mit \textit{TaylorArsinh}, \textit{TaylorLn} und \textit{Restreihe} bezeichnet.
@@ -132,7 +132,7 @@
     \]
     Aus dieser Formel lässt sich bereits ablesen, dass der Betrag des k-ten Reihengliedes kleiner ist, je kleiner $|x|$ ist.
     Die Reihe liefert demnach bereits mit weniger Reihengliedern genaue Ergebnisse, je näher x an 0 liegt.
-    Mithilfe dieser Formel lässt sich feststellen, dass für x = 0.25 alle Reihenglieder ab dem 13. Glied keinen Einfluss mehr auf das Endergebnis haben, da sie aufgrund der Beschränkung der Mantisse auf 52 Bit diese bei der Addition absorbiert werden.
+    Mithilfe dieser Formel lässt sich feststellen, dass für x = 0.25 alle Reihenglieder ab dem 13. Glied keinen Einfluss mehr auf das Endergebnis haben, da sie aufgrund der Beschränkung der Mantisse auf 52 Bit bei der Addition absorbiert werden.
     Für x = 0.5 müssten 26 Reihenglieder berechnet werden.
     Für x = 0.99 sind bereits rund 1500 Reihenglieder nötig.
     Die Anzahl der zu berechnenden Reihenglieder wird auf 13 festgelegt und damit ein exponentiell ansteigender relativer Fehler ab $|x|>0.25$ in Kauf genommen.
@@ -143,7 +143,9 @@
 
     \subsection{Reine Reihendarstellung}\label{subsec:reine-reihendarstellung}
 
-    Es stellt sich die Frage, ob die Reihenentwicklung für $|x|\geq1$ oder $|x|\leq1$ verwendet werden sollte.
+    Es stellt sich die Frage, ob die Reihenentwicklung für $|x|\geq1$ oder $|x|\leq1$ verwendet werden sollte. Hierzu muss zwischen Genauigkeit und Konvergenzbereich abgewägt werden. 
+    
+    Da im Datentyp double für $|x|<1$ gleich viele Werte existieren wie für $|x|\geq1$, beinhaltet der Konvergenzbereich der Reihen für die beiden Intervalle gleich viele mögliche double-Eingabewerte.
 
     Da es sich bei der Reihenentwicklung für $|x|\geq1$ nicht um eine reine Reihe handelt, gilt es zunächst, die beiden verwendeten Reihen zu einer reinen Reihe zu vereinigen:
     \[
@@ -152,11 +154,12 @@
     Da $|x|>1$ gilt, steht im Argument des natürlichen Logarithmus ein Wert $\in ]0, 1]$, für den die \textbf{TaylorLn}-Reihe konvergiert.
     Um die reine Reihe zu erhalten, können durch Ausmultiplizieren der ersten n Reihenglieder die ersten n Koeffizienten $a_k$ der neuen Reihe bestimmt werden, wodurch sich eine reine Reihendarstellung der Form $\sum_{k=0}^{n} a_k x^{-k}$ ergibt.
 
-    Es wird die \textit{TaylorArsinh} verwendet.
-    Diese Entscheidung entsteht primär aus einer Abwägung aus Genauigkeit und Konvergenzbereich.
-    Da im Datentyp double für $|x|<1$ gleich viele Werte existieren wie für $|x|\geq1$, beinhaltet der Konvergenzbereich der Reihen für die beiden Intervalle gleich viele mögliche double-Eingabewerte.
-    Durch an dieser Stelle nicht weiter definerte Genauigkeits-Messungen hat sich ergeben, dass die TaylorArsinh(x) für den Großteil der Eingabewerte unter 1 mit wenigen Reihengliedern bereits ein exaktes Ergebnis liefern kann.
-    Das Ergebnis der Näherung $ arsinh(x)\approx ln(2x) + error(x) = ln(2) - ln(\frac{1}{x}) + error(x)$ wird hingegen ungenauer, je größer $|x|$ ist.
+    Durch an dieser Stelle nicht weiter definerte Genauigkeits-Messungen hat sich ergeben, dass das Ergebnis dieser Näherung $ arsinh(x)\approx ln(2) - ln(\frac{1}{x}) + error(x)$ ungenauer wird, je größer $|x|$ ist.
+
+    Die TaylorArsinh(x) hingegen kann für den Großteil der Eingabewerte unter 1 mit wenigen Reihengliedern bereits ein exaktes Ergebnis liefern kann.
+
+    Es wird somit die \textit{TaylorArsinh} verwendet.
+    
 
     \subsection{Reihendarstellung mit Fallunterscheidung}\label{subsec:reihendarstellung-mit-fallunterscheidung}
 
