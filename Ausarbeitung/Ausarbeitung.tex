@@ -120,7 +120,7 @@
     Daher lässt sich die Berechnung optimieren, indem die Koeffizienten aller drei Reihen bereits vor Runtime berechnet werden.
     Durch Anwendung des Horner-Schemas lassen sich die Reihen besonders effizient berechnen.
 
-    Die Anzahl an benutzten Reihenglieder, entsteht aus einer Abwägung zwischen Performanz und Genauigkeit.
+    Die Anzahl an benutzten Reihengliedern, entsteht aus einer Abwägung zwischen Performanz und Genauigkeit.
     Wie viele Reihenglieder für ein möglichst genaues Ergebnis berechnet werden müssen, hängt von dem Eingabewert ab.
     Da die Reihenglieder aller drei Reihen für Eingabewerte innerhalb des jeweiligen Konvergenzbereichs immer kleiner werden, gilt:
     Je kleiner das letzte berechnete Reihenglied, desto genauer ist das Ergebnis.
@@ -132,10 +132,10 @@
     \]
     Aus dieser Formel lässt sich bereits ablesen, dass der Betrag des k-ten Reihengliedes kleiner ist, je kleiner $|x|$ ist.
     Die Reihe liefert demnach bereits mit weniger Reihengliedern genaue Ergebnisse, je näher x an 0 liegt.
-    Mithilfe dieser Formel lässt sich feststellen, dass für x = 0.25 alle Reihenglieder ab dem 13. Glied keinen Einfluss mehr auf das Endergebnis haben, da sie aufgrund der Beschränkung der Mantisse auf 52 Bit diese bei der Addition absorbiert werden.
-    Für x = 0.5 müssten 26 Reihenglieder berechnet werden.
-    Für x = 0.99 sind bereits rund 1500 Reihenglieder nötig.
-    Die Anzahl der zu berechnenden Reihenglieder wird auf 13 festgelegt und damit ein exponentiell ansteigender relativer Fehler ab $|x|>0.25$ in Kauf genommen.
+    Mithilfe dieser Formel lässt sich feststellen, dass für $|x| = 0.25$ alle Reihenglieder ab dem 13. Glied keinen Einfluss mehr auf das Endergebnis haben, da sie aufgrund der Beschränkung der Mantisse auf 52 Bit diese bei der Addition absorbiert werden.
+    Für $|x| = 0.5$ müssten 26 Reihenglieder berechnet werden.
+    Für $|x| = 0.99$ sind bereits rund 1500 Reihenglieder nötig.
+    Die Anzahl der zu berechnenden Reihenglieder wird auf 13 festgelegt und damit ein exponentiell ansteigender relativer Fehler ab $|x| > 0.25$ in Kauf genommen.
     Ähnliche Abwägungen lassen sich für die \textit{Restreihe} aufstellen, weshalb für diese Reihe ebenfalls 13 Reihenglieder verwendet werden.
 
     Es sei hier bereits erwähnt, dass ausgehend von diesen Untersuchungen eine weitere Optimierung umsetzbar wäre, die (beispielsweise mithilfe des Exponenten des Eingabewertes) die Anzahl der nötigen Reihenglieder bestimmt und nur diese berechnet.
@@ -190,7 +190,7 @@
 
     Diese Verteilung ermöglicht ein besonders effizientes Mapping der Eingabewerte auf den zugehörigen Index in der Lookup-Tabelle durch eine Hashfunktion.
     Durch eine Bitmaske lassen sich Exponent und die ersten 4 Bits der Mantisse ermitteln.
-    Diese 15 Bits bilden den Index i des nächstkleineren Wertes in der Lookup-Tabelle.
+    Diese 15 bit bilden den Index $i$ des nächstkleineren Wertes in der Lookup-Tabelle.
     Mit diesem und dem nächsten Tabellenwert gilt $table[i] \leq arsinh(x) < table[i+1]$.
     Daraufhin wird gemäß
     \[
@@ -229,7 +229,7 @@
     \end{figure}
 
     \subsection{Reine Reihenentwicklung}\label{subsec:reine-reihenentwicklung}
-    Wie deutlich in Abb. 3 und 4 erkennbar ist, liefert die Reihenentwicklung für $|x|<0.25$ nahezu immer den exakten Funktionswert.
+        Wie deutlich in Abb. 3 und 4 erkennbar ist, liefert die Reihenentwicklung für $|x|<0.25$ nahezu immer den exakten Funktionswert.
     Wie in Abb. 4 erkennbar, steigt der relative Fehler ab $|x| = 0.25$ exponentiell zum Eingabewert an.
     Dies lässt sich anhand der Konvergenz der Reihenglieder für verschiedene Eingabewerte erklären.
     Wie im Kapitel Optimierung erläutert, ist das Ergebnis genauer, je kleiner das letzte berechnete Reihenglied ist.
