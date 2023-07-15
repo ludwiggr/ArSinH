@@ -40,7 +40,7 @@ double approxArsinh_lookup(double x);
 
 double approxArsinh_series(double x);
 
-double approxArsinh_differentSeries(double x);
+double approxArsinh_series_V2(double x);
 
 double approxArsinh_complexInstructions(double x);
 
@@ -62,7 +62,7 @@ double calculate_result(double x, int implementation) {
         case 1:
             return approxArsinh_series(x);
         case 2:
-            return approxArsinh_differentSeries(x);
+            return approxArsinh_series_V2(x);
         case 3:
             return approxArsinh_complexInstructions(x);
         default:
@@ -90,7 +90,7 @@ double relative_error(double x, int implementation) {
             approx = approxArsinh_series(x);
             break;
         case 2:
-            approx = approxArsinh_differentSeries(x);
+            approx = approxArsinh_series_V2(x);
             break;
         case 3:
             approx = approxArsinh_complexInstructions(x);
