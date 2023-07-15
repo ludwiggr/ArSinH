@@ -418,7 +418,7 @@
     
     Für eine genauere Interpolation zwischen den gespeicherten Werten bietet sich die Verwendung von Splines in der Lookuptabelle an:
     Statt der bisher linearen Näherung zwischen zwei Messpunkten würde der $arsinh(x)$ in diesem Intervall durch ein Polynom angenähert.
-    Hierzu werden in der Regel Polynome vom Grad drei verwendet.~\cite{????}
+    Hierzu werden in der Regel Polynome vom Grad drei verwendet.~\cite{splines}
 
     Des Weiteren ist eine effizientere Verteilung der Tabellenwerte möglich.
     Stärkere Krümmung der $arsinh$-Funktion führt zu ungenaueren Ergebnissen der Interpolation.
@@ -429,7 +429,7 @@
     \newline
     \newline
     Zusammenfassend lässt sich feststellen, dass die Wahl der geeigneten Implementierung von den genauen Rahmenbedingungen abhängt.
-    Die $arsinh$-Funktion findet in erster Linie Anwendung in verschiedensten Bereichen der Physik und Ingenierswissenschaften.~\cite{????}.
+    Die $arsinh$-Funktion findet in erster Linie Anwendung in verschiedensten Bereichen der Physik und Ingenierswissenschaften.
     Für die Verwendung in Echtzeitsystemen eignet sich somit die Lookup-Tabelle besser, da Messungen in der Regel kleine Fehler aufweisen und die Lookup-Tabelle für viele Werte aufgrund der höheren Performanz schneller Ergebnisse liefert.
     Steht Genauigkeit im Vordergrund, so eignet sich eine Reihenentwicklung mit einer geeigneten Menge an Reihengliedern besser.
 
