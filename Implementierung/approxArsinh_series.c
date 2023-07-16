@@ -18,11 +18,11 @@ static const double LOG_TWO = 0.69314718055994530941;
  * exponentially less accurate results for |x| closer to 1
  */
 double approxArsinh_series(double x) {
-    size_t iterations = 13;
+    size_t seriesTerms = 13;
     double sum = 0;
     double prev = x;
     double Sqr = x * x;
-    for (size_t k = 0; k < iterations; k++) {
+    for (size_t k = 0; k < seriesTerms; k++) {
         sum += prev * coeffs_below[k];
         prev *= Sqr;
     }
@@ -43,11 +43,11 @@ double approxArsinh_series(double x) {
  * Exponentially less accurate results, the closer x is to 1
  */
 double approxAsymptoticExpansionRest(double x) {
-    size_t iterations = 13;
+    size_t seriesTerms = 13;
     double InvSqr = 1.0 / (x * x);
     double prev = InvSqr;
     double sum = 0;
-    for (size_t k = 0; k < iterations; k++) {
+    for (size_t k = 0; k < seriesTerms; k++) {
         sum += prev * coeffs_rest[k];
         prev *= InvSqr;
     }
@@ -66,11 +66,11 @@ double approxAsymptoticExpansionRest(double x) {
  * Returns: exact value of ln(x) for input values
  */
 double approxLnTaylor(double x) {  //
+    size_t seriesTerms = 28;
     double fak = x - 1;
     double prev = fak;
     double sum = 0;
-    size_t iterations = 27;
-    for (size_t k = 0; k <= iterations; k++) {
+    for (size_t k = 0; k < seriesTerms; k++) {
         sum += prev * coeffs_taylor[k];
         prev *= fak;
     }
