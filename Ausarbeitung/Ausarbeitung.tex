@@ -57,11 +57,11 @@
     \subsection{Analyse und Spezifikation der Aufgabenstellung}\label{subsec:analyse-und-spezifikation-der-aufgabenstellung}
 
     Die Aufgabe A316 ist, den $arsinh(x)$ im C17 Standard von C zu approximieren.
-    Spezifischer verlangt die Aufgabenstellung explizit zwei Implementierungen, die auf einfachen arithmetischen Ausdrücken basieren sowie eine Vergleichsimplementierung, die komplexe Instruktionen benutzen darf.
+    Spezifischer verlangt die Aufgabenstellung zwei Implementierungen, die auf einfachen arithmetischen Ausdrücken basieren sowie eine Vergleichsimplementierung, die komplexe Instruktionen benutzen darf.
     Eine der einfachen Implementierungen soll eine reine Reihe sein, während die andere einen Tabellen-Lookup benutzen soll.
 
     Für die Implementierungen wurden folgende Annahmen getroffen:
-    Die \textbf{reine Reihenentwicklung} soll hierbei eine Berechnung der Form $\sum_{k=0}^{\pm\infty} a_k x^k$ sein und bis auf einzelne Inputs keine weiteren Fallunterscheidungen machen.
+    Die \textbf{reine Reihenentwicklung} soll eine Berechnung der Form $\sum_{k=0}^{\pm\infty} a_k x^k$ sein und bis auf einzelne Inputs keine weiteren Fallunterscheidungen machen.
     Hierbei sollte eine Reihe gewählt werden, deren Konvergenzbereich am ehesten für ein mögliches Anwendungsgebiet geeignet ist.
     Als weitere Implementierung, die für alle Eingabewerte gültige Näherungen liefert, verwendet eine \textbf{Reihenentwicklung mit Fallunterscheidung} verschiedene Reihen in Abhängigkeit vom Eingabewert.
     Für die \textbf{Lookup-Tabelle} war der Speicherplatz Teil der zentralen Abwägung, da für die meisten Anwendungen Speichereffizienz wichtig ist.
@@ -78,7 +78,7 @@
 
     Bei der Approximation durch eine reine Reihe der Form $\sum_{k=0}^{\pm\infty} a_k x^k$ werden Overflows zum Problem.
     Unabhängig welche Reihe genutzt wird, können die Zwischenergebnisse $x^{\pm k}$ entweder für sehr große Werte oder sehr kleine Werte von $x$ nicht als $double$ dargestellt werden, was zu einem falschen Endergebnis führt.
-    Daher haben Reihendarstellungen stets begrenzte Gültigkeitsbereiche.
+    Daher haben solche Reihendarstellungen stets begrenzte Gültigkeitsbereiche.
     Es wird versucht, eine Reihenentwicklung zu finden, die für einen sinnvollen Konvergenzbereich möglichst genaue Ergebnisse liefert.
 
     Unter anderem kann die Methode der kleinsten Quadrate verwendet werden, um geeignet Koeffizienten für Reihenglieder mit positiven oder negativen Potenzen zu finden.
@@ -120,7 +120,7 @@
     Daher lässt sich die Berechnung optimieren, indem die Koeffizienten aller drei Reihen bereits vor Runtime berechnet werden.
     Durch Anwendung des Horner-Schemas lassen sich die Reihen besonders effizient berechnen.
 
-    Die Anzahl an benutzten Reihengliedern, entsteht aus einer Abwägung zwischen Performanz und Genauigkeit.
+    Die Anzahl zu berechnender Reihengliedern, entsteht aus einer Abwägung zwischen Performanz und Genauigkeit.
     Wie viele Reihenglieder für ein möglichst genaues Ergebnis berechnet werden müssen, hängt von dem Eingabewert ab.
     Da die Reihenglieder aller drei Reihen für Eingabewerte innerhalb des jeweiligen Konvergenzbereichs immer kleiner werden, gilt:
     Je kleiner das letzte berechnete Reihenglied, desto genauer ist das Ergebnis.
@@ -203,6 +203,8 @@
     Für negative Werte wird die Punktsymmetrie der $arsinh$-Funktion: $arsinh(-x) = -arsinh(x)$ genutzt.
     Die Funktionswerte für negative Eingabewerte können per Fallunterscheidung mit $-arsinh(|x|)$ berechnet werden, wodurch weniger Werte gespeichert werden müssen.
 
+    \subsection{Implementierung mit komplexen Instruktionen}
+    Die Vergleichsimplementierung kann unter Verwendung der C-Mathematikbibliothek die Formel $\ln{x+\sqrt{x^2+1}}$ direkt umsetzen. Ab etwa $|x|>10^{16}$ muss allerdings die Näherung $arsinh(x)\approx \ln{2x}$ herangezogen werden um double Overflows bei der Quadrierung zu vermeiden.
 
     \section{Genauigkeit}\label{sec:genauigkeit}
 
@@ -231,7 +233,8 @@
         \end{minipage}
     \end{figure}
 
-    \subsection{Reine Reihenentwicklung}\label{subsec:reine-reihenentwicklung
+    \subsection{Reine Reihenentwicklung}\label{subsec:reine-reihenentwicklung}
+    
     Wie deutlich in Abb. 3 und 4 erkennbar ist, liefert die Reihenentwicklung für $|x|<0.25$ nahezu immer den exakten Funktionswert.
     Wie in Abb. 4 erkennbar, steigt der relative Fehler ab $|x| = 0.25$ exponentiell zum Eingabewert an.
     Dies lässt sich anhand der Konvergenz der Reihenglieder für verschiedene Eingabewerte erklären.
@@ -262,7 +265,7 @@
     In Abb. 2 und 4 lässt sich vergleichbar zur reinen Reihenentwicklung erkennen, dass die Reihenentwicklung außerhalb der Intervalle $0.25<|x|<4$ nahezu immer den exakten Funktionswert liefert.
     Es gibt einige Ausnahmen mit einem verschwindend geringen relativen Fehler $\leq2^{-50}$, welche sich durch floating-point-Rundungsfehler bei der Umrechnung der Polynomkoeffizienten erklären lassen.
     Da der Fall $1<x<0.25$ exakt äquivalent zu der reinen Reihe ist, wird die Ungenauigkeiten im Intervall $1<x<4$ betrachtet.
-    Wird das letzte Reihenglied der \textit{Restreihe} für $|x|=4$ berechnet.
+    Es wird das letzte Reihenglied der \textit{Restreihe} für $|x|=4$ berechnet.
 
     \[
         \textit{Restreihe}: \frac{(2\cdot13)!}{2\cdot13(2^{13}\cdot 13!)^2} \cdot \frac{1}{4^{2\cdot13}} \approx 2^{-59}
@@ -287,7 +290,8 @@
 
     Im Abb. 3 ist zudem deutlich erkennbar, dass die Funktion, wie die Reihenentwicklung, deutlich ungenauere Ergebnisse für Eingabewerte nahe an 1 liefert.
     Dies lässt sich mithilfe des Krümmungsverhaltens der Funktion begründen.
-    Der folgende Graph zeigt die zweite Ableitung des $arsinh''(x) = \frac{-x}{x^2\cdot \sqrt{x^2+1}+\sqrt{x^2+1}}$
+    Der folgende Graph zeigt die zweite Ableitung des $arsinh''(x) = \frac{-x}{x^2\cdot \sqrt{x^2+1}+\sqrt{x^2+1}}$:
+    
     \begin{figure}
         \begin{tikzpicture}
             \begin{axis}
@@ -341,11 +345,9 @@
     Gemessen wurde auf einem System mit Intel i5-10210U Prozessor, 1.60 GHz, 8 GiB Arbeitsspeicher, Ubuntu 22.04.2 LTS, 64 Bit, 5.19.0-46-generic Linux-Kernel.
     Kompiliert wurde mit GCC 11.3.0 mit der Option -O3. Um eine optimale Vergleichbarkeit der Ergebnisse zu garantieren, wurden alle nicht für das Betriebssystem nötigen Prozesse beendet.
 
-    Da die Reihenentwicklung zwei sehr verschiedene Berechnungen für $|x|>1$ und $|x|\geq 1$ durchführt, wurden bei der Laufzeitmessung diese beiden Fälle unterschieden.
+    Da die Reihenentwicklung mit Fallunterscheidung zwei sehr verschiedene Berechnungen für $|x|<1$ und $|x|\geq 1$ durchführt, wurden bei der Laufzeitmessung diese beiden Fälle unterschieden. Aufgrund der Fallunterscheidung in der Implementierung mit komplexen Instruktionen wurde zudem der Fall $|x|>10^{16}$ abgegrenzt.
     Ansonsten hängt die Laufzeit aller drei Implementierungen bedingt von der Größenordnung der Eingabewerte ab, daher wurde die Laufzeitmessung für die beiden Intervalle jeweils mit repräsentativen Werten verschiedener Größenordnungen durchgeführt.
     Die Methoden wurden mit 10 verschiedenen Werten jeweils 100.000.000-fach aufgerufen, um das arithmetische Mittel der Zeit für einen Funktionsaufruf zu ermitteln.
-
-    \subsubsection{Zeitmessung der Implementierungen}
 
     Abb. 6 zeigt die durchschnittliche Laufzeit eines Funktionsaufrufs der drei Implementierungen mit Reihenentwicklung, Tabellen-Lookup und der Implementierung mithilfe komplexer Instruktionen der C-math-library in Nanosekunden:
 
@@ -382,8 +384,8 @@
     Diese Berechnung wird bei Optimierungsstufe $-O3$ so stark optimiert, dass sie sogar bei $10^{12}$ Iterationen eine Laufzeit nahe Null aufweist.
     Für den Großteil der Werte deren Betrag kleiner ist als $10^{16}$ sind allerdings neben der Logarithmus berechnung zudem Multiplikation, Addition und Wurzelberechnung für die exakte Berechnung erforderlich, wodurch die Funktion in diesem Intervall eine durchschnittliche Laufzeit von rund 1.648 ns hat.
 
-    Die Lookup-Tabelle hat für alle reellen Eingabewerte deine ähnliche Laufzeit von 2.613 ns, da die Berechnung unabhängig von der Höhe des Eingabewerts ist.
-    Durch die effiziente Hashfunktion mittels Bitmaske, die für das Mapping der Eingabewerte auf den jeweiligen Tabellenwert verwendet wird, ist diese Implementierung lediglich um den Faktor 1,5 langsamer, als der worst-case Laufzeit der Implementierung mit komplexen Instruktionen.
+    Die Lookup-Tabelle hat für alle reellen Eingabewerte eine ähnliche Laufzeit von 2.613 ns, da die Berechnung unabhängig von der Höhe des Eingabewerts ist.
+    Durch die effiziente Hashfunktion mittels Bitmaske, die für das Mapping der Eingabewerte auf den jeweiligen Tabellenwert verwendet wird, ist diese Implementierung lediglich um den Faktor 1,5 langsamer, als die worst-case Laufzeit der Implementierung mit komplexen Instruktionen.
     Neben der Hashfunktion werden wenige einfache Instruktionen für die lineare Interpolation benötigt, was ebenfalls zu der hohen Performanz dieser Implementierung beiträgt.
 
     Im Vergleich zu der Lookup-Tabelle, braucht die reine Reihenentwicklung für die definierte Anzahl berechneter Reihenglieder mit 6.369 ns 2.5-mal so lange wie die Lookup-Tabelle.
