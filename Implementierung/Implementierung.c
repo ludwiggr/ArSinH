@@ -266,7 +266,7 @@ int main(int argc, char *argv[]) {
     /*regular calculation of the function with specified Implementation*/
     if (!relativeError && iterations == 0) {
         double result = calculate_result(number, implementation);
-        printf("Calculating arsinh(%f) with implementation number %li results in %.*g.\n", number, implementation, 20,
+        printf("Calculating arsinh(%.15g) with implementation number %li results in %.15g.\n", number, implementation,
                result);
         if (implementation == 1 && (number < -1. || number > 1.)) {
             printf("WARNING: The Taylor Series of Arsinh only provides meaningful results within its convergence zone [-1; 1].\n");
@@ -277,14 +277,14 @@ int main(int argc, char *argv[]) {
         /*calculation of relative error for specified implementation*/
     else if (relativeError) {
         double error = relative_error(number, implementation);
-        printf("The relative error when calculating arsinh(%f) with implementation number %ld was %.*f\n", number,
-               implementation, 15, error);
+        printf("The relative error when calculating arsinh(%.15g) with implementation number %ld was %.15g\n", number,
+               implementation, error);
         return EXIT_SUCCESS;
     }
         /*runtime measurement for specified iterations and implementation*/
     else {
         double time = performance(iterations, number, implementation);
-        printf("The measured runtime of %ld iterations of implementation number %ld was %f seconds.\n", iterations,
+        printf("The measured runtime of %ld iterations of implementation number %ld was %.15g seconds.\n", iterations,
                implementation, time);
         if (iterations < 100000000) {
             printf("WARNING: Using less than 100000000 iterations is not recommended. \nThe program might not run long enough to provide meaningful measurements.");
