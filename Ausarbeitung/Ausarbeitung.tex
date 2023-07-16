@@ -93,7 +93,7 @@
 
     \[
         \textit{\textbf{TaylorArsinh}}\coloneqq arsinh(x) = \sum_{k = 0}^{\infty} \frac{(2k-1)!!(-x^2)^k}{(2k)!!(2k + 1)}
-        = \sum_{k = 0}^{\infty} \frac{(-1)^k(2k)!x^{2k + 1}}{(2k + 1)(2^k*k!)^2}
+        = \sum_{k = 0}^{\infty} \frac{(-1)^k(2k)!x^{2k + 1}}{(2k + 1)(2^k \cdot k!)^2}
     \]
 
     Das Auflösen der Doppelfakultäten liefert eine leichter implementierbare Formel.
@@ -128,7 +128,7 @@
     Wir betrachten zunächst \textit{TaylorArsinh}:
     Das k-te Reihenglied hat den Betrag
     \[
-        \frac{(2k)!}{(2k + 1)(2^k*k!)^2}\cdot x^{2k+1}
+        \frac{(2k)!}{(2k + 1)(2^k \cdot k!)^2}\cdot x^{2k+1}
     \]
     Aus dieser Formel lässt sich bereits ablesen, dass der Betrag des k-ten Reihengliedes kleiner ist, je kleiner $|x|$ ist.
     Die Reihe liefert demnach bereits mit weniger Reihengliedern genaue Ergebnisse, je näher x an 0 liegt.
