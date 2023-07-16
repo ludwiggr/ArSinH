@@ -161,20 +161,20 @@ int main(int argc, char *argv[]) {
                     if (endptr == optarg || *endptr != '\0') {
                         fprintf(stderr, "%s could not be converted to long.\nArgument may only contain digits 0-9.\n",
                                 optarg);
-                        printf("If you wanted to parse the input value for the arsinh function, please don't parse it directly after the -B flag.\n");
+                        printf("If you wanted to pass the input value for the arsinh function, please don't pass it directly after the -B flag.\n");
                         return EXIT_FAILURE;
                     } else if (errno == ERANGE) {
                         fprintf(stderr,
                                 "%s over- or underflows long. \nTo choose the iterations of the function, select a number between 1 and %li.\n",
                                 optarg, maxNumberOfIterations);
-                        printf("If you wanted to parse the input value for the arsinh function, please don't parse it directly after the -B flag.\n");
+                        printf("If you wanted to pass the input value for the arsinh function, please don't pass it directly after the -B flag.\n");
 
                         return EXIT_FAILURE;
                     } else if (iterations < 0 || iterations > maxNumberOfIterations) {
                         fprintf(stderr,
                                 "%li is not a valid number of repetitions of the function call.\nChoose a value between 1 and %li.\n",
                                 iterations, maxNumberOfIterations);
-                        printf("If you wanted to parse the input value for the arsinh function, please don't parse it directly after the -B flag.\n");
+                        printf("If you wanted to pass the input value for the arsinh function, please don't pass it directly after the -B flag.\n");
                         return EXIT_FAILURE;
                     }
                 }
@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
                 return EXIT_SUCCESS;
 
                 /*if the - is followed by one of these chars, we assume that
-                the user might want to parse a negative number as a positional argument*/
+                the user might want to pass a negative number as a positional argument*/
             case '0'  :
             case '1'  :
             case '2'  :
@@ -222,7 +222,7 @@ int main(int argc, char *argv[]) {
                     printf("datatype double has to be in range +/- 1.7E +/-308.\n");
                     return EXIT_FAILURE;
                 }
-                /*only sets the new parsed number, if no negative number has been parsed yet*/
+                /*only sets the new passed number, if no negative number has been parsed yet*/
                 if (!negativeNumber_Set) {
                     negativeNumber_Set = true;
                     negativeNumber_Index = optind;
