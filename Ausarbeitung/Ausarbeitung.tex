@@ -89,7 +89,7 @@
     Die Berechnungen werden im Folgenden näher erläutert:
 
     \subsubsection{Reihendarstellung für $|x|\leq 1$}
-    Für $|x| \leq 1$ wird die Taylor-Reihe des $arsinh(x)$ um den Entwicklungspunkt 0 verwendet:
+    Für $|x| \leq 1$ wird die Taylor-Reihe des $arsinh(x)$ um den Entwicklungspunkt 0 \cite{taylor_series} verwendet:
 
     \[
         \textit{\textbf{TaylorArsinh}}\coloneqq arsinh(x) = \sum_{k = 0}^{\infty} \frac{(2k-1)!!(-x^2)^k}{(2k)!!(2k + 1)}
@@ -103,15 +103,15 @@
     \[
         arsinh(x) = \ln(x + \sqrt{x^2 + 1}) = \ln(2x) + error(x)
     \]
-    Der Fehler dieser Näherung kann durch eine dritte Reihe berechnet werden, die vor allem für den Funktionswert von Eingabewerten $|x| < 2^{8}$ notwendig ist:
-    \[
-        \textit{\textbf{Restreihe}}\coloneqq error(x) =  \sum_{k = 1}^{\infty} \frac{(-1)^{k - 1}(2k)!}{2k(2^k\cdot k!)^2} \cdot \frac{1}{x^{2k}}
-    \]
 
-    Für die Berechnung von $\ln(2x)$ wird die Taylor-Reihe des natürlichen Logarithmus um den Entwicklungspunkt 1 verwendet.
+    Für die Berechnung von $\ln(2x)$ wird die Taylor-Reihe des natürlichen Logarithmus um den Entwicklungspunkt 1\cite{taylor_series} verwendet.
     Es ist zu beachten, dass diese Reihe ausschließlich im Wertebereich $[0, 2]$ konvergiert.
     \[
         \textbf{\textit{TaylorLn}}\coloneqq\ln(x) = \sum_{k = 1}^{\infty} \frac{(-1)^{k + 1}}{k}(x - 1)^k
+    \]
+    Der Fehler dieser Näherung kann durch eine dritte Reihe\cite{rest_series} berechnet werden, die vor allem für den Funktionswert von Eingabewerten $|x| < 2^{8}$ notwendig ist:
+    \[
+        \textit{\textbf{Restreihe}}\coloneqq error(x) =  \sum_{k = 1}^{\infty} \frac{(-1)^{k - 1}(2k)!}{2k(2^k\cdot k!)^2} \cdot \frac{1}{x^{2k}}
     \]
 
     \subsubsection{Optimierungen: Genauigkeit und Performanz}
@@ -143,7 +143,7 @@
 
     \subsection{Reine Reihendarstellung}\label{subsec:reine-reihendarstellung}
 
-    Es stellt sich die Frage, ob die Reihenentwicklung für $|x|\geq1$ oder $|x|\leq1$ verwendet werden sollte. Hierzu muss zwischen Genauigkeit und Konvergenzbereich abgewägt werden.
+    Es stellt sich die Frage, ob die Reihenentwicklung für $|x|\geq1$ oder $|x|\leq1$ verwendet werden sollte. Hierzu muss zwischen Genauigkeit und Nützlichkeit des Konvergenzbereichs abgewägt werden.
 
     Da im Datentyp double für $|x|<1$ gleich viele Werte existieren wie für $|x|\geq1$, beinhaltet der Konvergenzbereich der Reihen für die beiden Intervalle gleich viele mögliche double-Eingabewerte.
 
@@ -200,8 +200,8 @@
         arsinh(x) \approx \frac{x-x_i}{x_{i+1} - x_i}\cdot (y_{i+1}-y_i) + y_i
     \]
     linear interpoliert.
-    Für negative Werte wird die Punktsymmetrie der $arsinh$-Funktion: $arsinh(-x) = -arsinh(x)$ genutzt.
-    Die Funktionswerte für negative Eingabewerte können per Fallunterscheidung mit $-arsinh(|x|)$ berechnet werden, wodurch weniger Werte gespeichert werden müssen.
+    Für negative Werte wird die Punktsymmetrie der $arsinh$-Funktion: $arsinh(-x) = -arsinh(x)$ genutzt\cite{properties}.
+    Die Funktionswerte für negative Eingabewerte können per Fallunterscheidung mit $-arsinh(-x)$ berechnet werden, wodurch weniger Werte gespeichert werden müssen.
 
     \subsection{Implementierung mit komplexen Instruktionen}
     Die Vergleichsimplementierung kann unter Verwendung der C-Mathematikbibliothek die Formel $\ln{x+\sqrt{x^2+1}}$ direkt umsetzen. Ab etwa $|x|>10^{16}$ muss allerdings die Näherung $arsinh(x)\approx \ln{2x}$ herangezogen werden um double Overflows bei der Quadrierung zu vermeiden.
