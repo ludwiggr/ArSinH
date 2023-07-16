@@ -142,7 +142,7 @@ double approxXAboveOne(double x) {
 double approxArsinh_series_V2(double x) {
     if (x == -INFINITY || x == INFINITY || x == NAN || x == -NAN) {
         return x;
-    } else if (x >= 1 || x <= -1) {
+    } else if (x > 1 || x < -1) {
         return approxXAboveOne(x);
     } else {
         return approxArsinh_series(x);
