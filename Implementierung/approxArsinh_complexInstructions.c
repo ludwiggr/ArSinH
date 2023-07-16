@@ -13,6 +13,9 @@ double approxArsinh_complexInstructions(double x) {
     if (x > 1e16) {
         return log(2) + log(x);
     }
+    if (x < -1e16) {
+        return -log(2) - log(-x);
+    }
     return log(x + sqrt(x * x + 1));
 }
 
