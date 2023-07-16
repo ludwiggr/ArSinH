@@ -22,7 +22,7 @@ double approxArsinh_series(double x) {
     double sum = 0;
     double prev = x;
     double Sqr = x * x;
-    for (size_t k = 0; k <= iterations; k++) {
+    for (size_t k = 0; k < iterations; k++) {
         sum += prev * coeffs_below[k];
         prev *= Sqr;
     }
