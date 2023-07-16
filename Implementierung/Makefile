@@ -23,3 +23,4 @@ clean:
 
 # Source/Reference: https://www.gnu.org/software/make/manual/make.html
 # Source/Reference: https://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
+# Source/Reference: https://stackoverflow.com/questions/60353633/how-to-include-d-posix-c-source-200809-when-you-compile-the-code
